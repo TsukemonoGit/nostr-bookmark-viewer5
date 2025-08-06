@@ -135,6 +135,14 @@
 			{/if}
 		</div>
 		<div class="mb-4 flex items-center justify-between">
+			<label class="flex items-center space-x-2">
+				<input
+					type="checkbox"
+					class="form-checkbox"
+					onchange={toggleSelectAll}
+					checked={tagsToDisplay.length > 0 && selectedTags.length === tagsToDisplay.length}
+				/> <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択</span>
+			</label>
 			<div class="flex items-center space-x-2">
 				<button
 					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
@@ -153,14 +161,6 @@
 					非公開
 				</button>
 			</div>
-			<label class="flex items-center space-x-2">
-				<input
-					type="checkbox"
-					class="form-checkbox"
-					onchange={toggleSelectAll}
-					checked={tagsToDisplay.length > 0 && selectedTags.length === tagsToDisplay.length}
-				/> <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択</span>
-			</label>
 		</div>
 		<div class="space-y-2">
 			{#each tagsToDisplay as tag}
@@ -203,35 +203,36 @@
 		ブックマークが選択されていません
 	</div>
 {/if}
-
-<div
-	class="fixed right-4 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-900 p-4 text-white shadow-xl dark:bg-neutral-900"
->
-	<div class="flex items-center space-x-2">
-		{#if selectedTags.length > 0}
-			<span class="text-sm font-bold">
-				{selectedTags.length}個選択中
-			</span>
-		{/if}
+{#if selectedItem}
+	<div
+		class="fixed right-4 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-900 p-4 text-white shadow-xl dark:bg-neutral-900"
+	>
+		<div class="flex items-center space-x-2">
+			{#if selectedTags.length > 0}
+				<span class="text-sm font-bold">
+					{selectedTags.length}個選択中
+				</span>
+			{/if}
+			<button
+				onclick={deleteSelectedTags}
+				disabled={selectedTags.length === 0}
+				class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:bg-red-300 dark:disabled:bg-red-700"
+			>
+				削除
+			</button>
+			<button
+				onclick={moveSelectedTags}
+				disabled={selectedTags.length === 0}
+				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-700"
+			>
+				他のリストへ移動
+			</button>
+		</div>
 		<button
-			onclick={deleteSelectedTags}
-			disabled={selectedTags.length === 0}
-			class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:bg-red-300 dark:disabled:bg-red-700"
+			onclick={addNewTag}
+			class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700"
 		>
-			削除
-		</button>
-		<button
-			onclick={moveSelectedTags}
-			disabled={selectedTags.length === 0}
-			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-700"
-		>
-			他のリストへ移動
+			タグを追加
 		</button>
 	</div>
-	<button
-		onclick={addNewTag}
-		class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700"
-	>
-		タグを追加
-	</button>
-</div>
+{/if}
