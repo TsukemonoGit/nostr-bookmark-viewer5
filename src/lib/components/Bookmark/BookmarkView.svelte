@@ -47,6 +47,7 @@
 	];
 
 	$effect(() => {
+		isPrivate;
 		if (selectedItem) {
 			untrack(async () => {
 				selectedTagIds = new Set(); // 新しいSetで置き換える
@@ -58,6 +59,7 @@
 
 	$effect(() => {
 		isSorting;
+
 		untrack(() => {
 			//モードが変わったらリセット
 			tagsToDisplay = [...originalTags];
