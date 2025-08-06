@@ -18,12 +18,10 @@
 
 	// 全て選択/選択解除を切り替える関数
 	function toggleSelectAll() {
-		if (selectedTags.length === selectedItem?.event.tags.length) {
-			// 全て選択されている場合は、全て解除
+		if (selectedItem && selectedTags.length === selectedItem.event.tags.length) {
 			selectedTags = [];
 		} else {
-			// 全て選択されていない場合は、全て選択
-			selectedTags = [...(selectedItem?.event.tags || [])];
+			selectedTags = selectedItem ? [...selectedItem.event.tags] : [];
 		}
 	}
 
@@ -43,16 +41,25 @@
 
 	// 選択したタグを削除する関数 (ダミー)
 	function deleteSelectedTags() {
-		alert(`以下のタグを削除します: ${JSON.stringify(selectedTags)}`);
+		alert(`${selectedTags.length}個のタグを削除します。`);
 		// ここに実際の削除ロジックを実装
 		selectedTags = [];
 	}
 
 	// 選択したタグを他のリストへ移動する関数 (ダミー)
 	function moveSelectedTags() {
-		alert(`以下のタグを他のリストへ移動します: ${JSON.stringify(selectedTags)}`);
+		alert(`${selectedTags.length}個のタグを他のリストへ移動します。`);
 		// ここに実際の移動ロジックを実装
 		selectedTags = [];
+	}
+
+	// 新しいタグを追加する関数 (ダミー)
+	function addNewTag() {
+		const newTag = prompt('新しいタグを入力してください:');
+		if (newTag) {
+			alert(`新しいタグ "${newTag}" を追加します。`);
+			// ここに実際のタグ追加ロジックを実装
+		}
 	}
 </script>
 
@@ -75,7 +82,7 @@
 					<h2
 						class="mb-2 text-2xl font-bold text-neutral-900 dark:text-white"
 						style=" white-space: pre-wrap;
-    word-break: break-word;"
+		word-break: break-word;"
 					>
 						{selectedItem.title}
 					</h2>
@@ -84,7 +91,7 @@
 					<p
 						class="text-neutral-600 dark:text-neutral-300"
 						style=" white-space: pre-wrap;
-    word-break: break-word;"
+		word-break: break-word;"
 					>
 						{selectedItem.description}
 					</p>
@@ -96,7 +103,7 @@
 			<span
 				class="rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
 				style=" white-space: pre-wrap;
-    word-break: break-word;">ID: {selectedItem.atag}</span
+		word-break: break-word;">ID: {selectedItem.atag}</span
 			>
 			{#if selectedItem.identifier}
 				<span
@@ -116,61 +123,41 @@
 						selectedTags.length === selectedItem.event.tags.length &&
 						selectedTags.length > 0}
 				/>
-				<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択/解除</span
-				>
+				<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択</span>
 			</label>
-			<div class="flex space-x-2">
-				<button
-					onclick={deleteSelectedTags}
-					disabled={selectedTags.length === 0}
-					class="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white disabled:bg-red-300 dark:disabled:bg-red-700"
-				>
-					削除
-				</button>
-				<button
-					onclick={moveSelectedTags}
-					disabled={selectedTags.length === 0}
-					class="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white disabled:bg-blue-300 dark:disabled:bg-blue-700"
-				>
-					他のリストへ移動
-				</button>
-			</div>
 		</div>
 
 		<div class="space-y-2">
 			{#each selectedItem?.event.tags as tag, index}
-				{#if tag[0] !== 'd'}<!--dタグは操作不可-->
-					<div
-						class="flex items-center space-x-4 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
-						style=" white-space: pre-wrap;
-    word-break: break-word;"
-					>
-						<input
-							type="checkbox"
-							class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
-							checked={isTagSelected(tag)}
-							onchange={() => handleCheckboxChange(tag)}
-						/>
-						<div class="flex-1">
-							{#if tag[0] === 'e'}
-								<NoteEvent {tag} />
-							{:else if tag[0] === 'a'}
-								<NaddrEvent {tag} />
-							{:else if tag[0] === 'r'}
-								{#if tag[1].startsWith('ws')}
-									<Relay {tag} />
-								{:else}
-									<Url {tag} />
-								{/if}
-							{:else if tag[0] === 't'}
-								<Hashtag {tag} />
+				<div
+					class="flex items-center space-x-4 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+					style=" white-space: pre-wrap;
+		word-break: break-word;"
+				>
+					<input
+						type="checkbox"
+						class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+						checked={isTagSelected(tag)}
+						onchange={() => handleCheckboxChange(tag)}
+					/>
+					<div class="flex-1">
+						{#if tag[0] === 'e'}
+							<NoteEvent {tag} />
+						{:else if tag[0] === 'a'}
+							<NaddrEvent {tag} />
+						{:else if tag[0] === 'r'}
+							{#if tag[1].startsWith('ws')}
+								<Relay {tag} />
 							{:else}
-								{tag}
+								<Url {tag} />
 							{/if}
-						</div>
-						<!--  <TagControll {tag} {index} /> -->
+						{:else if tag[0] === 't'}
+							<Hashtag {tag} />
+						{:else}
+							{tag}
+						{/if}
 					</div>
-				{/if}
+				</div>
 			{/each}
 		</div>
 	</div>
@@ -181,3 +168,35 @@
 		ブックマークが選択されていません
 	</div>
 {/if}
+
+<div
+	class="fixed right-4 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-900 p-4 text-white shadow-xl dark:bg-neutral-900"
+>
+	<div class="flex items-center space-x-2">
+		{#if selectedTags.length > 0}
+			<span class="text-sm font-bold">
+				{selectedTags.length}個選択中
+			</span>
+		{/if}
+		<button
+			onclick={deleteSelectedTags}
+			disabled={selectedTags.length === 0}
+			class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:bg-red-300 dark:disabled:bg-red-700"
+		>
+			削除
+		</button>
+		<button
+			onclick={moveSelectedTags}
+			disabled={selectedTags.length === 0}
+			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-700"
+		>
+			他のリストへ移動
+		</button>
+	</div>
+	<button
+		onclick={addNewTag}
+		class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700"
+	>
+		タグを追加
+	</button>
+</div>
