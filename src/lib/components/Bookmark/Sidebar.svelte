@@ -42,7 +42,7 @@
 
 			{#if key === 'Bookmarksets'}
 				<button
-					class="flex w-full items-center gap-1 rounded-md bg-neutral-200 px-4 py-2 text-left font-semibold text-neutral-800 transition-colors hover:bg-neutral-300 active:bg-neutral-400"
+					class="mb-2 flex w-full items-center gap-1 rounded-md bg-neutral-200 px-4 py-2 text-left font-semibold text-neutral-800 transition-colors hover:bg-neutral-300 active:bg-neutral-400"
 					onclick={() => console.log('新しいブックマークリストを作成')}
 				>
 					<Plus size="20" />New Bookmark List

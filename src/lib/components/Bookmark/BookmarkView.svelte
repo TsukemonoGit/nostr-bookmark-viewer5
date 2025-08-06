@@ -5,62 +5,88 @@
 	import NaddrEvent from '../Tags/NaddrEvent.svelte';
 	import NoteEvent from '../Tags/NoteEvent.svelte';
 	import Url from '../Tags/Url.svelte';
-	import { bookmarkableTagsSet } from '$lib/utils/constants';
+
+	import { untrack } from 'svelte';
 
 	interface Props {
 		selectedItem: BookmarkItem | null;
 	}
 
-	let { selectedItem }: Props = $props();
+	let { selectedItem }: Props = $props(); // 公開/非公開の表示を切り替えるステート
 
-	// 選択されたタグを管理する配列
-	let selectedTags: string[][] = $state([]);
+	let isPrivate = $state(false); // 選択されたタグを管理する配列
+
+	let selectedTags: string[][] = $state([]); // 表示するタグの配列を返すリアクティブな関数
+
+	let tagsToDisplay: string[][] = $state([]);
+	$effect(() => {
+		const pri = isPrivate; //isPrivategが変わったら更新
+		if (selectedItem) {
+			untrack(async () => {
+				selectedTags = []; //isPrivategが変わったら、selectedItemが変わったら選択をリセット
+				tagsToDisplay = await getTagsToDisplay();
+			});
+		}
+	});
+	async function getTagsToDisplay(): Promise<string[][]> {
+		if (!selectedItem) {
+			return [];
+		}
+		if (isPrivate) {
+			if (!selectedItem) return [];
+			try {
+				const decryptedContent = await window.nostr?.nip04?.decrypt(
+					selectedItem.event.pubkey,
+					selectedItem.event.content
+				);
+				if (!decryptedContent) return [];
+				return JSON.parse(decryptedContent) as string[][];
+			} catch (error) {
+				return [];
+			}
+		}
+		return selectedItem.event.tags;
+	}
 
 	// 全て選択/選択解除を切り替える関数
+
 	function toggleSelectAll() {
-		if (selectedItem && selectedTags.length === selectedItem.event.tags.length) {
+		if (selectedTags.length === tagsToDisplay.length) {
 			selectedTags = [];
 		} else {
-			selectedTags = selectedItem ? [...selectedItem.event.tags] : [];
+			selectedTags = [...tagsToDisplay];
 		}
-	}
+	} // タグが選択されているかチェックする関数
 
-	// タグが選択されているかチェックする関数
 	function isTagSelected(tag: string[]) {
 		return selectedTags.some((t) => t[0] === tag[0] && t[1] === tag[1]);
-	}
+	} // チェックボックスの状態が変更されたときに呼ばれる関数
 
-	// チェックボックスの状態が変更されたときに呼ばれる関数
 	function handleCheckboxChange(tag: string[]) {
 		if (isTagSelected(tag)) {
 			selectedTags = selectedTags.filter((t) => t[0] !== tag[0] || t[1] !== tag[1]);
 		} else {
 			selectedTags = [...selectedTags, tag];
 		}
-	}
+	} // 選択したタグを削除する関数 (ダミー)
 
-	// 選択したタグを削除する関数 (ダミー)
 	function deleteSelectedTags() {
 		alert(`${selectedTags.length}個のタグを削除します。`);
-		// ここに実際の削除ロジックを実装
 		selectedTags = [];
-	}
+	} // 選択したタグを他のリストへ移動する関数 (ダミー)
 
-	// 選択したタグを他のリストへ移動する関数 (ダミー)
 	function moveSelectedTags() {
 		alert(`${selectedTags.length}個のタグを他のリストへ移動します。`);
-		// ここに実際の移動ロジックを実装
 		selectedTags = [];
-	}
+	} // 新しいタグを追加する関数 (ダミー)
 
-	// 新しいタグを追加する関数 (ダミー)
 	function addNewTag() {
 		const newTag = prompt('新しいタグを入力してください:');
 		if (newTag) {
 			alert(`新しいタグ "${newTag}" を追加します。`);
-			// ここに実際のタグ追加ロジックを実装
 		}
 	}
+	$inspect(selectedTags);
 </script>
 
 {#if selectedItem}
@@ -81,8 +107,7 @@
 				{#if selectedItem.title}
 					<h2
 						class="mb-2 text-2xl font-bold text-neutral-900 dark:text-white"
-						style=" white-space: pre-wrap;
-		word-break: break-word;"
+						style=" white-space: pre-wrap; word-break: break-word;"
 					>
 						{selectedItem.title}
 					</h2>
@@ -90,20 +115,17 @@
 				{#if selectedItem.description}
 					<p
 						class="text-neutral-600 dark:text-neutral-300"
-						style=" white-space: pre-wrap;
-		word-break: break-word;"
+						style=" white-space: pre-wrap; word-break: break-word;"
 					>
 						{selectedItem.description}
 					</p>
 				{/if}
 			</div>
 		</div>
-
 		<div class="mb-6 flex flex-wrap gap-4 text-sm text-neutral-500 dark:text-neutral-400">
 			<span
 				class="rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
-				style=" white-space: pre-wrap;
-		word-break: break-word;">ID: {selectedItem.atag}</span
+				style=" white-space: pre-wrap; word-break: break-word;">ID: {selectedItem.atag}</span
 			>
 			{#if selectedItem.identifier}
 				<span
@@ -112,52 +134,65 @@
 				>
 			{/if}
 		</div>
-
 		<div class="mb-4 flex items-center justify-between">
+			<div class="flex items-center space-x-2">
+				<button
+					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
+						? 'bg-neutral-200 dark:bg-neutral-700'
+						: 'bg-blue-500 text-white'}"
+					onclick={() => (isPrivate = false)}
+				>
+					公開
+				</button>
+				<button
+					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
+						? 'bg-blue-500 text-white'
+						: 'bg-neutral-200 dark:bg-neutral-700'}"
+					onclick={() => (isPrivate = true)}
+				>
+					非公開
+				</button>
+			</div>
 			<label class="flex items-center space-x-2">
 				<input
 					type="checkbox"
 					class="form-checkbox"
 					onchange={toggleSelectAll}
-					checked={selectedItem &&
-						selectedTags.length === selectedItem.event.tags.length &&
-						selectedTags.length > 0}
-				/>
-				<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択</span>
+					checked={tagsToDisplay.length > 0 && selectedTags.length === tagsToDisplay.length}
+				/> <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">全て選択</span>
 			</label>
 		</div>
-
 		<div class="space-y-2">
-			{#each selectedItem?.event.tags as tag, index}
-				<div
-					class="flex items-center space-x-4 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
-					style=" white-space: pre-wrap;
-		word-break: break-word;"
-				>
-					<input
-						type="checkbox"
-						class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
-						checked={isTagSelected(tag)}
-						onchange={() => handleCheckboxChange(tag)}
-					/>
-					<div class="flex-1">
-						{#if tag[0] === 'e'}
-							<NoteEvent {tag} />
-						{:else if tag[0] === 'a'}
-							<NaddrEvent {tag} />
-						{:else if tag[0] === 'r'}
-							{#if tag[1].startsWith('ws')}
-								<Relay {tag} />
+			{#each tagsToDisplay as tag}
+				{#if tag[0] !== 'd'}<!--dtagは無視-->
+					<div
+						class="flex items-center space-x-4 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+						style=" white-space: pre-wrap; word-break: break-word;"
+					>
+						<input
+							type="checkbox"
+							class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+							checked={isTagSelected(tag)}
+							onchange={() => handleCheckboxChange(tag)}
+						/>
+						<div class="flex-1">
+							{#if tag[0] === 'e'}
+								<NoteEvent {tag} />
+							{:else if tag[0] === 'a'}
+								<NaddrEvent {tag} />
+							{:else if tag[0] === 'r'}
+								{#if tag[1].startsWith('ws')}
+									<Relay {tag} />
+								{:else}
+									<Url {tag} />
+								{/if}
+							{:else if tag[0] === 't'}
+								<Hashtag {tag} />
 							{:else}
-								<Url {tag} />
+								{tag}
 							{/if}
-						{:else if tag[0] === 't'}
-							<Hashtag {tag} />
-						{:else}
-							{tag}
-						{/if}
-					</div>
-				</div>
+						</div>
+					</div>{/if}
 			{/each}
 		</div>
 	</div>
