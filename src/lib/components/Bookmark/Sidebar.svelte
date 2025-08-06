@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bookmarkItemsMap } from '$lib/types/bookmark.svelte';
-	import { Plus } from '@lucide/svelte';
+	import { Plus, Trash2 } from '@lucide/svelte'; // Trash2をインポート
 
 	interface Props {
 		selectedAtag: string | null;
@@ -24,6 +24,13 @@
 		selectedAtag = atag;
 		onItemSelect?.();
 	}
+
+	// 削除処理用の関数を定義
+	function handleDeleteItem(atag: string) {
+		// ここに削除ロジックを実装
+		// 例: itemsから該当アイテムを削除する、APIを呼び出すなど
+		console.log(`アイテム ${atag} を削除します`);
+	}
 </script>
 
 <nav class="h-full overflow-y-auto p-2 text-sm">
@@ -44,13 +51,20 @@
 
 			<ul class="space-y-1">
 				{#each store as item}
-					<li>
+					<li class="group flex items-center justify-between">
 						<button
 							onclick={() => handleItemClick(item.atag)}
-							class="w-full rounded px-2 py-1 text-left transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-800"
+							class="flex-1 rounded px-2 py-1 text-left transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-800"
 							class:selected={selectedAtag === item.atag}
 						>
 							{item.title || item.identifier || item.event.kind}
+						</button>
+						<button
+							onclick={() => handleDeleteItem(item.atag)}
+							class="rounded p-1 text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500 hover:text-white"
+							aria-label="Delete"
+						>
+							<Trash2 size="16" />
 						</button>
 					</li>
 				{/each}
