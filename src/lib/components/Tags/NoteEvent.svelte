@@ -56,4 +56,6 @@
 			<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 		{/if}
 	</div>
+{:else}
+	<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 {/if}
