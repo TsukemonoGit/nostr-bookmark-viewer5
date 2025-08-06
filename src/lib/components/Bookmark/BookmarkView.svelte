@@ -11,6 +11,7 @@
 	import { Select } from 'bits-ui';
 	import Url from '../Tags/Url.svelte';
 	import { ChevronsUpDown } from '@lucide/svelte';
+	import { formatAbsoluteDateFromUnix } from '$lib/utils/util';
 
 	interface Props {
 		selectedItem: BookmarkItem | null;
@@ -234,6 +235,11 @@
 					識別子: {selectedItem.identifier}
 				</span>
 			{/if}
+			<span
+				class="rounded-md bg-gray-50 px-3 py-1.5 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+			>
+				更新日時: {formatAbsoluteDateFromUnix(selectedItem.event.created_at)}
+			</span>
 		</div>
 		<div class="mb-4 flex items-center justify-between">
 			<Select.Root
