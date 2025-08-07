@@ -3,7 +3,9 @@
 	import BookmarkView from '$lib/components/Bookmark/BookmarkView.svelte';
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 	import RelayStatus from '$lib/components/RelayStatus.svelte';
+	import type { LayoutData } from './$types';
 
+	let { data }: { data: LayoutData } = $props();
 	let selectedAtag: string | null = $state(null);
 	let showMobileSidebar = $state(false);
 	//$inspect(selectedAtag);
@@ -27,7 +29,7 @@
 	<aside
 		class="hidden w-64 shrink-0 border-r border-neutral-300 bg-neutral-100 md:block dark:border-neutral-700 dark:bg-neutral-900"
 	>
-		<Sidebar bind:selectedAtag />
+		<Sidebar bind:selectedAtag pubkey={data.pubkey} />
 	</aside>
 
 	<!-- Mobile Layout Container -->
@@ -85,7 +87,7 @@
 
 			<!-- Sidebar Content -->
 			<div class="h-full overflow-y-auto">
-				<Sidebar bind:selectedAtag onItemSelect={closeMobileSidebar} />
+				<Sidebar bind:selectedAtag onItemSelect={closeMobileSidebar} pubkey={data.pubkey} />
 			</div>
 		</aside>
 	</div>
