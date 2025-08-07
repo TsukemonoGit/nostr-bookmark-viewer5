@@ -19,6 +19,7 @@
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
 	import { loginUser } from '$lib/utils/stores.svelte';
+	import CreateNewTag from './CreateNewTag.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -32,8 +33,8 @@
 	let isPrivate = $state(false);
 	let isSorting = $state(false);
 	let selectedTagIds = $state(new Set<string>());
-	let tagsToDisplay: DndTagItem[] = $state([]);
-	let displayTags: DndTagItem[] = $state([]);
+	let tagsToDisplay: DndTagItem[] = $state([]); //dとかフィルターする前の配列
+	let displayTags: DndTagItem[] = $state([]); //画面に出すものにフィルターした配列
 	let selectedCount = $derived(selectedTagIds.size);
 
 	let editingTitle = $state(false);
@@ -261,30 +262,41 @@
 		selectedTagIds = new Set();
 	}
 
-	function addNewTag() {
-		const newTagValue = prompt('新しいタグを入力してください:');
-		if (newTagValue?.trim()) {
-			const newId = `tag-new-${Date.now()}`;
-			const newTag: DndTagItem = {
-				id: newId,
-				tag: ['t', newTagValue.trim()]
-			};
-			tagsToDisplay = [...tagsToDisplay, newTag];
-			originalTags = $state.snapshot(tagsToDisplay);
-			alert(`新しいタグ "${newTagValue}" を追加しました。`);
+	async function addNewTag(tag: string[]) {
+		console.log('新しいタグが追加されました:', tag);
+
+		if (!selectedBookmark) {
+			toastStore.error({
+				title: 'エラー',
+				description: 'ブックマークが選択されていません。'
+			});
+			return;
+		}
+
+		// 新しいタグにユニークなIDを付与する
+		const newTagItem: DndTagItem = {
+			id: `${tagsToDisplay.length}`,
+			tag,
+			originalIndex: tagsToDisplay.length
+		};
+		const updatedTagsToDisplay = [...tagsToDisplay, newTagItem];
+		// 新しいタグリストから、イベントに保存するためのタグ配列を生成
+		const tagsToSave = updatedTagsToDisplay.map((item) => item.tag);
+
+		// イベントパラメータを作成
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			// イベントをパブリッシュ
+			await publishEvent(ev, 'タグ追加完了', 'タグ追加失敗');
 		}
 	}
 
 	function handleDndConsider(e: CustomEvent<{ items: DndTagItem[] }>) {
-		const updatedDisplayTags = e.detail.items;
-		const dTags = tagsToDisplay.filter((item) => item.tag[0] === 'd');
-		tagsToDisplay = [...(dTags || []), ...updatedDisplayTags];
+		tagsToDisplay = e.detail.items;
 	}
 
 	function handleDndFinalize(e: CustomEvent<{ items: DndTagItem[] }>) {
-		const updatedDisplayTags = e.detail.items;
-		const dTags = tagsToDisplay.filter((item) => item.tag[0] === 'd');
-		tagsToDisplay = [...(dTags || []), ...updatedDisplayTags];
+		tagsToDisplay = e.detail.items;
 	}
 
 	async function updateTags() {
@@ -363,6 +375,7 @@
 					>
 						{#if selectedBookmark.image && selectedBookmark.image.trim() !== ''}
 							<img
+								loading="lazy"
 								src={selectedBookmark.image}
 								alt={selectedBookmark.title || ''}
 								class="h-[240px] w-full rounded object-cover"
@@ -516,7 +529,7 @@
 						</Select.Content></Select.Portal
 					>
 				</Select.Root>{/if}
-			<div class="flex items-center space-x-2">
+			<div class="flex flex-wrap items-center justify-center gap-1">
 				<button
 					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
 						? 'bg-neutral-200 dark:bg-neutral-700'
@@ -657,12 +670,13 @@
 				</button>
 			{/if}
 		</div>
-		<button
+		<CreateNewTag onConformNewTag={addNewTag} />
+		<!-- <button
 			onclick={addNewTag}
 			class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
 		>
 			タグを追加
-		</button>
+		</button> -->
 	</div>
 {/if}
 
