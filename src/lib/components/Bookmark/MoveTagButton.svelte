@@ -50,16 +50,22 @@
 			<Dialog.Title
 				class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
 			>
-				Move bookmark to ？
+				ブックマークの移動先を選択
 			</Dialog.Title>
 			<Separator.Root class="bg-muted -mx-5 mt-5 mb-6 block h-px" />
 			<Dialog.Description class="text-foreground-alt text-sm"></Dialog.Description>
 			<div class="max-h-[min(24em,80vh)] overflow-y-auto">
 				{#each Object.entries(items) as [key, store]}
 					<h2 class="mb-2 text-2xl font-bold text-neutral-600 dark:text-neutral-400">
-						{key}
+						<!-- カテゴリ名を日本語に変換 -->
+						{#if key === 'BookmarkList'}
+							ブックマーク
+						{:else if key === 'Bookmarksets'}
+							ブックマークセット
+						{:else if key === 'Genericlists'}
+							その他のリスト
+						{/if}
 					</h2>
-
 					<ul class="space-y-1">
 						{#each store as item}
 							<li class="group flex items-center justify-between">
@@ -77,18 +83,20 @@
 			</div>
 			<div class="flex flex-wrap gap-2">
 				<button
+					type="button"
 					onclick={() => handleMove(false)}
 					disabled={disabled || !selectedListId}
-					class="mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
+					class="btn preset-filled-primary-500"
 				>
-					公開ブクマに移動
+					公開リストに移動
 				</button>
 				<button
+					type="button"
 					onclick={() => handleMove(true)}
 					disabled={disabled || !selectedListId}
-					class="mt-4 flex items-center justify-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
+					class="btn flex items-center gap-1 preset-filled-secondary-500"
 				>
-					<LockKeyhole />非公開ブクマに移動
+					<LockKeyhole />非公開リストに移動
 				</button>
 			</div>
 			<Dialog.Close

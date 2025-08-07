@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { BookmarkItem } from '$lib/types/bookmark.svelte';
+	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 	import Relay from '../Tags/Relay.svelte';
 	import Hashtag from '../Tags/Hashtag.svelte';
 	import NaddrEvent from '../Tags/NaddrEvent.svelte';
@@ -22,6 +22,7 @@
 	import CreateNewTag from './CreateNewTag.svelte';
 	import TagEditor from './TagEditor.svelte';
 	import MoveTagButton from './MoveTagButton.svelte';
+	import { get } from 'svelte/store';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -187,63 +188,6 @@
 		}
 	}
 
-	async function createEventParameters(tagsToSave: string[][]): Promise<EventParameters | null> {
-		if (!selectedBookmark) {
-			return null;
-		}
-
-		let ev: EventParameters;
-		if (isPrivate) {
-			try {
-				const tagsJson = JSON.stringify(tagsToSave);
-				const encryptedContent = await window.nostr?.nip04?.encrypt(
-					selectedBookmark.event.pubkey,
-					tagsJson
-				);
-				if (!encryptedContent) {
-					toastStore.error({
-						title: 'エラー',
-						description: 'タグの暗号化に失敗しました。'
-					});
-					return null;
-				}
-				ev = {
-					kind: selectedBookmark.event.kind,
-					created_at: Math.floor(Date.now() / 1000),
-					tags: $state.snapshot(selectedBookmark.event.tags),
-					content: encryptedContent
-				};
-			} catch (error) {
-				console.error('タグの更新中にエラーが発生しました (非公開):', error);
-				toastStore.error({
-					title: 'エラー',
-					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
-				});
-				return null;
-			}
-		} else {
-			const otherTags = tagsToSave.filter(
-				(tag) => !['d', 'title', 'description', 'image'].includes(tag[0])
-			);
-			const newTags: string[][] = [];
-			const dTag = selectedBookmark.event.tags.find((tag) => tag[0] === 'd');
-			if (dTag) newTags.push(dTag);
-			if (selectedBookmark.event.kind !== 10003) {
-				if (tempTitle) newTags.push(['title', tempTitle]);
-				if (tempDescription) newTags.push(['description', tempDescription]);
-				if (tempImage) newTags.push(['image', tempImage]);
-			}
-			newTags.push(...otherTags);
-			ev = {
-				kind: selectedBookmark.event.kind,
-				created_at: Math.floor(Date.now() / 1000),
-				tags: $state.snapshot(newTags),
-				content: selectedBookmark.event.content
-			};
-		}
-		return ev;
-	}
-
 	async function deleteSelectedTags() {
 		const selectedCount = selectedTagIds.size;
 		if (selectedCount === 0 || !selectedBookmark) return;
@@ -251,7 +195,8 @@
 		tagsToDisplay = tagsToDisplay.filter((item) => !selectedTagIds.has(item.id));
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '削除完了', '削除失敗');
 			originalTags = $state.snapshot(tagsToDisplay);
@@ -259,13 +204,104 @@
 		}
 	}
 
-	function moveSelectedTags(id: string, isPrv: boolean) {
-		console.log(id, isPrv);
-		const selectedCount = selectedTagIds.size;
-		if (selectedCount === 0) return;
+	async function moveSelectedTags(atag: string, isPrv: boolean) {
+		if (selectedCount === 0 || !selectedBookmark) {
+			toastStore.error({
+				title: 'エラー',
+				description: '移動するタグが選択されていません。'
+			});
+			return;
+		}
 
-		alert(`${selectedCount}個のタグを他のリストへ移動します。`);
-		selectedTagIds = new Set();
+		try {
+			// 1. 移動先のブックマークを取得
+			const destinationBookmarkMap = get(bookmarkItemsMap);
+			const destinationBookmark = destinationBookmarkMap.get(atag);
+
+			if (!destinationBookmark) {
+				toastStore.error({
+					title: 'エラー',
+					description: '移動先のブックマークが見つかりませんでした。'
+				});
+				return;
+			}
+
+			// 2. 移動するタグと、移動元に残すタグを抽出
+			const tagsToMove = tagsToDisplay.filter((item) => selectedTagIds.has(item.id));
+			const tagsToMoveAsArray = tagsToMove.map((item) => item.tag);
+			const remainingTags = tagsToDisplay.filter((item) => !selectedTagIds.has(item.id));
+			const remainingTagsAsArray = remainingTags.map((item) => item.tag);
+
+			// 3. 移動先の新しいタグリストを準備
+			let destinationTagsToSave: string[][] = [];
+
+			if (isPrv) {
+				// 非公開の場合: 既存のcontentがある場合は復号し、tagsToMoveを追加する
+				const content = destinationBookmark.event.content;
+				if (content) {
+					const decryptedContent = await window.nostr?.nip04?.decrypt(
+						destinationBookmark.event.pubkey,
+						content
+					);
+					if (!decryptedContent) {
+						toastStore.error({
+							title: 'エラー',
+							description: '既存の非公開タグの復号に失敗しました。'
+						});
+						return;
+					}
+
+					const existingTags = JSON.parse(decryptedContent) as string[][];
+					destinationTagsToSave = $state.snapshot([...existingTags, ...tagsToMoveAsArray]);
+				} else {
+					destinationTagsToSave = $state.snapshot(tagsToMoveAsArray);
+				}
+			} else {
+				// 公開の場合: 既存のtagsにtagsToMoveを追加する
+				destinationTagsToSave = $state.snapshot([
+					...destinationBookmark.event.tags,
+					...tagsToMoveAsArray
+				]);
+			}
+
+			// 4. 移動先のイベントを作成
+			const destinationEventParams = await createEventParametersForBookmark(
+				destinationBookmark,
+				destinationTagsToSave,
+				isPrv
+			);
+			console.log(destinationEventParams);
+			if (!destinationEventParams) {
+				toastStore.error({ title: 'エラー', description: '移動先のイベント作成に失敗しました。' });
+				return;
+			}
+
+			// 5. 移動先のブックマークを更新し、成功したら移動元を更新
+			await publishEvent(destinationEventParams, '移動（追加）完了', '移動（追加）失敗');
+
+			// 移動先の更新が成功した場合のみ、移動元の更新に進む
+			const sourceEventParams = await createEventParametersForBookmark(
+				selectedBookmark,
+				remainingTagsAsArray,
+				isPrivate
+			);
+			console.log(sourceEventParams);
+			if (sourceEventParams) {
+				await publishEvent(sourceEventParams, '移動（削除）完了', '移動（削除）失敗');
+
+				toastStore.success({
+					title: '移動完了',
+					description: `${selectedCount}個のタグを移動しました。`
+				});
+				/* 		// 6. 状態をリセットしてUIを更新
+				tagsToDisplay = [...remainingTags];
+				originalTags = $state.snapshot(tagsToDisplay);
+				selectedTagIds = new Set(); */
+			}
+		} catch (error) {
+			console.error('タグの移動中にエラーが発生しました:', error);
+			toastStore.error({ title: 'エラー', description: 'タグの移動に失敗しました。' });
+		}
 	}
 
 	async function addNewTag(tag: string[]) {
@@ -278,21 +314,17 @@
 			});
 			return;
 		}
-
-		// 新しいタグにユニークなIDを付与する
 		const newTagItem: DndTagItem = {
 			id: `${tagsToDisplay.length}`,
 			tag,
 			originalIndex: tagsToDisplay.length
 		};
 		const updatedTagsToDisplay = [...tagsToDisplay, newTagItem];
-		// 新しいタグリストから、イベントに保存するためのタグ配列を生成
 		const tagsToSave = updatedTagsToDisplay.map((item) => item.tag);
 
-		// イベントパラメータを作成
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			// イベントをパブリッシュ
 			await publishEvent(ev, 'タグ追加完了', 'タグ追加失敗');
 		}
 	}
@@ -315,7 +347,8 @@
 		}
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '更新完了', '更新失敗');
 		}
@@ -327,6 +360,7 @@
 	}
 
 	async function saveTagEdit(id: string, newTag: string[]) {
+		if (!selectedBookmark) return;
 		const tagIndex = tagsToDisplay.findIndex((t) => t.id === id);
 		if (tagIndex === -1) {
 			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
@@ -337,7 +371,8 @@
 		updatedTags[tagIndex] = { ...updatedTags[tagIndex], tag: newTag };
 
 		const tagsToSave = updatedTags.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '更新完了', '更新失敗');
 		}
@@ -347,7 +382,8 @@
 		if (!selectedBookmark) return;
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, 'タイトル更新完了', 'タイトル更新失敗');
 			editingTitle = false;
@@ -361,7 +397,8 @@
 		if (!selectedBookmark) return;
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '説明更新完了', '説明更新失敗');
 			console.log('end');
@@ -376,7 +413,8 @@
 		if (!selectedBookmark) return;
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		const ev = await createEventParameters(tagsToSave);
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '画像更新完了', '画像更新失敗');
 			editingImage = false;
@@ -385,11 +423,85 @@
 			editingImage = false;
 		}
 	}
+
+	// createEventParametersは削除し、この関数に一本化します。
+	async function createEventParametersForBookmark(
+		bookmark: BookmarkItem,
+		tagsToSave: string[][],
+		isPrivate: boolean
+	): Promise<EventParameters | null> {
+		if (!bookmark) {
+			toastStore.error({ title: 'エラー', description: 'ブックマークが指定されていません。' });
+			return null;
+		}
+
+		let ev: EventParameters;
+		if (isPrivate) {
+			try {
+				const tagsJson = JSON.stringify(tagsToSave);
+				const encryptedContent = await window.nostr?.nip04?.encrypt(
+					bookmark.event.pubkey,
+					tagsJson
+				);
+				if (!encryptedContent) {
+					toastStore.error({
+						title: 'エラー',
+						description: 'タグの暗号化に失敗しました。'
+					});
+					return null;
+				}
+				ev = {
+					kind: bookmark.event.kind,
+					created_at: Math.floor(Date.now() / 1000),
+					tags: $state.snapshot(bookmark.event.tags), // 元のタグを保持
+					content: encryptedContent
+				};
+			} catch (error) {
+				console.error('タグの更新中にエラーが発生しました (非公開):', error);
+				toastStore.error({
+					title: 'エラー',
+					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
+				});
+				return null;
+			}
+		} else {
+			const newTags: string[][] = [];
+			const dTag = bookmark.event.tags.find((tag) => tag[0] === 'd');
+			if (dTag) newTags.push(dTag);
+
+			// 公開イベントの場合、タイトル、説明、画像タグをtagsToSaveから抽出し、
+			// もし存在すれば追加する。
+			if (bookmark.event.kind !== 10003) {
+				const titleTag = tagsToSave.find((tag) => tag[0] === 'title');
+				if (titleTag) newTags.push(titleTag);
+
+				const descriptionTag = tagsToSave.find((tag) => tag[0] === 'description');
+				if (descriptionTag) newTags.push(descriptionTag);
+
+				const imageTag = tagsToSave.find((tag) => tag[0] === 'image');
+				if (imageTag) newTags.push(imageTag);
+			}
+
+			// 移動/削除対象のタグは tagsToSave に含まれている
+			const otherTags = tagsToSave.filter(
+				(tag) => !['d', 'title', 'description', 'image'].includes(tag[0])
+			);
+			newTags.push(...otherTags);
+
+			ev = {
+				kind: bookmark.event.kind,
+				created_at: Math.floor(Date.now() / 1000),
+				tags: $state.snapshot(newTags),
+				content: bookmark.event.content
+			};
+		}
+		return ev;
+	}
 </script>
 
 {#if selectedBookmark}
 	<div
-		class="max-w-full overflow-x-hidden rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
+		class="mx-auto max-w-4xl overflow-x-hidden rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
 	>
 		{#if selectedBookmark.event.kind !== 10003}
 			<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-[0.3fr_0.7fr]">
