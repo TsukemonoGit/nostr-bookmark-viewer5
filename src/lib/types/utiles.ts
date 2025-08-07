@@ -12,3 +12,8 @@ export interface UserProfile {
 	lud06?: string;
 	birthday?: { year?: number; month?: number; day?: number };
 }
+export interface DndTagItem {
+	id: string;
+	tag: string[];
+	originalIndex?: number;
+}

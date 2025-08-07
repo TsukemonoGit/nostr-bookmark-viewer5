@@ -15,15 +15,12 @@
 	import type { EventParameters } from 'nostr-typedef';
 	import { nip07Signer } from 'rx-nostr';
 	import { publishSignEvent } from '$lib/nostr/nostrSubscriptions';
+	import ConfirmDeleteDialog from '../Layout/ConfirmDeleteDialog.svelte';
+	import TagRenderer from './TagRenderer.svelte';
+	import type { DndTagItem } from '$lib/types/utiles';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
-	}
-
-	interface DndTagItem {
-		id: string;
-		tag: string[];
-		originalIndex?: number;
 	}
 
 	let { selectedBookmark }: Props = $props();
@@ -122,7 +119,7 @@
 		if (target.checked) {
 			selectedTagIds = new Set(displayTags.map((item) => item.id));
 		} else {
-			selectedTagIds.clear();
+			selectedTagIds = new Set();
 		}
 		selectedTagIds = selectedTagIds;
 	}
@@ -141,29 +138,115 @@
 		selectedTagIds = newSelectedTagIds;
 	}
 
-	function deleteSelectedTags() {
+	let selectedTags = $derived(tagsToDisplay.filter((item) => selectedTagIds.has(item.id)));
+
+	// 新しい共通関数を作成
+	async function publishEvent(
+		eventParameters: EventParameters,
+		successMessage: string,
+		errorMessage: string
+	) {
+		const publishPromise = new Promise<number>(async (resolve, reject) => {
+			try {
+				const signer = nip07Signer();
+				const signed = await signer.signEvent(eventParameters);
+				const res = await publishSignEvent(signed);
+				if (res.length > 0) {
+					resolve(res.length);
+				} else {
+					reject('OKパケットが返ってきませんでした');
+				}
+			} catch (error) {
+				reject(error);
+			}
+		});
+
+		toastStore.promise(publishPromise, {
+			loading: {
+				title: '送信中...',
+				description: `${successMessage.slice(0, -1)}イベントをリレーに送信しています。`
+			},
+			success: (result) => ({
+				title: `${successMessage}！`,
+				description: `${result}個のリレーでイベントを更新しました。`
+			}),
+			error: (error) => ({
+				title: `${errorMessage}`,
+				description: `エラー: ${typeof error === 'string' ? error : '不明なエラー'}`
+			})
+		});
+	}
+
+	async function createEventParameters(tagsToSave: string[][]): Promise<EventParameters | null> {
+		if (!selectedBookmark) {
+			return null;
+		}
+
+		let ev: EventParameters;
+		if (isPrivate) {
+			try {
+				const tagsJson = JSON.stringify(tagsToSave);
+				const encryptedContent = await window.nostr?.nip04?.encrypt(
+					selectedBookmark.event.pubkey,
+					tagsJson
+				);
+				if (!encryptedContent) {
+					toastStore.error({
+						title: 'エラー',
+						description: 'タグの暗号化に失敗しました。'
+					});
+					return null;
+				}
+				ev = {
+					kind: selectedBookmark.event.kind,
+					created_at: Math.floor(Date.now() / 1000),
+					tags: $state.snapshot(selectedBookmark.event.tags),
+					content: encryptedContent
+				};
+			} catch (error) {
+				console.error('タグの更新中にエラーが発生しました (非公開):', error);
+				toastStore.error({
+					title: 'エラー',
+					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
+				});
+				return null;
+			}
+		} else {
+			const otherTags = tagsToSave.filter(
+				(tag) => !['d', 'title', 'description', 'image'].includes(tag[0])
+			);
+			const newTags: string[][] = [];
+			const dTag = selectedBookmark.event.tags.find((tag) => tag[0] === 'd');
+			if (dTag) newTags.push(dTag);
+			if (selectedBookmark.event.kind !== 10003) {
+				if (tempTitle) newTags.push(['title', tempTitle]);
+				if (tempDescription) newTags.push(['description', tempDescription]);
+				if (tempImage) newTags.push(['image', tempImage]);
+			}
+			newTags.push(...otherTags);
+			ev = {
+				kind: selectedBookmark.event.kind,
+				created_at: Math.floor(Date.now() / 1000),
+				tags: $state.snapshot(newTags),
+				content: selectedBookmark.event.content
+			};
+		}
+		return ev;
+	}
+
+	async function deleteSelectedTags() {
 		const selectedCount = selectedTagIds.size;
-		if (selectedCount === 0) return;
-
-		if (!confirm(`${selectedCount}個のタグを削除しますか？`)) {
-			return;
-		}
-
-		const selectedBookmarks = tagsToDisplay.filter((item) => selectedTagIds.has(item.id));
-		const indicesToDelete = new Set(
-			selectedBookmarks.map((item) => item.originalIndex).filter((idx) => idx !== undefined)
-		);
-
-		if (selectedBookmark) {
-			const sortedIndices = Array.from(indicesToDelete).sort((a, b) => b - a);
-			console.log('削除対象インデックス:', sortedIndices);
-		}
+		if (selectedCount === 0 || !selectedBookmark) return;
 
 		tagsToDisplay = tagsToDisplay.filter((item) => !selectedTagIds.has(item.id));
-		originalTags = $state.snapshot(tagsToDisplay);
-		selectedTagIds = new Set();
 
-		alert(`${selectedCount}個のタグを削除しました。`);
+		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, '削除完了', '削除失敗');
+			originalTags = $state.snapshot(tagsToDisplay);
+			selectedTagIds = new Set();
+		}
 	}
 
 	function moveSelectedTags() {
@@ -210,87 +293,12 @@
 		}
 
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
-		let ev: EventParameters;
-
-		if (isPrivate) {
-			try {
-				const tagsJson = JSON.stringify(tagsToSave);
-				const encryptedContent = await window.nostr?.nip04?.encrypt(
-					selectedBookmark.event.pubkey,
-					tagsJson
-				);
-				if (!encryptedContent) {
-					toastStore.error({
-						title: 'エラー',
-						description: 'タグの暗号化に失敗しました。'
-					});
-					return;
-				}
-				ev = {
-					kind: selectedBookmark.event.kind,
-					created_at: Math.floor(Date.now() / 1000),
-					tags: $state.snapshot(selectedBookmark.event.tags),
-					content: encryptedContent
-				};
-			} catch (error) {
-				console.error('タグの更新中にエラーが発生しました (非公開):', error);
-				toastStore.error({
-					title: 'エラー',
-					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
-				});
-				return;
-			}
-		} else {
-			const otherTags = tagsToSave.filter(
-				(tag) => !['d', 'title', 'description', 'image'].includes(tag[0])
-			);
-			const newTags: string[][] = [];
-			const dTag = selectedBookmark.event.tags.find((tag) => tag[0] === 'd');
-			if (dTag) newTags.push(dTag);
-			if (selectedBookmark.event.kind !== 10003) {
-				if (tempTitle) newTags.push(['title', tempTitle]);
-				if (tempDescription) newTags.push(['description', tempDescription]);
-				if (tempImage) newTags.push(['image', tempImage]);
-			}
-			newTags.push(...otherTags);
-			ev = {
-				kind: selectedBookmark.event.kind,
-				created_at: Math.floor(Date.now() / 1000),
-				tags: $state.snapshot(newTags),
-				content: selectedBookmark.event.content
-			};
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, '更新完了', '更新失敗');
 		}
-
-		const publishPromise = new Promise<number>(async (resolve, reject) => {
-			try {
-				const signer = nip07Signer();
-				const signed = await signer.signEvent(ev);
-				const res = await publishSignEvent(signed);
-				if (res.length > 0) {
-					resolve(res.length); // ここを修正
-				} else {
-					reject('OKパケットが返ってきませんでした');
-				}
-			} catch (error) {
-				reject(error);
-			}
-		});
-
-		toastStore.promise(publishPromise, {
-			loading: {
-				title: '送信中...',
-				description: 'タグの更新イベントをリレーに送信しています。'
-			},
-			success: (result) => ({
-				title: '更新完了！',
-				description: `${result}個のリレーでタグを更新しました。`
-			}),
-			error: (error) => ({
-				title: '更新失敗',
-				description: `エラー: ${typeof error === 'string' ? error : '不明なエラー'}`
-			})
-		});
 	}
+
 	function cancelSorting() {
 		tagsToDisplay = [...originalTags];
 		isSorting = false;
@@ -486,7 +494,7 @@
 				</Select.Trigger>
 				<Select.Portal>
 					<Select.Content
-						class="focus-override shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2  outline-hidden z-50 max-h-[var(--bits-select-content-available-height)] w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)] rounded-xl border border-neutral-600 bg-neutral-100 select-none data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 dark:border-neutral-400 dark:bg-neutral-900"
+						class="focus-override shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--bits-select-content-available-height)] w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)] rounded-xl border border-neutral-600 bg-neutral-100 outline-hidden select-none data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 dark:border-neutral-400 dark:bg-neutral-900"
 					>
 						<Select.Viewport class="p-1">
 							{#each selectItem as item, i (i + item.value)}
@@ -575,25 +583,8 @@
 									onchange={() => toggleTagSelection(item.id)}
 								/>
 							{/if}
-							<div class="flex-1">
-								{#if item.tag[0] === 'e'}
-									<NoteEvent tag={item.tag} />
-								{:else if item.tag[0] === 'a'}
-									<NaddrEvent tag={item.tag} />
-								{:else if item.tag[0] === 'r'}
-									{#if item.tag[1]?.startsWith('ws')}
-										<Relay tag={item.tag} />
-									{:else}
-										<Url tag={item.tag} />
-									{/if}
-								{:else if item.tag[0] === 't'}
-									<Hashtag tag={item.tag} />
-								{:else}
-									<div class="text-sm text-neutral-600 dark:text-neutral-400">
-										{JSON.stringify(item.tag)}
-									</div>
-								{/if}
-							</div>
+							<TagRenderer tag={item.tag} />
+
 							<button
 								onclick={() => startTagEditing(item.id, item.tag[1])}
 								class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
@@ -624,13 +615,12 @@
 				</span>
 			{/if}
 			{#if !isSorting}
-				<button
-					onclick={deleteSelectedTags}
+				<ConfirmDeleteDialog
+					{selectedTags}
+					onConfirm={deleteSelectedTags}
 					disabled={selectedCount === 0 || isSorting}
-					class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 dark:disabled:bg-red-700"
-				>
-					削除
-				</button>
+				/>
+
 				<button
 					onclick={moveSelectedTags}
 					disabled={selectedCount === 0 || isSorting}
