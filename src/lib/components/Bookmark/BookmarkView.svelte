@@ -379,21 +379,22 @@
 					{selectedCount}個選択中
 				</span>
 			{/if}
-			<button
-				onclick={deleteSelectedTags}
-				disabled={selectedCount === 0 || isSorting}
-				class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 dark:disabled:bg-red-700"
-			>
-				削除
-			</button>
-			<button
-				onclick={moveSelectedTags}
-				disabled={selectedCount === 0 || isSorting}
-				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
-			>
-				他のリストへ移動
-			</button>
-			{#if isSorting}
+			{#if !isSorting}
+				<button
+					onclick={deleteSelectedTags}
+					disabled={selectedCount === 0 || isSorting}
+					class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 dark:disabled:bg-red-700"
+				>
+					削除
+				</button>
+				<button
+					onclick={moveSelectedTags}
+					disabled={selectedCount === 0 || isSorting}
+					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
+				>
+					他のリストへ移動
+				</button>
+			{:else}
 				<button
 					onclick={cancelSorting}
 					class="rounded-md bg-gray-600 px-4 py-2 text-sm font-medium hover:bg-gray-700"
@@ -410,7 +411,6 @@
 		</div>
 		<button
 			onclick={addNewTag}
-			disabled={isSorting}
 			class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
 		>
 			タグを追加
@@ -421,9 +421,5 @@
 <style>
 	.cursor-grab {
 		cursor: grab;
-	}
-
-	.cursor-grabbing {
-		cursor: grabbing;
 	}
 </style>
