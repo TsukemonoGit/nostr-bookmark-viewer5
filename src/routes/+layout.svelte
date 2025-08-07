@@ -7,6 +7,8 @@
 	import { nip19 } from 'nostr-tools';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { toastStore } from '$lib/utils/util';
+	import { Toaster } from '@skeletonlabs/skeleton-svelte';
 
 	let { children } = $props();
 
@@ -38,3 +40,4 @@
 </svelte:head>
 
 {@render children?.()}
+<Toaster toaster={toastStore}></Toaster>

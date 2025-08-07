@@ -11,7 +11,10 @@
 	import { Select } from 'bits-ui';
 	import Url from '../Tags/Url.svelte';
 	import { ChevronsUpDown } from '@lucide/svelte';
-	import { formatAbsoluteDateFromUnix } from '$lib/utils/util';
+	import { formatAbsoluteDateFromUnix, toastStore } from '$lib/utils/util';
+	import type { EventParameters } from 'nostr-typedef';
+	import { nip07Signer } from 'rx-nostr';
+	import { publishSignEvent } from '$lib/nostr/nostrSubscriptions';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -197,11 +200,97 @@
 		tagsToDisplay = [...(dTags || []), ...updatedDisplayTags];
 	}
 
-	function updateTags() {
-		alert('タグの並び順を更新しました！');
-		isSorting = false;
-	}
+	async function updateTags() {
+		if (!selectedBookmark) {
+			toastStore.error({
+				title: 'エラー',
+				description: 'ブックマークが選択されていません。'
+			});
+			return;
+		}
 
+		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		let ev: EventParameters;
+
+		if (isPrivate) {
+			try {
+				const tagsJson = JSON.stringify(tagsToSave);
+				const encryptedContent = await window.nostr?.nip04?.encrypt(
+					selectedBookmark.event.pubkey,
+					tagsJson
+				);
+				if (!encryptedContent) {
+					toastStore.error({
+						title: 'エラー',
+						description: 'タグの暗号化に失敗しました。'
+					});
+					return;
+				}
+				ev = {
+					kind: selectedBookmark.event.kind,
+					created_at: Math.floor(Date.now() / 1000),
+					tags: $state.snapshot(selectedBookmark.event.tags),
+					content: encryptedContent
+				};
+			} catch (error) {
+				console.error('タグの更新中にエラーが発生しました (非公開):', error);
+				toastStore.error({
+					title: 'エラー',
+					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
+				});
+				return;
+			}
+		} else {
+			const otherTags = tagsToSave.filter(
+				(tag) => !['d', 'title', 'description', 'image'].includes(tag[0])
+			);
+			const newTags: string[][] = [];
+			const dTag = selectedBookmark.event.tags.find((tag) => tag[0] === 'd');
+			if (dTag) newTags.push(dTag);
+			if (selectedBookmark.event.kind !== 10003) {
+				if (tempTitle) newTags.push(['title', tempTitle]);
+				if (tempDescription) newTags.push(['description', tempDescription]);
+				if (tempImage) newTags.push(['image', tempImage]);
+			}
+			newTags.push(...otherTags);
+			ev = {
+				kind: selectedBookmark.event.kind,
+				created_at: Math.floor(Date.now() / 1000),
+				tags: $state.snapshot(newTags),
+				content: selectedBookmark.event.content
+			};
+		}
+
+		const publishPromise = new Promise<number>(async (resolve, reject) => {
+			try {
+				const signer = nip07Signer();
+				const signed = await signer.signEvent(ev);
+				const res = await publishSignEvent(signed);
+				if (res.length > 0) {
+					resolve(res.length); // ここを修正
+				} else {
+					reject('OKパケットが返ってきませんでした');
+				}
+			} catch (error) {
+				reject(error);
+			}
+		});
+
+		toastStore.promise(publishPromise, {
+			loading: {
+				title: '送信中...',
+				description: 'タグの更新イベントをリレーに送信しています。'
+			},
+			success: (result) => ({
+				title: '更新完了！',
+				description: `${result}個のリレーでタグを更新しました。`
+			}),
+			error: (error) => ({
+				title: '更新失敗',
+				description: `エラー: ${typeof error === 'string' ? error : '不明なエラー'}`
+			})
+		});
+	}
 	function cancelSorting() {
 		tagsToDisplay = [...originalTags];
 		isSorting = false;

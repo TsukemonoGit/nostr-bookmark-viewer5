@@ -1,5 +1,7 @@
 import type { nip19 } from 'nostr-tools';
+import { createToaster } from '@skeletonlabs/skeleton-svelte';
 
+export const toastStore = createToaster();
 export function parseNaddr(tag: string[]): nip19.AddressPointer {
 	const [, reference, relay] = tag; // 配列の2番目の要素を取り出す
 	const [kind, pubkey, ...identifierParts] = reference.split(':'); // referenceをコロンで分割, identifierの中に:が含まれる可能性がある

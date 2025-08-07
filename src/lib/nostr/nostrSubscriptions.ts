@@ -4,7 +4,9 @@ import {
 	createRxForwardReq,
 	uniq,
 	type AcceptableDefaultRelaysConfig,
-	type EventPacket
+	type EventPacket,
+	type OkPacketAgainstEvent,
+	type OkPacket
 } from 'rx-nostr';
 import { tap, type Observable, type OperatorFunction } from 'rxjs';
 import { verifier } from '@rx-nostr/crypto';
@@ -16,7 +18,11 @@ import { relayStateMap } from '$lib/utils/stores.svelte';
 import { createQuery, useQueryClient, type QueryKey } from '@tanstack/svelte-query';
 import { derived, writable } from 'svelte/store';
 
-const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({ verifier, eoseTimeout: 3000 });
+const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
+	verifier,
+	eoseTimeout: 3000,
+	okTimeout: 3000
+});
 rxNostr.setDefaultRelays(defaultRelays);
 rxNostr.createConnectionStateObservable().subscribe((packet) => {
 	relayStateMap.update((value) => {
@@ -245,4 +251,47 @@ export function useReq(
 			//  }
 		})
 	};
+}
+
+const maxWaitingTime = 5000; // 3秒
+
+/**
+ * 署名済みNostrイベントをリレーに送信します。
+ * @param ev 署名済みのNostrイベントオブジェクト
+ * @returns リレーからのOKパケットの配列を返します。
+ */
+export async function publishSignEvent(ev: Nostr.Event): Promise<OkPacket[]> {
+	return new Promise<OkPacket[]>((resolve) => {
+		const results: OkPacket[] = [];
+		let subscription: any;
+
+		// タイムアウトを設定
+		const timeoutId = setTimeout(() => {
+			console.warn(`Event ${ev.id.slice(0, 8)} publish timed out.`);
+			if (subscription) {
+				subscription.unsubscribe();
+			}
+			resolve(results); // タイムアウト時の時点で収集したOKパケットを返す
+		}, maxWaitingTime);
+
+		subscription = rxNostr.send(ev).subscribe({
+			next: (packet) => {
+				// OKパケットのみを収集
+				if (packet.ok) {
+					results.push(packet);
+				}
+			},
+			complete: () => {
+				// Observableが完了したら、タイマーをクリアして解決
+				clearTimeout(timeoutId);
+				resolve(results);
+			},
+			error: (err) => {
+				// エラーが発生したら、タイマーをクリアして空の配列で解決
+				console.error('イベント送信中にエラーが発生しました:', err);
+				clearTimeout(timeoutId);
+				resolve([]);
+			}
+		});
+	});
 }
