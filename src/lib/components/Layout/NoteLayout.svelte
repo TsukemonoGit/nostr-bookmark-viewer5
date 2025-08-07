@@ -116,6 +116,7 @@
 	}
 
 	.note-name {
+		width: 4em;
 		font-weight: bold;
 		font-size: 14px;
 		color: var(--name-color);
