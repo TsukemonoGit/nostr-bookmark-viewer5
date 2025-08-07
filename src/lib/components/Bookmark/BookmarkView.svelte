@@ -511,15 +511,15 @@
 			>
 				ID: {selectedBookmark.atag}
 			</span>
-			{#if selectedBookmark.identifier}
+			<!-- {#if selectedBookmark.identifier}
 				<span
 					class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
 				>
 					識別子: {selectedBookmark.identifier}
 				</span>
-			{/if}
+			{/if} -->
 			<span
-				class="rounded-md bg-gray-50 px-3 py-1.5 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+				class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
 			>
 				更新日時: {formatAbsoluteDateFromUnix(selectedBookmark.event.created_at)}
 			</span>
@@ -603,7 +603,7 @@
 			{#each displayTags as item (item.id)}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<div
-						class="my-1 flex items-center rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
+						class="my-1 flex items-center rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
 							item.id
 						)
 							? 'ring-2 ring-blue-500'
