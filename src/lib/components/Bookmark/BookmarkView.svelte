@@ -255,36 +255,38 @@
 		class="max-w-full overflow-x-hidden rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
 	>
 		{#if selectedBookmark.event.kind !== 10003}
-			<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+			<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-[0.3fr_0.7fr]">
 				<div>
 					<div
-						class="flex h-[300px] w-full items-center justify-center rounded bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+						class="flex h-[240px] w-full items-center justify-center rounded bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
 					>
 						{#if selectedBookmark.image && selectedBookmark.image.trim() !== ''}
 							<img
 								src={selectedBookmark.image}
 								alt={selectedBookmark.title || ''}
-								class="h-[300px] w-full rounded object-cover"
+								class="h-[240px] w-full rounded object-cover"
 							/>
 						{:else}
 							<span class="text-lg">画像なし</span>
 						{/if}
 					</div>
 					{#if editingImage}
-						<div class="mt-2 flex items-center gap-2">
+						<div class="mt-2">
 							<input
 								type="text"
 								bind:value={tempImage}
-								class="flex-1 rounded-md border p-2"
+								class="w-full flex-1 rounded-md border p-2"
 								placeholder="画像URL"
 							/>
-							<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white"
-								>保存</button
-							>
-							<button
-								onclick={() => (editingImage = false)}
-								class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
-							>
+							<div class="mt-2 flex flex-wrap items-center justify-end gap-1">
+								<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white"
+									>保存</button
+								>
+								<button
+									onclick={() => (editingImage = false)}
+									class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
+								>
+							</div>
 						</div>
 					{:else}
 						<button
@@ -303,7 +305,7 @@
 							class="mb-2 rounded-md border p-2 text-2xl font-bold"
 							placeholder="タイトル"
 						/>
-						<div class="flex gap-2">
+						<div class="mb-2 flex justify-end gap-2">
 							<button onclick={saveTitle} class="rounded-md bg-blue-500 px-4 py-2 text-white"
 								>保存</button
 							>
@@ -334,7 +336,7 @@
 							class="flex-1 rounded-md border p-2"
 							placeholder="説明"
 						></textarea>
-						<div class="mt-2 flex gap-2">
+						<div class="mt-2 flex justify-end gap-2">
 							<button onclick={saveDescription} class="rounded-md bg-blue-500 px-4 py-2 text-white"
 								>保存</button
 							>
