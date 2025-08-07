@@ -13,7 +13,7 @@
 	import { ChevronsUpDown } from '@lucide/svelte';
 	import { formatAbsoluteDateFromUnix, toastStore } from '$lib/utils/util';
 	import type { EventParameters } from 'nostr-typedef';
-	import { nip07Signer } from 'rx-nostr';
+	import { nip07Signer, type OkPacket } from 'rx-nostr';
 	import { publishSignEvent } from '$lib/nostr/nostrSubscriptions';
 	import ConfirmDeleteDialog from '../Layout/ConfirmDeleteDialog.svelte';
 	import TagRenderer from './TagRenderer.svelte';
@@ -152,35 +152,38 @@
 		successMessage: string,
 		errorMessage: string
 	) {
-		const publishPromise = new Promise<number>(async (resolve, reject) => {
-			try {
-				const signer = nip07Signer();
-				const signed = await signer.signEvent(eventParameters);
-				const res = await publishSignEvent(signed);
-				if (res.length > 0) {
-					resolve(res.length);
-				} else {
-					reject('OKパケットが返ってきませんでした');
-				}
-			} catch (error) {
-				reject(error);
-			}
-		});
+		try {
+			// 署名（ここで await して完了を保証する）
+			const signer = nip07Signer();
+			const signed = await signer.signEvent(eventParameters);
 
-		toastStore.promise(publishPromise, {
-			loading: {
-				title: '送信中...',
-				description: `${successMessage.slice(0, -1)}イベントをリレーに送信しています。`
-			},
-			success: (result) => ({
-				title: `${successMessage}！`,
-				description: `${result}個のリレーでイベントを更新しました。`
-			}),
-			error: (error) => ({
+			// 公開処理を Promise 化（トースト表示付き）
+			const publishPromise = publishSignEvent(signed);
+
+			toastStore.promise(publishPromise, {
+				loading: {
+					title: '送信中...',
+					description: `${successMessage.slice(0, -1)}イベントをリレーに送信しています。`
+				},
+				success: (result: OkPacket[]) => ({
+					title: `${successMessage}！`,
+					description: `${result.length}個のリレーでイベントを更新しました。`
+				}),
+				error: (error) => ({
+					title: `${errorMessage}`,
+					description: `エラー: ${typeof error === 'string' ? error : '不明なエラー'}`
+				})
+			});
+
+			await publishPromise;
+		} catch (error) {
+			// signer.signEvent などの失敗時
+			toastStore.error({
+				type: 'error',
 				title: `${errorMessage}`,
 				description: `エラー: ${typeof error === 'string' ? error : '不明なエラー'}`
-			})
-		});
+			});
+		}
 	}
 
 	async function createEventParameters(tagsToSave: string[][]): Promise<EventParameters | null> {
@@ -338,25 +341,47 @@
 		}
 	}
 
-	function saveTitle() {
-		if (selectedBookmark) {
-			alert('タイトルを更新しました！');
+	async function saveTitle() {
+		if (!selectedBookmark) return;
+
+		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, 'タイトル更新完了', 'タイトル更新失敗');
+			editingTitle = false;
+		} else {
+			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			editingTitle = false;
 		}
-		editingTitle = false;
 	}
 
-	function saveDescription() {
-		if (selectedBookmark) {
-			alert('説明を更新しました！');
+	async function saveDescription() {
+		if (!selectedBookmark) return;
+
+		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, '説明更新完了', '説明更新失敗');
+			console.log('end');
+			editingDescription = false;
+		} else {
+			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			editingDescription = false;
 		}
-		editingDescription = false;
 	}
 
-	function saveImage() {
-		if (selectedBookmark) {
-			alert('画像を更新しました！');
+	async function saveImage() {
+		if (!selectedBookmark) return;
+
+		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, '画像更新完了', '画像更新失敗');
+			editingImage = false;
+		} else {
+			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			editingImage = false;
 		}
-		editingImage = false;
 	}
 </script>
 
@@ -655,12 +680,6 @@
 			{/if}
 		</div>
 		<CreateNewTag onConformNewTag={addNewTag} />
-		<!-- <button
-			onclick={addNewTag}
-			class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
-		>
-			タグを追加
-		</button> -->
 	</div>
 {/if}
 
