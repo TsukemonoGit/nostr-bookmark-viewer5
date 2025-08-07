@@ -17,3 +17,10 @@ export interface DndTagItem {
 	tag: string[];
 	originalIndex?: number;
 }
+
+export interface CreateData {
+	d: string;
+	title: string;
+	image: string;
+	description: string;
+}

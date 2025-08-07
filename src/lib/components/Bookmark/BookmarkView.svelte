@@ -19,7 +19,7 @@
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
 	import { loginUser } from '$lib/utils/stores.svelte';
-	import CreateNewTag from './CreateNewTag.svelte';
+	import CreateNewTag from '../Layout/CreateNewTag.svelte';
 	import TagEditor from './TagEditor.svelte';
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';

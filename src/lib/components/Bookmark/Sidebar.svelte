@@ -5,6 +5,9 @@
 	import type { EventParameters } from 'nostr-typedef';
 	import ConfirmDeleteList from '../Layout/ConfirmDeleteList.svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
+	import CreateNewList from '../Layout/CreateNewList.svelte';
+	import type { CreateData } from '$lib/types/utiles';
+	import { toastStore } from '$lib/utils/util';
 
 	interface Props {
 		pubkey: string;
@@ -56,6 +59,28 @@
 			console.error(`削除中にエラーが発生しました:`, error);
 		}
 	}
+
+	async function createNewList(data: CreateData) {
+		console.log('create new list', data);
+		if (!data.d) {
+			toastStore.error({ title: 'ERROR', description: 'dタグは必須項目です', duration: 10000 });
+			return;
+		}
+		// Nostrイベントのタグを構築
+		const tags = [['d', data.d]];
+		if (data.title) tags.push(['title', data.title]);
+		if (data.image) tags.push(['image', data.image]);
+		if (data.description) tags.push(['description', data.description]);
+
+		const ev: EventParameters = {
+			kind: 30003, // ブックマークセットのkind
+			content: '',
+			tags: tags
+		};
+
+		console.log('作成されるイベント:', ev);
+		await publishEvent(ev, '作成完了', '作成失敗');
+	}
 </script>
 
 <nav class="h-full overflow-y-auto p-2 text-sm">
@@ -66,12 +91,7 @@
 			</h2>
 
 			{#if key === 'Bookmarksets' && editable}
-				<button
-					class="mb-2 flex w-full items-center gap-1 rounded-md bg-neutral-200 px-4 py-2 text-left font-semibold text-neutral-800 transition-colors hover:bg-neutral-300 active:bg-neutral-400"
-					onclick={() => console.log('新しいブックマークリストを作成')}
-				>
-					<Plus size="20" />New Bookmark List
-				</button>
+				<CreateNewList onConfirm={createNewList} />
 			{/if}
 
 			<ul class="space-y-1">
