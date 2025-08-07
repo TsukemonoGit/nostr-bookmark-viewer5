@@ -21,6 +21,7 @@
 	import { loginUser } from '$lib/utils/stores.svelte';
 	import CreateNewTag from './CreateNewTag.svelte';
 	import TagEditor from './TagEditor.svelte';
+	import MoveTagButton from './MoveTagButton.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -258,7 +259,8 @@
 		}
 	}
 
-	function moveSelectedTags() {
+	function moveSelectedTags(id: string, isPrv: boolean) {
+		console.log(id, isPrv);
 		const selectedCount = selectedTagIds.size;
 		if (selectedCount === 0) return;
 
@@ -601,7 +603,7 @@
 			{#each displayTags as item (item.id)}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<div
-						class="my-1 flex items-center space-x-4 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
+						class="my-1 flex items-center rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
 							item.id
 						)
 							? 'ring-2 ring-blue-500'
@@ -614,14 +616,13 @@
 							{:else}
 								<input
 									type="checkbox"
-									class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+									class="form-checkbox m-1 h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
 									checked={isTagSelected(item.id)}
 									onchange={() => toggleTagSelection(item.id)}
 								/>
 							{/if}
 						{/if}
-						<TagRenderer tag={item.tag} />
-						{#if editable}
+						<TagRenderer tag={item.tag} />{#if editable}
 							<TagEditor
 								initTag={item.tag}
 								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
@@ -656,14 +657,7 @@
 					onConfirm={deleteSelectedTags}
 					disabled={selectedCount === 0 || isSorting}
 				/>
-
-				<button
-					onclick={moveSelectedTags}
-					disabled={selectedCount === 0 || isSorting}
-					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
-				>
-					他のリストへ移動
-				</button>
+				<MoveTagButton onMoveTo={moveSelectedTags} disabled={selectedCount === 0 || isSorting} />
 			{:else}
 				<button
 					onclick={cancelSorting}

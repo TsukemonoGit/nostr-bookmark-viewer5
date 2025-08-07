@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { X } from '@lucide/svelte';
+	import { Pencil, X } from '@lucide/svelte';
 	import { Dialog, Separator } from 'bits-ui';
 
 	import BookmarkFormE from './BookmarkFormE.svelte';
@@ -40,9 +40,9 @@
 
 <Dialog.Root bind:open={isOpen}>
 	<Dialog.Trigger
-		class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
+		class="rounded-md bg-neutral-200 p-1 text-sm font-medium hover:bg-neutral-300 dark:bg-neutral-700  hover:dark:bg-neutral-600"
 	>
-		修正
+		<Pencil />
 	</Dialog.Trigger>
 	<Dialog.Portal>
 		<Dialog.Overlay

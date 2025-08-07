@@ -40,7 +40,7 @@
 	</div>
 {:else}
 	<div class="nostr-wrapper">
-		<div class="note-content">
+		<div class="note-header">
 			<div class="note-avatar">
 				{#if profile?.picture}
 					<UserAvatar url={profile?.picture} name={profile.name} />
@@ -48,33 +48,29 @@
 					<div class="avatar placeholder"></div>
 				{/if}
 			</div>
-
-			<div class="note-details">
-				<div class="note-header">
-					<div class="note-name">
-						{#if profile?.name || profile?.display_name}
-							{profile?.display_name}@{profile?.name || 'no name'}
-						{:else}
-							<div class="name placeholder"></div>
-						{/if}
-					</div>
-					<div class="note-time">
-						{#if created_at}
-							<time datetime={datetime(created_at)}>{formatAbsoluteDateFromUnix(created_at)}</time>
-						{:else}
-							<div class="time placeholder"></div>
-						{/if}
-					</div>
-				</div>
-
-				{#if replyUser}<div class="mention-container">{@render replyUser?.()}</div>{/if}
-				<div class="note-body">
-					{#if content}
-						{@render content()}
-					{:else}
-						<div class="content placeholder"></div>
-					{/if}
-				</div>
+			<div class="note-name">
+				{#if profile?.name || profile?.display_name}
+					{profile?.display_name}@{profile?.name || 'no name'}
+				{:else}
+					<div class="name placeholder"></div>
+				{/if}
+			</div>
+			<div class="note-time">
+				{#if created_at}
+					<time datetime={datetime(created_at)}>{formatAbsoluteDateFromUnix(created_at)}</time>
+				{:else}
+					<div class="time placeholder"></div>
+				{/if}
+			</div>
+		</div>
+		<div class="note-body-wrapper">
+			{#if replyUser}<div class="mention-container">{@render replyUser?.()}</div>{/if}
+			<div class="note-body">
+				{#if content}
+					{@render content()}
+				{:else}
+					<div class="content placeholder"></div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -91,11 +87,13 @@
 
 	.nostr-wrapper {
 		@apply max-w-full overflow-x-hidden;
-	}
-	.note-content {
-		@apply max-w-full overflow-x-hidden;
 		display: flex;
-		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.note-header {
+		display: flex;
+		align-items: center;
 		gap: 6px;
 	}
 
@@ -117,28 +115,26 @@
 		border-radius: 20%;
 	}
 
-	.note-details {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.note-header {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		justify-content: space-between;
-	}
-
 	.note-name {
 		font-weight: bold;
 		font-size: 14px;
 		color: var(--name-color);
+		flex-grow: 1; /* 名前が残りスペースを埋める */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.note-time {
 		font-size: 12px;
 		color: var(--time-color);
+		flex-shrink: 0;
+	}
+
+	.note-body-wrapper {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.note-body {
