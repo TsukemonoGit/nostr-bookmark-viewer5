@@ -52,7 +52,7 @@
 		<!-- Mobile Content -->
 		<main class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white dark:bg-black">
 			<div class="p-4">
-				<BookmarkView {selectedItem} />
+				<BookmarkView selectedBookmark={selectedItem} />
 			</div>
 		</main>
 	</div>
