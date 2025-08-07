@@ -50,7 +50,7 @@
 		</header>
 
 		<!-- Mobile Content -->
-		<main class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white dark:bg-black">
+		<main class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white pb-16 dark:bg-black">
 			<div class="p-4">
 				<BookmarkView selectedBookmark={selectedItem} />
 			</div>
