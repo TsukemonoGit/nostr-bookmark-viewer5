@@ -2,14 +2,20 @@
 	import { hexRegex } from '$lib/utils/regex';
 	import { toastStore } from '$lib/utils/util';
 	import { nip19 } from 'nostr-tools';
+	import { encodetoNote } from '$lib/utils/encode';
 
 	interface Props {
 		onSubmit: (data: string[]) => void;
-	}
-	let { onSubmit }: Props = $props();
 
-	let eventId = $state('');
-	let relay = $state('');
+		initialTag?: string[];
+	}
+
+	// propsの初期値を設定
+	let { onSubmit, initialTag }: Props = $props();
+
+	// $state変数をpropsの初期値で設定
+	let eventId = $state(encodetoNote(initialTag?.[1]) || '');
+	let relay = $state(initialTag?.[2] || '');
 
 	function handleSubmit() {
 		const id = checkId(eventId.trim());

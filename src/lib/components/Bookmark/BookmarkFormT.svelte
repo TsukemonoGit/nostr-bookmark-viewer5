@@ -1,10 +1,15 @@
 <script lang="ts">
 	interface Props {
 		onSubmit: (data: string[]) => void;
+		// 新しく追加したprops
+		initialTag?: string[];
 	}
-	let { onSubmit }: Props = $props();
 
-	let hashtag = $state('');
+	// propsの初期値を設定
+	let { onSubmit, initialTag }: Props = $props();
+
+	// $state変数をpropsの初期値で設定
+	let hashtag = $state(initialTag?.[1] || '');
 
 	function handleSubmit() {
 		const formData = ['t', hashtag].filter(Boolean);

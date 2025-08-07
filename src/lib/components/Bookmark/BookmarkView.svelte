@@ -20,6 +20,7 @@
 	import type { DndTagItem } from '$lib/types/utiles';
 	import { loginUser } from '$lib/utils/stores.svelte';
 	import CreateNewTag from './CreateNewTag.svelte';
+	import TagEditor from './TagEditor.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -320,25 +321,21 @@
 		isSorting = false;
 	}
 
-	function startTagEditing(id: string, tagValue: string) {
-		editingTagId = id;
-		console.log(tagValue);
-	}
-
-	function saveTagEdit(id: string, newTagValue: string) {
+	async function saveTagEdit(id: string, newTag: string[]) {
 		const tagIndex = tagsToDisplay.findIndex((t) => t.id === id);
-		if (tagIndex !== -1) {
-			const updatedTags = [...tagsToDisplay];
-			updatedTags[tagIndex].tag[1] = newTagValue;
-			tagsToDisplay = updatedTags;
-			originalTags = $state.snapshot(tagsToDisplay);
+		if (tagIndex === -1) {
+			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			return;
 		}
-		editingTagId = null;
-		alert('タグを更新しました！');
-	}
 
-	function cancelTagEdit() {
-		editingTagId = null;
+		const updatedTags = [...tagsToDisplay];
+		updatedTags[tagIndex] = { ...updatedTags[tagIndex], tag: newTag };
+
+		const tagsToSave = updatedTags.map((item) => item.tag);
+		const ev = await createEventParameters(tagsToSave);
+		if (ev) {
+			await publishEvent(ev, '更新完了', '更新失敗');
+		}
 	}
 
 	function saveTitle() {
@@ -586,37 +583,24 @@
 							: ''} {isSorting ? 'cursor-grab' : ''}"
 						style="white-space: pre-wrap; word-break: break-word;"
 					>
-						<!--修正窓の出し方考える-->
-						{#if editingTagId === item.id}
-							<input type="text" bind:value={item.tag[1]} class="flex-1 rounded-md border p-2" />
-							<button
-								onclick={() => saveTagEdit(item.id, item.tag[1])}
-								class="rounded-md bg-blue-500 px-4 py-2 text-white">保存</button
-							>
-							<button onclick={cancelTagEdit} class="rounded-md bg-gray-500 px-4 py-2 text-white"
-								>キャンセル</button
-							>
-						{:else}
-							{#if editable}
-								{#if isSorting}
-									<span class="handle text-neutral-400">⋮⋮</span>
-								{:else}
-									<input
-										type="checkbox"
-										class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
-										checked={isTagSelected(item.id)}
-										onchange={() => toggleTagSelection(item.id)}
-									/>
-								{/if}
+						{#if editable}
+							{#if isSorting}
+								<span class="handle text-neutral-400">⋮⋮</span>
+							{:else}
+								<input
+									type="checkbox"
+									class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+									checked={isTagSelected(item.id)}
+									onchange={() => toggleTagSelection(item.id)}
+								/>
 							{/if}
-							<TagRenderer tag={item.tag} />
-							{#if editable}
-								<button
-									onclick={() => startTagEditing(item.id, item.tag[1])}
-									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-									>修正</button
-								>
-							{/if}
+						{/if}
+						<TagRenderer tag={item.tag} />
+						{#if editable}
+							<TagEditor
+								initTag={item.tag}
+								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
+							/>
 						{/if}
 					</div>
 				</div>

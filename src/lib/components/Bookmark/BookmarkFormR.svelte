@@ -1,11 +1,16 @@
 <script lang="ts">
 	interface Props {
 		onSubmit: (data: string[]) => void;
+		// 新しく追加したprops
+		initialTag?: string[];
 	}
-	let { onSubmit }: Props = $props();
 
-	let url = $state('');
-	let title = $state('');
+	// propsの初期値を設定
+	let { onSubmit, initialTag }: Props = $props();
+
+	// $state変数をpropsの初期値で設定
+	let url = $state(initialTag?.[1] || '');
+	let title = $state(initialTag?.[2] || '');
 
 	function handleSubmit() {
 		const formData = ['r', url, title].filter(Boolean);

@@ -1,15 +1,21 @@
 <script lang="ts">
+	import { encodetoNaddr } from '$lib/utils/encode';
 	import { nip33Regex } from '$lib/utils/regex';
 	import { toastStore } from '$lib/utils/util';
 	import { nip19 } from 'nostr-tools';
 
 	interface Props {
 		onSubmit: (data: string[]) => void;
+		// 新しく追加したprops
+		initialTag?: string[];
 	}
-	let { onSubmit }: Props = $props();
 
-	let addressableId = $state('');
-	let relay = $state('');
+	// propsの初期値を設定
+	let { onSubmit, initialTag }: Props = $props();
+
+	// $state変数をpropsの初期値で設定
+	let addressableId = $state(encodetoNaddr(initialTag?.[1]) || '');
+	let relay = $state(initialTag?.[2] || '');
 
 	function handleSubmit() {
 		const checkedId = checkId(addressableId.trim());
