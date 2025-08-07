@@ -18,6 +18,7 @@
 	import ConfirmDeleteDialog from '../Layout/ConfirmDeleteDialog.svelte';
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
+	import { loginUser } from '$lib/utils/stores.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -25,6 +26,9 @@
 
 	let { selectedBookmark }: Props = $props();
 
+	let editable = $derived(
+		(selectedBookmark && loginUser.get() === selectedBookmark.event.pubkey) || false
+	);
 	let isPrivate = $state(false);
 	let isSorting = $state(false);
 	let selectedTagIds = $state(new Set<string>());
@@ -367,31 +371,32 @@
 							<span class="text-lg">画像なし</span>
 						{/if}
 					</div>
-					{#if editingImage}
-						<div class="mt-2">
-							<input
-								type="text"
-								bind:value={tempImage}
-								class="w-full flex-1 rounded-md border p-2"
-								placeholder="画像URL"
-							/>
-							<div class="mt-2 flex flex-wrap items-center justify-end gap-1">
-								<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white"
-									>保存</button
-								>
-								<button
-									onclick={() => (editingImage = false)}
-									class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
-								>
+					{#if editable}
+						{#if editingImage}
+							<div class="mt-2">
+								<input
+									type="text"
+									bind:value={tempImage}
+									class="w-full flex-1 rounded-md border p-2"
+									placeholder="画像URL"
+								/>
+								<div class="mt-2 flex flex-wrap items-center justify-end gap-1">
+									<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white"
+										>保存</button
+									>
+									<button
+										onclick={() => (editingImage = false)}
+										class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
+									>
+								</div>
 							</div>
-						</div>
-					{:else}
-						<button
-							onclick={() => (editingImage = true)}
-							class=" float-end m-1 self-end rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-							>修正</button
-						>
-					{/if}
+						{:else}
+							<button
+								onclick={() => (editingImage = true)}
+								class=" float-end m-1 self-end rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
+								>修正</button
+							>
+						{/if}{/if}
 				</div>
 
 				<div class="flex flex-col">
@@ -419,11 +424,12 @@
 							>
 								{selectedBookmark.title || 'タイトルがありません'}
 							</h2>
-							<button
-								onclick={() => (editingTitle = true)}
-								class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-								>修正</button
-							>
+							{#if editable}
+								<button
+									onclick={() => (editingTitle = true)}
+									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
+									>修正</button
+								>{/if}
 						</div>
 					{/if}
 
@@ -450,11 +456,12 @@
 							>
 								{selectedBookmark.description || '説明がありません'}
 							</p>
-							<button
-								onclick={() => (editingDescription = true)}
-								class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-								>修正</button
-							>
+							{#if editable}
+								<button
+									onclick={() => (editingDescription = true)}
+									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
+									>修正</button
+								>{/if}
 						</div>
 					{/if}
 				</div>
@@ -481,33 +488,34 @@
 			</span>
 		</div>
 		<div class="mb-4 flex items-center justify-between">
-			<Select.Root
-				items={selectItem}
-				type="single"
-				onValueChange={(v) => (isSorting = v === 'sorting')}
-			>
-				<Select.Trigger
-					class="data-placeholder:text-foreground-alt/50 inline-flex h-8 w-[296px] touch-none items-center rounded-md border border-neutral-600 px-[11px] text-sm transition-colors select-none dark:border-neutral-400"
+			{#if editable}
+				<Select.Root
+					items={selectItem}
+					type="single"
+					onValueChange={(v) => (isSorting = v === 'sorting')}
 				>
-					{isSorting ? selectItem[1].label : selectItem[0].label}
-					<ChevronsUpDown class="text-muted-foreground ml-auto size-6" />
-				</Select.Trigger>
-				<Select.Portal>
-					<Select.Content
-						class="focus-override shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--bits-select-content-available-height)] w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)] rounded-xl border border-neutral-600 bg-neutral-100 outline-hidden select-none data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 dark:border-neutral-400 dark:bg-neutral-900"
+					<Select.Trigger
+						class="data-placeholder:text-foreground-alt/50 inline-flex h-8 w-[296px] touch-none items-center rounded-md border border-neutral-600 px-[11px] text-sm transition-colors select-none dark:border-neutral-400"
 					>
-						<Select.Viewport class="p-1">
-							{#each selectItem as item, i (i + item.value)}
-								<Select.Item
-									class="rounded-button data-highlighted:bg-muted flex h-10 w-full items-center py-3 pr-1.5 pl-5 text-sm capitalize outline-hidden select-none data-disabled:opacity-50"
-									value={item.value}
-									label={item.label}>{item.label}</Select.Item
-								>
-							{/each}</Select.Viewport
+						{isSorting ? selectItem[1].label : selectItem[0].label}
+						<ChevronsUpDown class="text-muted-foreground ml-auto size-6" />
+					</Select.Trigger>
+					<Select.Portal>
+						<Select.Content
+							class="focus-override shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--bits-select-content-available-height)] w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)] rounded-xl border border-neutral-600 bg-neutral-100 outline-hidden select-none data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 dark:border-neutral-400 dark:bg-neutral-900"
 						>
-					</Select.Content></Select.Portal
-				>
-			</Select.Root>
+							<Select.Viewport class="p-1">
+								{#each selectItem as item, i (i + item.value)}
+									<Select.Item
+										class="rounded-button data-highlighted:bg-muted flex h-10 w-full items-center py-3 pr-1.5 pl-5 text-sm capitalize outline-hidden select-none data-disabled:opacity-50"
+										value={item.value}
+										label={item.label}>{item.label}</Select.Item
+									>
+								{/each}</Select.Viewport
+							>
+						</Select.Content></Select.Portal
+					>
+				</Select.Root>{/if}
 			<div class="flex items-center space-x-2">
 				<button
 					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
@@ -518,6 +526,7 @@
 					公開
 				</button>
 				<button
+					disabled={!editable}
 					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
 						? 'bg-blue-500 text-white'
 						: 'bg-neutral-200 dark:bg-neutral-700'}"
@@ -527,22 +536,23 @@
 				</button>
 			</div>
 		</div>
-		<div class="mb-4 flex items-center justify-between">
-			<label class="flex items-center space-x-2">
-				<input
-					type="checkbox"
-					class="form-checkbox"
-					onchange={(e) => toggleSelectAll(e)}
-					checked={displayTags.length > 0 &&
-						selectedCount === displayTags.length &&
-						selectedCount !== 0}
-					disabled={isSorting}
-				/>
-				<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-					{isSorting ? 'タグをドラッグして並べ替えてください' : '全て選択'}
-				</span>
-			</label>
-		</div>
+		{#if editable}
+			<div class="mb-4 flex items-center justify-between">
+				<label class="flex items-center space-x-2">
+					<input
+						type="checkbox"
+						class="form-checkbox"
+						onchange={(e) => toggleSelectAll(e)}
+						checked={displayTags.length > 0 &&
+							selectedCount === displayTags.length &&
+							selectedCount !== 0}
+						disabled={isSorting}
+					/>
+					<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+						{isSorting ? 'タグをドラッグして並べ替えてください' : '全て選択'}
+					</span>
+				</label>
+			</div>{/if}
 		<div
 			use:dndzone={{
 				items: displayTags,
@@ -563,6 +573,7 @@
 							: ''} {isSorting ? 'cursor-grab' : ''}"
 						style="white-space: pre-wrap; word-break: break-word;"
 					>
+						<!--修正窓の出し方考える-->
 						{#if editingTagId === item.id}
 							<input type="text" bind:value={item.tag[1]} class="flex-1 rounded-md border p-2" />
 							<button
@@ -573,23 +584,26 @@
 								>キャンセル</button
 							>
 						{:else}
-							{#if isSorting}
-								<span class="handle text-neutral-400">⋮⋮</span>
-							{:else}
-								<input
-									type="checkbox"
-									class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
-									checked={isTagSelected(item.id)}
-									onchange={() => toggleTagSelection(item.id)}
-								/>
+							{#if editable}
+								{#if isSorting}
+									<span class="handle text-neutral-400">⋮⋮</span>
+								{:else}
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+										checked={isTagSelected(item.id)}
+										onchange={() => toggleTagSelection(item.id)}
+									/>
+								{/if}
 							{/if}
 							<TagRenderer tag={item.tag} />
-
-							<button
-								onclick={() => startTagEditing(item.id, item.tag[1])}
-								class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-								>修正</button
-							>
+							{#if editable}
+								<button
+									onclick={() => startTagEditing(item.id, item.tag[1])}
+									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
+									>修正</button
+								>
+							{/if}
 						{/if}
 					</div>
 				</div>
@@ -604,7 +618,7 @@
 	</div>
 {/if}
 
-{#if selectedBookmark}
+{#if selectedBookmark && editable}
 	<div
 		class="fixed right-4 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-900 p-4 text-white shadow-xl dark:bg-neutral-900"
 	>

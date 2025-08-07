@@ -4,6 +4,7 @@ import { SvelteMap } from 'svelte/reactivity';
 
 export const relayStateMap = createCustomStore<SvelteMap<string, ConnectionState>>(new SvelteMap());
 export const kind10002 = createCustomStore<Nostr.Event | null>(null);
+export const loginUser = createCustomStore<string | undefined>(undefined);
 
 //-------------------------------------
 

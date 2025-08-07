@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import { toastStore } from '$lib/utils/util';
 	import { Toaster } from '@skeletonlabs/skeleton-svelte';
+	import { loginUser } from '$lib/utils/stores.svelte';
 
 	let { children } = $props();
 
@@ -16,12 +17,18 @@
 		if (browser) {
 			document.addEventListener('nlAuth', (e: Event) => {
 				const customEvent = e as CustomEvent;
+				const pubkey = customEvent.detail.pubkey;
+				if (!pubkey) {
+					loginUser.set(undefined);
+					return;
+				}
 
+				loginUser.set(pubkey);
 				console.log(customEvent);
 
 				// 現在のパスがトップページ（'/'）であるか確認
 				if (page.url.pathname === '/') {
-					const npub = nip19.npubEncode(customEvent.detail.pubkey);
+					const npub = nip19.npubEncode(pubkey);
 					goto(`/${npub}`);
 				}
 			});
