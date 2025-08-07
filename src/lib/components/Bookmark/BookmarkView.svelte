@@ -403,9 +403,9 @@
 				</button>
 				<button
 					onclick={updateTags}
-					class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700"
+					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
 				>
-					OK
+					適応
 				</button>
 			{/if}
 		</div>
