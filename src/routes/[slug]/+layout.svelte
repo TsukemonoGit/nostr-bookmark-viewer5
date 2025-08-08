@@ -6,7 +6,7 @@
 		subscribeBookmarkData,
 		serRelays
 	} from '$lib/nostr/nostrSubscriptions';
-	import { kind10002 } from '$lib/utils/stores.svelte';
+	import { kind10002, queryClient } from '$lib/utils/stores.svelte';
 	import { QueryClient, QueryClientProvider, type QueryClientConfig } from '@tanstack/svelte-query';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -61,7 +61,7 @@
 		}
 	};
 
-	const queryClient = new QueryClient(config);
+	queryClient.set(new QueryClient(config));
 
 	let SvelteQueryDevtools: any = $state();
 
@@ -74,7 +74,7 @@
 	}
 </script>
 
-<QueryClientProvider client={queryClient}>
+<QueryClientProvider client={queryClient.get()}>
 	{@render children?.()}
 	{#if SvelteQueryDevtools}
 		<SvelteQueryDevtools initialIsOpen={false} />

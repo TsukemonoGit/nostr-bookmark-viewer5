@@ -13,8 +13,7 @@
 	import { ChevronsUpDown } from '@lucide/svelte';
 	import { formatAbsoluteDateFromUnix, toastStore } from '$lib/utils/util';
 	import type { EventParameters } from 'nostr-typedef';
-	import { nip07Signer, type OkPacket } from 'rx-nostr';
-	import { publishSignEvent } from '$lib/nostr/nostrSubscriptions';
+
 	import ConfirmDeleteDialog from '../Layout/ConfirmDeleteDialog.svelte';
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
@@ -24,6 +23,7 @@
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';
 	import { publishEvent } from '$lib/nostr/publish';
+	import ItemMenu from '../Layout/ItemMenu.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -44,7 +44,6 @@
 	let editingTitle = $state(false);
 	let editingDescription = $state(false);
 	let editingImage = $state(false);
-	let editingTagId: string | null = $state(null);
 
 	let tempTitle = $state('');
 	let tempDescription = $state('');
@@ -582,15 +581,9 @@
 				class="rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
 				style="white-space: pre-wrap; word-break: break-word;"
 			>
-				ID: {selectedBookmark.atag}
+				{selectedBookmark.atag}
 			</span>
-			<!-- {#if selectedBookmark.identifier}
-				<span
-					class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
-				>
-					識別子: {selectedBookmark.identifier}
-				</span>
-			{/if} -->
+
 			<span
 				class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
 			>
@@ -695,11 +688,16 @@
 								/>
 							{/if}
 						{/if}
-						<TagRenderer tag={item.tag} />{#if editable}
-							<TagEditor
-								initTag={item.tag}
+						<TagRenderer tag={item.tag} />
+						{#if editable}
+							<ItemMenu
+								tag={item.tag}
 								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
 							/>
+							<!-- <TagEditor
+								initTag={item.tag}
+								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
+							/> -->
 						{/if}
 					</div>
 				</div>

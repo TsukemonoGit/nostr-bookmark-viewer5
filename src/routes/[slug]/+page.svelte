@@ -4,6 +4,7 @@
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 	import RelayStatus from '$lib/components/RelayStatus.svelte';
 	import type { LayoutData } from './$types';
+	import { untrack } from 'svelte';
 
 	let { data }: { data: LayoutData } = $props();
 	let selectedAtag: string | null = $state(null);
@@ -12,7 +13,7 @@
 	let selectedItem: BookmarkItem | null = $derived(
 		selectedAtag ? $bookmarkItemsMap.get(selectedAtag) || null : null
 	);
-
+	let mainContent: HTMLElement | undefined = $state();
 	// モバイルサイドバーを閉じる関数
 	function closeMobileSidebar() {
 		showMobileSidebar = false;
@@ -22,6 +23,15 @@
 	function handleBackdropClick() {
 		closeMobileSidebar();
 	}
+	$effect(() => {
+		if (selectedItem) {
+			untrack(() => {
+				if (mainContent) {
+					mainContent.scrollTo({ top: 0 });
+				}
+			});
+		}
+	});
 </script>
 
 <div class="flex h-screen w-full overflow-hidden">
@@ -52,10 +62,11 @@
 		</header>
 
 		<!-- Mobile Content -->
-		<main class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white pb-16 dark:bg-black">
-			<div class="p-4">
-				<BookmarkView selectedBookmark={selectedItem} />
-			</div>
+		<main
+			bind:this={mainContent}
+			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-16 dark:bg-black"
+		>
+			<BookmarkView selectedBookmark={selectedItem} />
 		</main>
 	</div>
 </div>

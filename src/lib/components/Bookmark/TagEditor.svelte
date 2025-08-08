@@ -7,13 +7,12 @@
 	import BookmarkFormT from './BookmarkFormT.svelte';
 	import BookmarkFormR from './BookmarkFormR.svelte';
 
-	let isOpen = $state(false);
-
 	interface Props {
 		initTag: string[];
+		isOpen?: boolean;
 		onConformEditTag: (tag: string[]) => void;
 	}
-	let { initTag, onConformEditTag }: Props = $props();
+	let { initTag, onConformEditTag, isOpen = $bindable(false) }: Props = $props();
 
 	// initTagの最初の要素からフォームコンポーネントを決定
 	const FormComponent = (() => {
@@ -39,11 +38,11 @@
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-	<Dialog.Trigger
+	<!-- <Dialog.Trigger
 		class="rounded-md bg-neutral-200 p-1 text-sm font-medium hover:bg-neutral-300 dark:bg-neutral-700  hover:dark:bg-neutral-600"
 	>
 		<Pencil />
-	</Dialog.Trigger>
+	</Dialog.Trigger> -->
 	<Dialog.Portal>
 		<Dialog.Overlay
 			class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"

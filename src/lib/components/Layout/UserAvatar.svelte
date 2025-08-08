@@ -30,9 +30,7 @@
 
 <div
 	{title}
-	class="relative flex items-center justify-center {!square
-		? 'rounded-full'
-		: ''} overflow-hidden bg-neutral-800"
+	class="relative flex items-center justify-center overflow-hidden bg-neutral-800"
 	style="height: {size}px; width: {size}px;"
 >
 	{#if url && url !== ''}
@@ -41,7 +39,7 @@
 			onload={() => (loadingStatus = 'loaded')}
 			onerror={() => (loadingStatus = 'error')}
 			alt={name}
-			class="t-0 l-0 absolute object-cover {!square ? 'rounded-full' : ''}"
+			class="t-0 l-0 absolute object-cover"
 			style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
 			loading="lazy"
 		/>
