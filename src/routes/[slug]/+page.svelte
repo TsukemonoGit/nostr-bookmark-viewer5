@@ -77,7 +77,10 @@
 		<!-- Backdrop -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="bg-opacity-50 absolute inset-0 bg-black" onclick={handleBackdropClick}></div>
+		<div
+			class="bg-opacity-50 absolute inset-0 bg-neutral-900/50"
+			onclick={handleBackdropClick}
+		></div>
 
 		<!-- Sidebar -->
 		<aside class="absolute top-0 left-0 h-full w-64 bg-neutral-100 shadow-lg dark:bg-neutral-900">
