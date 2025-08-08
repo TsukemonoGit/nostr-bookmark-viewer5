@@ -1,15 +1,11 @@
 <script lang="ts">
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
-	import Relay from '../Tags/Relay.svelte';
-	import Hashtag from '../Tags/Hashtag.svelte';
-	import NaddrEvent from '../Tags/NaddrEvent.svelte';
-	import NoteEvent from '../Tags/NoteEvent.svelte';
 
 	import { dndzone } from 'svelte-dnd-action';
 	import { untrack } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { Select } from 'bits-ui';
-	import Url from '../Tags/Url.svelte';
+
 	import { ChevronsUpDown } from '@lucide/svelte';
 	import { formatAbsoluteDateFromUnix, toastStore } from '$lib/utils/util';
 	import type { EventParameters } from 'nostr-typedef';
@@ -19,7 +15,6 @@
 	import type { DndTagItem } from '$lib/types/utiles';
 	import { loginUser } from '$lib/utils/stores.svelte';
 	import CreateNewTag from '../Layout/CreateNewTag.svelte';
-	import TagEditor from './TagEditor.svelte';
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';
 	import { publishEvent } from '$lib/nostr/publish';
@@ -694,10 +689,6 @@
 								tag={item.tag}
 								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
 							/>
-							<!-- <TagEditor
-								initTag={item.tag}
-								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
-							/> -->
 						{/if}
 					</div>
 				</div>

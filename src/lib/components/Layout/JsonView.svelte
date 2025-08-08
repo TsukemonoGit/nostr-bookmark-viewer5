@@ -4,10 +4,11 @@
 	import { type Event as NostrEvent } from 'nostr-typedef';
 
 	interface Props {
+		tag: string[];
 		event: NostrEvent | null;
 		isOpen?: boolean;
 	}
-	let { event, isOpen = $bindable(false) }: Props = $props();
+	let { event, isOpen = $bindable(false), tag }: Props = $props();
 
 	let formattedJson = $derived(formatEvent(event));
 	function formatEvent(ev: NostrEvent | null): string | null {
@@ -34,7 +35,12 @@
 			>
 				JSON DATA
 			</Dialog.Title>
-
+			<div
+				class="mt-4 max-h-[70vh] overflow-auto rounded-lg bg-neutral-100 p-4 dark:bg-neutral-900"
+			>
+				<pre class="text-sm break-words whitespace-pre-wrap"><code>{JSON.stringify(tag)}</code
+					></pre>
+			</div>
 			<!-- イベントのJSON内容を表示する部分 -->
 			{#if formattedJson}
 				<div
