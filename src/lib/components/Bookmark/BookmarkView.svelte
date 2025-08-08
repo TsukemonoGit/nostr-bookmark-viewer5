@@ -570,7 +570,7 @@
 		<div class="mb-6 flex flex-wrap gap-4 text-sm text-neutral-500 dark:text-neutral-400">
 			<span
 				class="rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
-				style="white-space: pre-wrap; word-break: break-word;"
+				style="white-space: pre-wrap; word-break: break-word; "
 			>
 				{selectedBookmark.atag}
 			</span>

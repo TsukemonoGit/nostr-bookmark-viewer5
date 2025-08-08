@@ -55,6 +55,10 @@
 				<span class="text-lg">☰</span>
 				メニュー
 			</button>
+			{#if selectedItem}<div class="text-xs text-neutral-700 dark:text-neutral-300">
+					kind:{selectedItem.event.kind}
+					{#if selectedItem.identifier}ID:{selectedItem.identifier}{/if}
+				</div>{/if}
 			<div class="flex flex-auto justify-end"><RelayStatus /></div>
 			<!-- <div class="truncate text-xs text-neutral-500 dark:text-neutral-400">
 				{selectedItem?.title || '未選択'}
