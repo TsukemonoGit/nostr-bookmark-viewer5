@@ -19,7 +19,7 @@
 			return null;
 		}
 	}
-	$inspect(isOpen);
+	//$inspect(isOpen);
 </script>
 
 <Dialog.Root bind:open={isOpen}>

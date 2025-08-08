@@ -55,8 +55,19 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
 			return '3D';
 		} else {
 			try {
-				// プロキシAPI経由でContent-Typeを取得
 				const response = await fetch(`/api/url-check?url=${encodeURIComponent(url)}`);
+
+				const contentTypeHeader = response.headers.get('content-type') || '';
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				// Content-TypeがJSON形式でない場合は弾く
+				if (!contentTypeHeader.includes('application/json')) {
+					throw new Error(`Invalid content-type: ${contentTypeHeader}`);
+				}
+
 				const data = await response.json();
 				const contentType = data.contentType;
 
@@ -74,7 +85,7 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
 					return 'url';
 				}
 			} catch (error) {
-				console.log(error);
+				console.error('fetch error:', error);
 				return 'url';
 			}
 		}
