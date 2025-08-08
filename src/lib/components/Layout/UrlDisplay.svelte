@@ -4,6 +4,7 @@
 	import Link from './Link.svelte';
 	import ContentImage from './ContentImage.svelte';
 	import OgpLoad from './OgpLoad.svelte';
+	import ContentVideo from './ContentVideo.svelte';
 
 	interface Props {
 		part: Token;
@@ -22,8 +23,8 @@
 		{#snippet content(type)}
 			{#if type === 'image' || type === 'svg'}
 				<ContentImage url={part.content} />
-				<!--	{:else if type === 'movie'}
-				<ContentVideo src={part.content} url={part.content} {author} />
+			{:else if type === 'movie'}
+				<ContentVideo url={part.content} />
 			{:else if type === 'audio'}
 				<audio
 					aria-label="audio contents"
@@ -32,7 +33,7 @@
 					class=" max-h-80 max-w-[min(20rem,100%)] object-contain"
 					><track default kind="captions" /></audio
 				>
-			{:else if type === '3D'}
+				<!--{:else if type === '3D'}
 				<Content3D content={part.content} url={part.content} />-->
 			{:else if type === 'url'}
 				<OgpLoad url={part.content || ''} />{:else}

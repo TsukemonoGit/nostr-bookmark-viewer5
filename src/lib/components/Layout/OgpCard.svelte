@@ -57,11 +57,11 @@
 	<!-- テキスト部分 -->
 	{#snippet textContent()}
 		<div class="grid w-full grid-rows-[auto_1fr] p-0.5 pl-1">
-			<h2 class="line-clamp-2 text-sm font-bold text-neutral-200">
+			<h2 class="line-clamp-2 text-sm font-bold text-neutral-800 dark:text-neutral-200">
 				{contents.title}
 			</h2>
 			<p
-				class="line-clamp-6 max-w-full text-xs text-neutral-400"
+				class="line-clamp-6 max-w-full text-xs text-neutral-600 dark:text-neutral-400"
 				style="white-space: pre-wrap; word-break: break-word;"
 			>
 				{contents.description}
@@ -79,7 +79,7 @@
 						/>
 					{/if}
 				{/if}
-				<p class="text-xs text-neutral-300">
+				<p class="text-xs text-neutral-700 dark:text-neutral-300">
 					{#if contents.memo}
 						{contents.memo} /
 					{/if}
