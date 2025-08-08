@@ -46,20 +46,14 @@
 
 	$effect(() => {
 		if (selectedBookmark) {
-			tempTitle = selectedBookmark.title || '';
-			tempDescription = selectedBookmark.description || '';
-			tempImage = selectedBookmark.image || '';
-		}
-	});
-
-	$effect(() => {
-		if (tagsToDisplay) {
 			untrack(() => {
-				const excludedTags = new Set(['d', 'title', 'description', 'image']);
-				displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
+				tempTitle = selectedBookmark.title || '';
+				tempDescription = selectedBookmark.description || '';
+				tempImage = selectedBookmark.image || '';
 			});
 		}
 	});
+	const excludedTags = new Set(['d', 'title', 'description', 'image']);
 
 	let originalTags: DndTagItem[] = $state([]);
 
@@ -68,14 +62,18 @@
 		{ value: 'selecting', label: '選択モード' },
 		{ value: 'sorting', label: '並べ替えモード' }
 	];
-
+	$effect(() => {
+		if (tagsToDisplay) {
+			displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
+		}
+	});
 	$effect(() => {
 		isPrivate;
 		if (selectedBookmark) {
 			untrack(async () => {
 				selectedTagIds = new Set();
-				tagsToDisplay = await getTagsToDisplay();
-				originalTags = $state.snapshot(tagsToDisplay);
+				originalTags = await getTagsToDisplay();
+				tagsToDisplay = [...originalTags];
 			});
 		}
 	});
@@ -143,22 +141,24 @@
 
 	let selectedTags = $derived(tagsToDisplay.filter((item) => selectedTagIds.has(item.id)));
 
+	//削除
 	async function deleteSelectedTags() {
 		const selectedCount = selectedTagIds.size;
 		if (selectedCount === 0 || !selectedBookmark) return;
 
-		tagsToDisplay = tagsToDisplay.filter((item) => !selectedTagIds.has(item.id));
+		const deletedList = tagsToDisplay.filter((item) => !selectedTagIds.has(item.id));
 
-		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const tagsToSave = deletedList.map((item) => item.tag);
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
 			await publishEvent(ev, '削除完了', '削除失敗');
-			originalTags = $state.snapshot(tagsToDisplay);
-			selectedTagIds = new Set();
+			//originalTags = $state.snapshot(tagsToDisplay);
+			//selectedTagIds = new Set();
 		}
 	}
 
+	//移動
 	async function moveSelectedTags(atag: string, isPrv: boolean) {
 		if (selectedCount === 0 || !selectedBookmark) {
 			toastStore.error({
@@ -248,10 +248,6 @@
 					title: '移動完了',
 					description: `${selectedCount}個のタグを移動しました。`
 				});
-				/* 		// 6. 状態をリセットしてUIを更新
-				tagsToDisplay = [...remainingTags];
-				originalTags = $state.snapshot(tagsToDisplay);
-				selectedTagIds = new Set(); */
 			}
 		} catch (error) {
 			console.error('タグの移動中にエラーが発生しました:', error);
