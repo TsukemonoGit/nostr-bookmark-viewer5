@@ -23,6 +23,7 @@
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';
 	import { publishEvent } from '$lib/nostr/publish';
+	import ItemMenu from '../Layout/ItemMenu.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;
@@ -687,11 +688,16 @@
 								/>
 							{/if}
 						{/if}
-						<TagRenderer tag={item.tag} />{#if editable}
-							<TagEditor
-								initTag={item.tag}
+						<TagRenderer tag={item.tag} />
+						{#if editable}
+							<ItemMenu
+								tag={item.tag}
 								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
 							/>
+							<!-- <TagEditor
+								initTag={item.tag}
+								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
+							/> -->
 						{/if}
 					</div>
 				</div>

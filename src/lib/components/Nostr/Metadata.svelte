@@ -19,7 +19,7 @@
 
 	let { relays = undefined, pubkey, error, loading, nodata, content, onChange }: Props = $props();
 
-	let queryKey: QueryKey = $derived(['metadata', pubkey] as QueryKey);
+	let queryKey: QueryKey = $derived([`0:${pubkey}:`] as QueryKey);
 	let filters = $derived([{ kinds: [0], authors: [pubkey], limit: 1 }]);
 
 	let max3relays = $derived(relays?.slice(0, 3));

@@ -1,10 +1,12 @@
 import type { ConnectionState } from 'rx-nostr';
 import * as Nostr from 'nostr-typedef';
 import { SvelteMap } from 'svelte/reactivity';
+import type { QueryClient } from '@tanstack/svelte-query';
 
 export const relayStateMap = createCustomStore<SvelteMap<string, ConnectionState>>(new SvelteMap());
 export const kind10002 = createCustomStore<Nostr.Event | null>(null);
 export const loginUser = createCustomStore<string | undefined>(undefined);
+export const queryClient = createCustomStore<QueryClient | undefined>(undefined);
 
 //-------------------------------------
 

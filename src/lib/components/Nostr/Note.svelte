@@ -18,7 +18,7 @@
 
 	let { relays = undefined, id, error, loading, nodata, content, onChange }: Props = $props();
 
-	let queryKey: QueryKey = $derived(['note', id] as QueryKey);
+	let queryKey: QueryKey = $derived([id] as QueryKey);
 	let filters = $derived([{ ids: [id], limit: 1 }]);
 
 	let max3relays = $derived(relays?.slice(0, 3));
