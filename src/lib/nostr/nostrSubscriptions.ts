@@ -115,9 +115,31 @@ function upsertByAtag(incoming: Nostr.Event) {
 		return current;
 	});
 }
+
+// kind: 10003 の初期イベントを生成するヘルパー関数
+//10003イベントもってない人も10003操作できるように
+function createInitialKind10003Event(pubkey: string): Nostr.Event {
+	return {
+		kind: 10003,
+		pubkey: pubkey,
+		tags: [],
+		content: '',
+		id: '',
+		sig: '',
+		created_at: 0
+	};
+}
+
 // bookmarks購読（relay listが確定してから呼ばれる）
 export function subscribeBookmarkData(pubkey: string) {
 	if (!rxNostr) return;
+	const initialEvent = createInitialKind10003Event(pubkey);
+	const initialBookmarkItem = eventToBookmarkItem(initialEvent);
+	// writableストアのsetメソッドで初期化
+	const initialMap = new Map<string, BookmarkItem>();
+	initialMap.set(initialBookmarkItem.atag, initialBookmarkItem);
+	bookmarkItemsMap.set(initialMap);
+
 	const req = createRxForwardReq();
 	rxNostr
 		.use(req)
