@@ -583,12 +583,12 @@
 			>
 				{selectedBookmark.atag}
 			</span>
-
-			<span
-				class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
-			>
-				更新日時: {formatAbsoluteDateFromUnix(selectedBookmark.event.created_at)}
-			</span>
+			{#if selectedBookmark.event.created_at}
+				<span
+					class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
+				>
+					更新日時: {formatAbsoluteDateFromUnix(selectedBookmark.event.created_at)}
+				</span>{/if}
 		</div>
 		<div class="mb-4 flex items-center justify-between">
 			{#if editable}
