@@ -7,7 +7,6 @@
 	import JsonView from './JsonView.svelte';
 	import { queryClient } from '$lib/utils/stores.svelte';
 	import { encodetoNaddr, encodetoNevent } from '$lib/utils/encode';
-	import { goto } from '$app/navigation';
 
 	// MenubarからDropdownMenuに変更
 	interface Props {
@@ -19,11 +18,9 @@
 	let openJsonView = $state(false);
 	let menuItem = $derived([
 		{ id: 'edit', label: 'Edit', Icon: Pencil },
+		{ id: 'json', label: 'View Json', Icon: FileJson },
 		...(tag[0] === 'a' || tag[0] === 'e'
-			? [
-					{ id: 'json', label: 'View Json', Icon: FileJson },
-					{ id: 'njump', label: 'Open in njump', Icon: ExternalLink }
-				]
+			? [{ id: 'njump', label: 'Open in njump', Icon: ExternalLink }]
 			: [])
 	]);
 	let event: NostrEvent | null = $state(null);
@@ -78,4 +75,4 @@
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
 <TagEditor bind:isOpen={openTagEditor} initTag={tag} {onConformEditTag} />
-<JsonView {event} bind:isOpen={openJsonView} />
+<JsonView {event} {tag} bind:isOpen={openJsonView} />

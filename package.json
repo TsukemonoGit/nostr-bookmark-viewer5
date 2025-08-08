@@ -56,6 +56,7 @@
 		"nostr-login": "^1.7.11",
 		"nostr-tools": "^2.16.1",
 		"nostr-typedef": "^0.13.0",
-		"rx-nostr": "^3.6.1"
+		"rx-nostr": "^3.6.1",
+		"unfurl.js": "^6.4.0"
 	}
 }
