@@ -4,6 +4,9 @@
 
 	import { parseContent, TokenType, type Token } from '@konemono/nostr-content-parser';
 	import * as nip19 from 'nostr-tools/nip19';
+	import UrlDisplay from './UrlDisplay.svelte';
+	import CustomEmoji from './CustomEmoji.svelte';
+	import DecodedContent from './DecodedContent.svelte';
 
 	interface Props {
 		event: Partial<Nostr.Event>;
@@ -62,7 +65,7 @@
 </script>
 
 {#each parts as part}
-	<!-- {#if part.type === 'nip19'}
+	{#if part.type === 'nip19'}
 		{@const decoded = nip19Decode(part.metadata!.plainNip19 as string)}
 		{#if decoded}
 			<DecodedContent
@@ -79,11 +82,12 @@
 				tags={event.tags}
 			/>{:else}{part}{part.content}{/if}
 	{:else if part.type === 'url'}
-		<UrlDisplay {part} author={event.pubkey || ''} />
+		<UrlDisplay {part} />
 	{:else if part.type === TokenType.CUSTOM_EMOJI}
 		<CustomEmoji {part} />
-	{:else} -->
-	<span class="break-words whitespace-pre-wrap" style="word-break: break-word;">{part.content}</span
-	>
-	<!-- 	{/if} -->
+	{:else}
+		<span class="break-words whitespace-pre-wrap" style="word-break: break-word;"
+			>{part.content}</span
+		>
+	{/if}
 {/each}
