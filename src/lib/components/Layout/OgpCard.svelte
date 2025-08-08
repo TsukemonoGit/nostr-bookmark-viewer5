@@ -25,8 +25,8 @@
 </LinkCheck>
 
 {#snippet linkCard(isValid: boolean)}
-	{@const borderColor = isValid ? 'border-magnum-400' : 'border-neutral-400'}
-	{@const divideColor = isValid ? 'divide-magnum-400' : 'divide-neutral-400'}
+	{@const borderColor = isValid ? 'border-neutral-400' : 'border-neutral-400'}
+	{@const divideColor = isValid ? 'divide-neutral-400' : 'divide-neutral-400'}
 	{@const hoverClass = isValid ? 'hover:opacity-80' : ''}
 
 	<!-- 共通のコンテンツ部分 -->
@@ -57,11 +57,11 @@
 	<!-- テキスト部分 -->
 	{#snippet textContent()}
 		<div class="grid w-full grid-rows-[auto_1fr] p-0.5 pl-1">
-			<h2 class="text-magnum-200 line-clamp-2 text-sm font-bold">
+			<h2 class="line-clamp-2 text-sm font-bold text-neutral-200">
 				{contents.title}
 			</h2>
 			<p
-				class="text-magnum-400 line-clamp-6 max-w-full text-xs"
+				class="line-clamp-6 max-w-full text-xs text-neutral-400"
 				style="white-space: pre-wrap; word-break: break-word;"
 			>
 				{contents.description}
@@ -79,7 +79,7 @@
 						/>
 					{/if}
 				{/if}
-				<p class="text-magnum-300 text-xs">
+				<p class="text-xs text-neutral-300">
 					{#if contents.memo}
 						{contents.memo} /
 					{/if}
