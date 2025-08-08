@@ -4,34 +4,48 @@
 	import NaddrEvent from '../Tags/NaddrEvent.svelte';
 	import NoteEvent from '../Tags/NoteEvent.svelte';
 	import Relay from '../Tags/Relay.svelte';
+	import { viewport } from '$lib/utils/useViewportAction';
 
+	let hasLoaded = $state(false);
 	let { tag }: { tag: string[] } = $props();
+
+	const handleEnterViewport = () => {
+		//console.log('in,', noteId);
+		if (!hasLoaded) {
+			hasLoaded = true;
+		}
+	};
 </script>
 
-<div class="flex-1 p-1">
-	{#if tag[0] === 'e'}
-		<NoteEvent {tag} />
-	{:else if tag[0] === 'a'}
-		<NaddrEvent {tag} />
-	{:else if tag[0] === 'r'}
-		{#if tag[1]?.startsWith('ws')}
-			<Relay {tag} />
+<div class="w-full flex-1 p-1" use:viewport={null} onenterViewport={handleEnterViewport}>
+	{#if hasLoaded}
+		{#if tag[0] === 'e'}
+			<NoteEvent {tag} />
+		{:else if tag[0] === 'a'}
+			<NaddrEvent {tag} />
+		{:else if tag[0] === 'r'}
+			{#if tag[1]?.startsWith('ws')}
+				<Relay {tag} />
+			{:else}
+				<div>
+					{#if tag[2]}
+						<p class="text-lg font-bold">{tag[2]}</p>{/if}<UrlDisplay
+						part={{
+							type: TokenType.URL,
+							content: tag[1],
+							start: 0,
+							end: 0
+						} as Token}
+					/>
+				</div>
+			{/if}
+		{:else if tag[0] === 't'}
+			#{tag[1]}
 		{:else}
-			<div>
-				{#if tag[2]}
-					<p class="text-lg font-bold">{tag[2]}</p>{/if}<UrlDisplay
-					part={{
-						type: TokenType.URL,
-						content: tag[1],
-						start: 0,
-						end: 0
-					} as Token}
-				/>
+			<div class="text-sm text-neutral-600 dark:text-neutral-400">
+				{JSON.stringify(tag)}
 			</div>
-		{/if}
-	{:else if tag[0] === 't'}
-		#{tag[1]}
-	{:else}
+		{/if}{:else}
 		<div class="text-sm text-neutral-600 dark:text-neutral-400">
 			{JSON.stringify(tag)}
 		</div>
