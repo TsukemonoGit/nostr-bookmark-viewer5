@@ -568,12 +568,12 @@
 			</div>
 		{/if}
 		<div class="mb-6 flex flex-wrap gap-4 text-sm text-neutral-500 dark:text-neutral-400">
-			<div
-				class=" rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
+			<span
+				class="rounded bg-primary-100 px-2 py-1 text-primary-800 dark:bg-primary-900 dark:text-primary-200"
 				style="white-space: pre-wrap; word-break: break-word; "
 			>
 				{selectedBookmark.atag}
-			</div>
+			</span>
 			{#if selectedBookmark.event.created_at}
 				<span
 					class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
