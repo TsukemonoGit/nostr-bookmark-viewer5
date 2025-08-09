@@ -367,7 +367,16 @@
 	async function saveTitle() {
 		if (!selectedBookmark) return;
 
+		// 既存のタイトルタグを更新し、存在しない場合は追加
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const titleIndex = tagsToSave.findIndex((tag) => tag[0] === 'title');
+
+		if (titleIndex !== -1) {
+			tagsToSave[titleIndex] = ['title', tempTitle];
+		} else {
+			tagsToSave.push(['title', tempTitle]);
+		}
+
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
@@ -389,7 +398,16 @@
 	async function saveDescription() {
 		if (!selectedBookmark) return;
 
+		// 既存のdescriptionタグを更新し、存在しない場合は追加
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const descriptionIndex = tagsToSave.findIndex((tag) => tag[0] === 'description');
+
+		if (descriptionIndex !== -1) {
+			tagsToSave[descriptionIndex] = ['description', tempDescription];
+		} else {
+			tagsToSave.push(['description', tempDescription]);
+		}
+
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
@@ -412,7 +430,16 @@
 	async function saveImage() {
 		if (!selectedBookmark) return;
 
+		// 既存のimageタグを更新し、存在しない場合は追加
 		const tagsToSave = tagsToDisplay.map((item) => item.tag);
+		const imageIndex = tagsToSave.findIndex((tag) => tag[0] === 'image');
+
+		if (imageIndex !== -1) {
+			tagsToSave[imageIndex] = ['image', tempImage];
+		} else {
+			tagsToSave.push(['image', tempImage]);
+		}
+
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
