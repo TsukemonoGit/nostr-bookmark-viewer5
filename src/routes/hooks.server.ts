@@ -3,7 +3,7 @@ import { setLocale, getI18nOptions } from '@konemono/svelte5-i18n';
 import type { Handle } from '@sveltejs/kit';
 
 function getPreferredLocale(acceptLanguage: string | null, supportedLocales: string[]): string {
-	if (!acceptLanguage) return 'en'; // デフォルト言語
+	if (!acceptLanguage) return 'en';
 
 	const languages = acceptLanguage
 		.split(',')
@@ -15,8 +15,7 @@ function getPreferredLocale(acceptLanguage: string | null, supportedLocales: str
 			return lang;
 		}
 	}
-
-	return 'en'; // フォールバック
+	return 'en';
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -24,10 +23,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const acceptLanguage = event.request.headers.get('accept-language');
 	const preferredLocale = getPreferredLocale(
 		acceptLanguage,
-		options.supportedLocales || ['ja', 'en']
+		options.supportedLocales || ['en', 'ja']
 	);
 
-	// サーバーサイドで言語を設定
 	await setLocale(preferredLocale);
 
 	return resolve(event);
