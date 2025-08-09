@@ -10,7 +10,7 @@
 	import { toastStore } from '$lib/utils/util';
 	import { Toaster } from '@skeletonlabs/skeleton-svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
-	import '$lib/i18n/index.ts';
+
 	import { t } from '@konemono/svelte5-i18n';
 	let { children } = $props();
 
