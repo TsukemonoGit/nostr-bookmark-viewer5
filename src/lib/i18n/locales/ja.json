@@ -56,8 +56,7 @@
 	"bookmarkEdit": {
 		"title": "ブックマーク編集",
 		"description": "ブックマークのタグを編集",
-		"noForm": "適切なフォームが見つかりません。",
-		"close": "閉じる"
+		"noForm": "適切なフォームが見つかりません。"
 	},
 	"moveBookmark": {
 		"trigger": "他のリストに移動",
@@ -68,14 +67,24 @@
 			"Genericlists": "その他のリスト"
 		},
 		"public": "公開リストに移動",
-		"private": "非公開リストに移動",
-		"close": "閉じる"
+		"private": "非公開リストに移動"
 	},
 	"common": {
 		"save": "保存",
 		"cancel": "キャンセル",
 		"edit": "編集",
-		"apply": "適用"
+		"apply": "適用",
+		"close": "閉じる",
+		"delete": "削除"
+	},
+	"deleteItem": {
+		"title": "削除確認",
+		"description": "{{name}} を削除します。よろしいですか？"
+	},
+	"deleteConfirm": {
+		"trigger": "削除",
+		"title": "削除確認",
+		"description": "以下の{{count}}件をブックマークから削除します。よろしいですか？"
 	},
 	"tagEditor": {
 		"mode": {

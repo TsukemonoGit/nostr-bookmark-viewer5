@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@konemono/svelte5-i18n';
 	import { Trash2, X } from '@lucide/svelte';
 	import { Dialog, Separator } from 'bits-ui';
 
@@ -17,7 +18,7 @@
 	<Dialog.Trigger
 		{disabled}
 		class="rounded p-1 text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500 hover:text-white"
-		aria-label="Delete"
+		aria-label={$t('common.delete')}
 	>
 		<Trash2 size="16" />
 	</Dialog.Trigger>
@@ -31,11 +32,11 @@
 			<Dialog.Title
 				class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
 			>
-				Delete Confirmation
+				{$t('deleteItem.title')}
 			</Dialog.Title>
 			<Separator.Root class="bg-muted -mx-5 mt-5 mb-6 block h-px" />
 			<Dialog.Description class="text-foreground-alt text-sm">
-				{item.title || item.identifier || item.event.kind}を削除します。よろしいですか？
+				{$t('deleteItem.description', { name: item.title || item.identifier || item.event.kind })}
 			</Dialog.Description>
 
 			<div class="mt-1 flex w-full justify-end">
@@ -46,7 +47,7 @@
 					}}
 					class="h-input rounded-input shadow-mini focus-visible:ring-offset-background inline-flex items-center justify-center bg-red-600 px-[50px] text-[15px] font-semibold text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
 				>
-					削除
+					{$t('common.delete')}
 				</button>
 			</div>
 			<Dialog.Close
@@ -54,7 +55,7 @@
 			>
 				<div>
 					<X class="text-foreground size-5" />
-					<span class="sr-only">Close</span>
+					<span class="sr-only">{$t('common.close')}</span>
 				</div>
 			</Dialog.Close>
 		</Dialog.Content>

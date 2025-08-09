@@ -98,7 +98,7 @@
 			>
 				<div>
 					<X class="text-foreground size-5" />
-					<span class="sr-only">{$t('moveBookmark.close')}</span>
+					<span class="sr-only">{$t('common.close')}</span>
 				</div>
 			</Dialog.Close>
 		</Dialog.Content>

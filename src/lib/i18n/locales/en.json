@@ -56,8 +56,7 @@
 	"bookmarkEdit": {
 		"title": "Edit Bookmark",
 		"description": "Edit tags of the bookmark",
-		"noForm": "No appropriate form found.",
-		"close": "Close"
+		"noForm": "No appropriate form found."
 	},
 	"moveBookmark": {
 		"trigger": "Move to another list",
@@ -68,14 +67,24 @@
 			"Genericlists": "Other Lists"
 		},
 		"public": "Move to public list",
-		"private": "Move to private list",
-		"close": "Close"
+		"private": "Move to private list"
 	},
 	"common": {
 		"save": "Save",
 		"cancel": "Cancel",
 		"edit": "Edit",
-		"apply": "Apply"
+		"apply": "Apply",
+		"close": "Close",
+		"delete": "Delete"
+	},
+	"deleteItem": {
+		"title": "Delete Confirmation",
+		"description": "Are you sure you want to delete {{name}}?"
+	},
+	"deleteConfirm": {
+		"trigger": "Delete",
+		"title": "Delete Confirmation",
+		"description": "Are you sure you want to remove the following {{count}} items from bookmarks?"
 	},
 	"tagEditor": {
 		"mode": {
