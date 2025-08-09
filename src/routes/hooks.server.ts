@@ -1,4 +1,3 @@
-// hooks.server.ts
 import { setLocale, getI18nOptions } from '@konemono/svelte5-i18n';
 import type { Handle } from '@sveltejs/kit';
 
@@ -27,6 +26,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	);
 
 	await setLocale(preferredLocale);
+	event.locals.locale = preferredLocale;
 
 	return resolve(event);
 };
