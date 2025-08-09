@@ -68,19 +68,11 @@
 	{#if part.type === 'nip19'}
 		{@const decoded = nip19Decode(part.metadata!.plainNip19 as string)}
 		{#if decoded}
-			<DecodedContent
-				{decoded}
-				content={part.content}
-				tags={event.tags}
-			/>{:else}{part.content}{/if}
+			<DecodedContent {decoded} {part} tags={event.tags} />{:else}{part.content}{/if}
 	{:else if part.type === TokenType.LEGACY_REFERENCE && part.metadata && part.metadata.tagType && part.metadata.referenceId}
 		{@const decoded = arekore(part.metadata.tagType as string, part.metadata.referenceId as string)}
 		{#if decoded}
-			<DecodedContent
-				{decoded}
-				content={part.content}
-				tags={event.tags}
-			/>{:else}{part}{part.content}{/if}
+			<DecodedContent {decoded} {part} tags={event.tags} />{:else}{part}{part.content}{/if}
 	{:else if part.type === 'url'}
 		<UrlDisplay {part} />
 	{:else if part.type === TokenType.CUSTOM_EMOJI}

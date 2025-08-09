@@ -1,65 +1,49 @@
 <script lang="ts">
+	import { TokenType, type Token } from '@konemono/nostr-content-parser';
 	import { nip19 } from 'nostr-tools';
+	import UrlDisplay from './UrlDisplay.svelte';
+	import UserName from './UserName.svelte';
 
 	interface Props {
-		content: string | undefined;
-
 		decoded: nip19.DecodedResult;
 		tags?: string[][];
+		part: Token;
 	}
 
-	let { content, decoded, tags }: Props = $props();
-
-	const getRelayHint = (tag: string[]) => {
-		return tags?.find((t) => t[0] === tag[0] && t[1] === tag[1])?.[2];
-	};
-
-	// 複数のタグからリレーヒントを検索
-	const findRelayHint = (searchTags: string[][]) => {
-		for (const tag of searchTags) {
-			const hint = getRelayHint(tag);
-			if (hint) return hint;
-		}
-		return undefined;
-	};
-
-	// relayhintの構築
-	const buildRelayHint = (relayHint: string | undefined, existingRelays?: string[]) => {
-		return relayHint && relayHint !== '' ? [relayHint, ...(existingRelays || [])] : existingRelays;
-	};
+	let { decoded, tags, part }: Props = $props();
 </script>
 
-{content}<!-- 
-<div class="inline overflow-hidden">
-  {#if decoded.type === "npub"}
-    <span class="text-magnum-300 align-middle">
-      {#if displayMenu}
-        <PopupUserName pubkey={decoded.data} {zIndex} />
-      {:else}
-        <UserName pubhex={decoded.data} />
-      {/if}
-    </span>
-  {:else if decoded.type === "nprofile"}
-    <span class="text-magnum-300 align-middle">
-      {#if displayMenu}
-        <PopupUserName pubkey={decoded.data.pubkey} {zIndex} />
-      {:else}
-        <UserName pubhex={decoded.data.pubkey} />
-      {/if}
-    </span>
-  {:else if decoded.type === "nevent"}
+<!-- 
+{content}-->
+<div class="inline w-fit overflow-hidden">
+	{#if decoded.type === 'npub'}
+		<span class="inline-flex w-fit align-middle text-primary-300"
+			><UserName pubhex={decoded.data} />
+		</span>{:else if decoded.type === 'nprofile'}<span class="w-fit align-middle text-primary-300"
+			><UserName pubhex={decoded.data.pubkey} /></span
+		>
+	{:else}
+		<UrlDisplay
+			part={{
+				type: TokenType.URL,
+				content: `https://njump.me/${part.metadata?.plainNip19 || ''}`,
+				start: 0,
+				end: 0
+			} as Token}
+		/>
+		<!-- {:else if decoded.type === "nevent"}
     {@const relayHint = findRelayHint([
       ["e", decoded.data.id],
       ["q", decoded.data.id],
     ])}
     <span class="grid grid-cols-[auto_1fr_auto]">
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
       <Note
         {...baseNoteProps}
         id={decoded.data.id}
         relayhint={buildRelayHint(relayHint, decoded.data.relays)}
       />
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
     </span>
   {:else if decoded.type === "note"}
     {@const relayHint = findRelayHint([
@@ -67,13 +51,13 @@
       ["q", decoded.data],
     ])}
     <span class="grid grid-cols-[auto_1fr_auto]">
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
       <Note
         {...baseNoteProps}
         id={decoded.data}
         relayhint={buildRelayHint(relayHint)}
       />
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
     </span>
   {:else if decoded.type === "naddr"}
     {@const relayHint = getRelayHint([
@@ -81,7 +65,7 @@
       `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
     ])}
     <span class="grid grid-cols-[auto_1fr_auto]">
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
       <NaddrEvent
         {...baseNaddrProps}
         data={{
@@ -89,10 +73,9 @@
           relays: buildRelayHint(relayHint, decoded.data.relays),
         }}
       />
-      <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
+      <Quote size="14" class="text-primary-500 fill-primary-500/75" />
     </span>
   {:else if decoded.type === "nsec"}
-    {content}
-  {/if}
+    {content} -->
+	{/if}
 </div>
- -->

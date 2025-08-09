@@ -3,6 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import { datetime, formatAbsoluteDateFromUnix } from '$lib/utils/util';
 	import UserAvatar from './UserAvatar.svelte';
+	import DisplayName from './DisplayName.svelte';
 
 	interface Props {
 		// リアクションをしたユーザーの情報
@@ -13,9 +14,10 @@
 		created_at?: number | undefined;
 		// 元のノートのコンポーネント
 		originalNote: Snippet;
+		tags: string[][];
 	}
 
-	let { reactionProfile, reactionMark, created_at, originalNote }: Props = $props();
+	let { reactionProfile, reactionMark, created_at, originalNote, tags }: Props = $props();
 </script>
 
 <div class="reaction-header">
@@ -34,7 +36,11 @@
 		</div>
 		{#if reactionProfile?.display_name || reactionProfile?.name}
 			<span class="reaction-user-name">
-				{reactionProfile?.display_name || reactionProfile?.name}
+				<DisplayName
+					height={21}
+					name="{reactionProfile?.display_name}@{reactionProfile?.name || 'no name'}"
+					{tags}
+				/>
 			</span>
 		{/if}
 	</div>

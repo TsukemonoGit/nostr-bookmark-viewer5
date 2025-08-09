@@ -32,7 +32,11 @@
 
 {#if event.kind === 6 || event.kind === 7 || event.kind === 16}
 	{@const engagementId = repostedId(event.tags)}
-	<EngagementLayout reactionProfile={profile} created_at={event.created_at}>
+	<EngagementLayout
+		reactionProfile={profile}
+		created_at={event.created_at}
+		tags={metadata?.tags || []}
+	>
 		{#snippet reactionMark()}
 			{#if event.kind === 6 || event.kind === 16}
 				<Repeat size="18px" color="blue" />
@@ -44,7 +48,11 @@
 	</EngagementLayout>
 {:else if event.kind === 17}
 	{@const reactionedUrl = event.tags.find((tag) => tag[0] === 'r')?.[1]}
-	<EngagementLayout reactionProfile={profile} created_at={event.created_at}>
+	<EngagementLayout
+		reactionProfile={profile}
+		created_at={event.created_at}
+		tags={metadata?.tags || []}
+	>
 		{#snippet reactionMark()}
 			{#if event.kind === 6 || event.kind === 16}
 				<Repeat size="18px" color="blue" />
@@ -66,7 +74,7 @@
 {:else if event.kind === 9735}
 	<!--<PostWithEngagement {event} {profile} /> -->
 {:else}
-	<NoteLayout {profile} created_at={event?.created_at}>
+	<NoteLayout {profile} created_at={event?.created_at} tags={metadata?.tags || []}>
 		{#snippet replyUser()}
 			{@const replyUserList = event.tags
 				.filter((tag) => tag[0] === 'p' && typeof tag[1] === 'string')
