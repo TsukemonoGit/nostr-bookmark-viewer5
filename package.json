@@ -47,7 +47,7 @@
 	},
 	"dependencies": {
 		"@konemono/nostr-content-parser": "^0.6.8",
-		"@konemono/svelte5-i18n": "^0.2.0",
+		"@konemono/svelte5-i18n": "^0.2.2",
 		"@lucide/svelte": "^0.539.0",
 		"@rx-nostr/crypto": "^0.0.0",
 		"@tanstack/svelte-query": "^5.83.1",
