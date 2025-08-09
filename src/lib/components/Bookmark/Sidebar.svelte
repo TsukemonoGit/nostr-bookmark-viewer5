@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { publishEvent } from '$lib/nostr/publish';
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
-	import { Plus, Trash2 } from '@lucide/svelte'; // Trash2をインポート
+	import { Plus, Trash2 } from '@lucide/svelte';
 	import type { EventParameters } from 'nostr-typedef';
 	import ConfirmDeleteList from '../Layout/ConfirmDeleteList.svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
 	import CreateNewList from '../Layout/CreateNewList.svelte';
 	import type { CreateData } from '$lib/types/utiles';
 	import { toastStore } from '$lib/utils/util';
+	import { t } from '@konemono/svelte5-i18n';
 
 	interface Props {
 		pubkey: string;
@@ -34,10 +35,8 @@
 		onItemSelect?.();
 	}
 
-	// 削除処理用の関数を定義
-	// 削除処理用の関数を定義
 	async function handleDeleteItem(item: BookmarkItem) {
-		console.log(`アイテム ${item.atag} を削除します`);
+		console.log(`${$t('bookmark.deleteItem')} ${item.atag}`);
 
 		const ev: EventParameters = {
 			kind: 5,
@@ -49,37 +48,39 @@
 		};
 
 		try {
-			await publishEvent(ev, '削除完了', '削除失敗');
+			await publishEvent(ev, $t('bookmark.deleteSuccess'), $t('bookmark.deleteFail'));
 
-			// Nostrイベントが正常に公開されたら、$bookmarkItemsMapから削除する
 			$bookmarkItemsMap.delete(item.atag);
 			$bookmarkItemsMap = $bookmarkItemsMap;
-			console.log(`$bookmarkItemsMapからアイテム ${item.atag} を削除しました`);
+			console.log(`${$t('bookmark.removedFromMap')} ${item.atag}`);
 		} catch (error) {
-			console.error(`削除中にエラーが発生しました:`, error);
+			console.error(`${$t('bookmark.deleteError')}`, error);
 		}
 	}
 
 	async function createNewList(data: CreateData) {
-		console.log('create new list', data);
+		console.log($t('bookmark.createNewList'), data);
 		if (!data.d) {
-			toastStore.error({ title: 'ERROR', description: 'dタグは必須項目です', duration: 10000 });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('bookmark.requiredDTag'),
+				duration: 10000
+			});
 			return;
 		}
-		// Nostrイベントのタグを構築
 		const tags = [['d', data.d]];
 		if (data.title) tags.push(['title', data.title]);
 		if (data.image) tags.push(['image', data.image]);
 		if (data.description) tags.push(['description', data.description]);
 
 		const ev: EventParameters = {
-			kind: 30003, // ブックマークセットのkind
+			kind: 30003,
 			content: '',
 			tags: tags
 		};
 
-		console.log('作成されるイベント:', ev);
-		await publishEvent(ev, '作成完了', '作成失敗');
+		console.log($t('bookmark.eventCreated'), ev);
+		await publishEvent(ev, $t('bookmark.createSuccess'), $t('bookmark.createFail'));
 	}
 </script>
 
@@ -87,7 +88,7 @@
 	{#each Object.entries(items) as [key, store]}
 		<section class="mb-4">
 			<h2 class="mb-2 text-2xl font-bold text-neutral-600 dark:text-neutral-400">
-				{key}
+				{$t(`bookmark.sections.${key}`)}
 			</h2>
 
 			{#if key === 'Bookmarksets' && editable}
@@ -113,10 +114,3 @@
 		</section>
 	{/each}
 </nav>
-
-<style lang="postcss">
-	@reference "tailwindcss";
-	button.selected {
-		@apply bg-neutral-300 font-semibold dark:bg-neutral-700;
-	}
-</style>

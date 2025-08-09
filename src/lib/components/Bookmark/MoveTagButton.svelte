@@ -2,6 +2,7 @@
 	import { LockKeyhole, X } from '@lucide/svelte';
 	import { Dialog, Separator } from 'bits-ui';
 	import { bookmarkItemsMap } from '$lib/types/bookmark.svelte';
+	import { t } from '@konemono/svelte5-i18n';
 
 	let isOpen = $state(false);
 
@@ -38,7 +39,7 @@
 		{disabled}
 		class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
 	>
-		他のリストへ移動
+		{$t('moveBookmark.trigger')}
 	</Dialog.Trigger>
 	<Dialog.Portal>
 		<Dialog.Overlay
@@ -50,21 +51,14 @@
 			<Dialog.Title
 				class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
 			>
-				ブックマークの移動先を選択
+				{$t('moveBookmark.title')}
 			</Dialog.Title>
 			<Separator.Root class="bg-muted -mx-5 mt-5 mb-6 block h-px" />
 			<Dialog.Description class="text-foreground-alt text-sm"></Dialog.Description>
 			<div class="max-h-[min(24em,80vh)] overflow-y-auto">
 				{#each Object.entries(items) as [key, store]}
 					<h2 class="mb-2 text-2xl font-bold text-neutral-600 dark:text-neutral-400">
-						<!-- カテゴリ名を日本語に変換 -->
-						{#if key === 'BookmarkList'}
-							ブックマーク
-						{:else if key === 'Bookmarksets'}
-							ブックマークセット
-						{:else if key === 'Genericlists'}
-							その他のリスト
-						{/if}
+						{$t(`moveBookmark.sections.${key}`)}
 					</h2>
 					<ul class="space-y-1">
 						{#each store as item}
@@ -88,7 +82,7 @@
 					disabled={disabled || !selectedListId}
 					class="btn preset-filled-primary-500"
 				>
-					公開リストに移動
+					{$t('moveBookmark.public')}
 				</button>
 				<button
 					type="button"
@@ -96,7 +90,7 @@
 					disabled={disabled || !selectedListId}
 					class="btn flex items-center gap-1 preset-filled-secondary-500"
 				>
-					<LockKeyhole />非公開リストに移動
+					<LockKeyhole />{$t('moveBookmark.private')}
 				</button>
 			</div>
 			<Dialog.Close
@@ -104,7 +98,7 @@
 			>
 				<div>
 					<X class="text-foreground size-5" />
-					<span class="sr-only">Close</span>
+					<span class="sr-only">{$t('moveBookmark.close')}</span>
 				</div>
 			</Dialog.Close>
 		</Dialog.Content>

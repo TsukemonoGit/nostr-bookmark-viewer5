@@ -1,0 +1,153 @@
+{
+	"title": "ブックマーク管理ツール",
+	"login": {
+		"heading": "Nostrでログイン",
+		"subtitle": "Nostrに接続してプロフィールを表示",
+		"button": "Nostrでログイン",
+		"connecting": "接続中...",
+		"needAccount": "Nostrアカウントが必要ですか？",
+		"tip": {
+			"installExtension": "AlbyやNos2xなどのNostr拡張機能をインストール",
+			"useWebSigner": "またはWebサイナーサービスを使用"
+		},
+		"success": "ログイン成功",
+		"error": {
+			"browserRequired": "ブラウザ環境が必要です",
+			"failed": "ログイン失敗またはキャンセル"
+		}
+	},
+	"relay": {
+		"loadingRelayList": "リレーリストを取得中...",
+		"loadingBookmarkData": "ブックマークデータを取得中..."
+	},
+	"bookmark": {
+		"menu": "メニュー",
+		"title": "ブックマーク",
+		"deleteItem": "アイテムを削除中",
+		"deleteSuccess": "削除成功",
+		"deleteFail": "削除失敗",
+		"removedFromMap": "$bookmarkItemsMapからアイテムを削除",
+		"deleteError": "削除中にエラーが発生",
+		"createNewList": "新しいリストを作成中",
+		"error": "エラー",
+		"requiredDTag": "dタグが必要です",
+		"eventCreated": "作成されるイベント：",
+		"createSuccess": "作成成功",
+		"createFail": "作成失敗",
+		"sections": {
+			"BookmarkList": "ブックマークリスト",
+			"Bookmarksets": "ブックマークセット",
+			"Genericlists": "汎用リスト"
+		},
+		"noImage": "画像なし",
+		"imageUrlPlaceholder": "画像URL",
+		"titlePlaceholder": "タイトル",
+		"descriptionPlaceholder": "説明",
+		"noTitle": "タイトルなし",
+		"noDescription": "説明なし",
+		"updatedAt": "更新日時",
+		"public": "公開",
+		"private": "非公開",
+		"dragToSort": "タグをドラッグして並べ替え",
+		"selectAll": "すべて選択",
+		"noSelection": "ブックマークが選択されていません",
+		"selectedCountSuffix": "個選択中"
+	},
+	"bookmarkEdit": {
+		"title": "ブックマーク編集",
+		"description": "ブックマークのタグを編集",
+		"noForm": "適切なフォームが見つかりません。",
+		"close": "閉じる"
+	},
+	"moveBookmark": {
+		"trigger": "他のリストに移動",
+		"title": "ブックマークの移動先を選択",
+		"sections": {
+			"BookmarkList": "ブックマーク",
+			"Bookmarksets": "ブックマークセット",
+			"Genericlists": "その他のリスト"
+		},
+		"public": "公開リストに移動",
+		"private": "非公開リストに移動",
+		"close": "閉じる"
+	},
+	"common": {
+		"save": "保存",
+		"cancel": "キャンセル",
+		"edit": "編集",
+		"apply": "適用"
+	},
+	"tagEditor": {
+		"mode": {
+			"selecting": "選択モード",
+			"sorting": "並べ替えモード"
+		},
+		"actions": {
+			"deleteCompleted": "削除完了",
+			"deleteFailed": "削除失敗",
+			"moveCompleted": "移動完了",
+			"moveFailed": "移動失敗",
+			"moveAddCompleted": "移動（追加）完了",
+			"moveAddFailed": "移動（追加）失敗",
+			"moveDeleteCompleted": "移動（削除）完了",
+			"moveDeleteFailed": "移動（削除）失敗",
+			"tagAddCompleted": "タグ追加完了",
+			"tagAddFailed": "タグ追加失敗",
+			"updateCompleted": "更新完了",
+			"updateFailed": "更新失敗",
+			"titleUpdateCompleted": "タイトル更新完了",
+			"titleUpdateFailed": "タイトル更新失敗",
+			"descriptionUpdateCompleted": "説明更新完了",
+			"descriptionUpdateFailed": "説明更新失敗",
+			"imageUpdateCompleted": "画像更新完了",
+			"imageUpdateFailed": "画像更新失敗"
+		},
+		"errors": {
+			"noTagsSelected": "移動するタグが選択されていません。",
+			"destinationNotFound": "移動先のブックマークが見つかりませんでした。",
+			"decryptionFailed": "既存の非公開タグの復号に失敗しました。",
+			"destinationEventCreationFailed": "移動先のイベント作成に失敗しました。",
+			"moveFailed": "タグの移動に失敗しました。",
+			"noBookmarkSelected": "ブックマークが選択されていません。",
+			"editFailed": "編集に失敗しました",
+			"noBookmarkSpecified": "ブックマークが指定されていません。",
+			"encryptionFailed": "タグの暗号化に失敗しました。",
+			"privateUpdateFailed": "タグの更新に失敗しました。詳細をコンソールで確認してください。"
+		},
+		"success": {
+			"moveCompleted": "個のタグを移動しました。"
+		}
+	},
+	"hashtagForm": {
+		"label": "ハッシュタグ",
+		"placeholder": "nostr",
+		"submit": "OK"
+	},
+	"urlForm": {
+		"urlLabel": "URL",
+		"urlPlaceholder": "https://example.com",
+		"titleLabel": "タイトル（オプション）",
+		"titlePlaceholder": "ブックマークのタイトル",
+		"submit": "OK"
+	},
+	"eventForm": {
+		"eventIdLabel": "Event ID / Note / Nevent",
+		"eventIdPlaceholder": "hex形式のイベントID、note1～、またはnevent1～",
+		"relayLabel": "Relay URL（オプション）",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "無効なID"
+		}
+	},
+	"addressableForm": {
+		"addressableIdLabel": "Addressable ID / Naddr",
+		"addressableIdPlaceholder": "kind:pubkey:d-tag 形式、またはnaddr1～",
+		"relayLabel": "Relay URL（オプション）",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "無効なID"
+		}
+	}
+}

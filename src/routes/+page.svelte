@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { t } from '@konemono/svelte5-i18n';
 	import { browser } from '$app/environment';
-
 	import { Button } from 'bits-ui';
 
 	let isLoading = false;
@@ -10,7 +10,7 @@
 
 	async function handleLogin() {
 		if (!browser) {
-			error = 'Browser environment required';
+			error = $t('login.error.browserRequired');
 			return;
 		}
 
@@ -18,12 +18,10 @@
 		error = '';
 
 		try {
-			// nostr-loginによるログイン処理
-			// nlAuthイベントでログイン結果を受け取る
 			const nostrLogin = await import('nostr-login');
 			await nostrLogin.launch();
 		} catch (err) {
-			error = 'Login failed or cancelled';
+			error = $t('login.error.failed');
 			console.error('Login error:', err);
 		} finally {
 			isLoading = false;
@@ -32,14 +30,14 @@
 </script>
 
 <svelte:head>
-	<title>Login with Nostr</title>
+	<title>{$t('title')}</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center p-4">
 	<div class="w-full max-w-md space-y-6">
 		<div class="space-y-2 text-center">
-			<h1 class="text-2xl font-bold">Login with Nostr</h1>
-			<p class="text-muted-foreground">Connect your Nostr identity to view your profile</p>
+			<h1 class="text-2xl font-bold">{$t('login.heading')}</h1>
+			<p class="text-muted-foreground">{$t('login.subtitle')}</p>
 		</div>
 
 		<div class="space-y-4">
@@ -48,24 +46,28 @@
 			{/if}
 
 			{#if !isLoggedIn}
-				<Button.Root onclick={handleLogin} disabled={isLoading} class="w-full">
+				<Button.Root
+					onclick={handleLogin}
+					disabled={isLoading}
+					class="btn w-full preset-outlined-primary-500"
+				>
 					{#if isLoading}
-						Connecting...
+						{$t('login.connecting')}
 					{:else}
-						Login with Nostr
+						{$t('login.button')}
 					{/if}
 				</Button.Root>
 
 				<div class="space-y-2 text-center">
-					<p class="text-muted-foreground text-sm">Need a Nostr account?</p>
+					<p class="text-muted-foreground text-sm">{$t('login.needAccount')}</p>
 					<div class="text-muted-foreground flex flex-col space-y-1 text-xs">
-						<span>• Install a Nostr extension like Alby or nos2x</span>
-						<span>• Or use a web signer service</span>
+						<span>• {$t('login.tip.installExtension')}</span>
+						<span>• {$t('login.tip.useWebSigner')}</span>
 					</div>
 				</div>
 			{:else}
 				<div class="space-y-2 text-center">
-					<p class="text-sm text-green-600">✓ Logged in successfully</p>
+					<p class="text-sm text-green-600">✓ {$t('login.success')}</p>
 					<p class="text-muted-foreground text-xs break-all">
 						{pubkey}
 					</p>

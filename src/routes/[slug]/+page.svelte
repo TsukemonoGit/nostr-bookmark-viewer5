@@ -5,24 +5,24 @@
 	import RelayStatus from '$lib/components/RelayStatus.svelte';
 	import type { LayoutData } from './$types';
 	import { untrack } from 'svelte';
+	import { t } from '@konemono/svelte5-i18n';
 
 	let { data }: { data: LayoutData } = $props();
 	let selectedAtag: string | null = $state(null);
 	let showMobileSidebar = $state(false);
-	//$inspect(selectedAtag);
 	let selectedItem: BookmarkItem | null = $derived(
 		selectedAtag ? $bookmarkItemsMap.get(selectedAtag) || null : null
 	);
 	let mainContent: HTMLElement | undefined = $state();
-	// モバイルサイドバーを閉じる関数
+
 	function closeMobileSidebar() {
 		showMobileSidebar = false;
 	}
 
-	// サイドバー外クリックで閉じる
 	function handleBackdropClick() {
 		closeMobileSidebar();
 	}
+
 	$effect(() => {
 		if (selectedItem) {
 			untrack(() => {
@@ -53,16 +53,17 @@
 				class="flex h-6 items-center gap-2 rounded px-3 text-sm font-medium text-neutral-700 hover:bg-neutral-100 md:hidden dark:text-neutral-300 dark:hover:bg-neutral-800"
 			>
 				<span class="text-lg">☰</span>
-				メニュー
+				{$t('bookmark.menu')}
 			</button>
-			{#if selectedItem}<div class="text-xs text-neutral-700 dark:text-neutral-300">
-					kind:{selectedItem.event.kind}
-					{#if selectedItem.identifier}ID:{selectedItem.identifier}{/if}
-				</div>{/if}
+			{#if selectedItem}
+				<div class="text-xs text-neutral-700 dark:text-neutral-300">
+					kind: {selectedItem.event.kind}
+					{#if selectedItem.identifier}
+						ID: {selectedItem.identifier}
+					{/if}
+				</div>
+			{/if}
 			<div class="flex flex-auto justify-end"><RelayStatus /></div>
-			<!-- <div class="truncate text-xs text-neutral-500 dark:text-neutral-400">
-				{selectedItem?.title || '未選択'}
-			</div> -->
 		</header>
 
 		<!-- Mobile Content -->
@@ -75,12 +76,9 @@
 	</div>
 </div>
 
-<!-- Mobile Sidebar Overlay -->
 {#if showMobileSidebar}
 	<div class="fixed inset-0 z-50 md:hidden">
 		<!-- Backdrop -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="bg-opacity-50 absolute inset-0 bg-neutral-900/50"
 			onclick={handleBackdropClick}
@@ -93,7 +91,7 @@
 				class="flex items-center justify-between border-b border-neutral-300 px-4 py-3 dark:border-neutral-700"
 			>
 				<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-					ブックマーク
+					{$t('bookmark.title')}
 				</span>
 				<button
 					onclick={closeMobileSidebar}

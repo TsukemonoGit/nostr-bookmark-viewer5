@@ -29,7 +29,7 @@
 		console.log(e, e.id === 'json');
 
 		if (e.id === 'edit') {
-			console.log('編集モードをアクティブにします');
+			//console.log('編集モードをアクティブにします');
 			openTagEditor = true;
 		} else if (e.id === 'json') {
 			try {
@@ -41,7 +41,7 @@
 				console.log(error);
 			}
 			openJsonView = true;
-			console.log('JSONビューを表示します', openJsonView, event);
+			//console.log('JSONビューを表示します', openJsonView, event);
 		} else if (e.id === 'njump') {
 			console.log('njumpで開きます');
 			const link =

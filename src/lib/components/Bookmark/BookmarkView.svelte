@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
-
+	import { t } from '@konemono/svelte5-i18n';
 	import { dndzone } from 'svelte-dnd-action';
 	import { untrack } from 'svelte';
 	import { flip } from 'svelte/animate';
@@ -59,8 +59,8 @@
 
 	const flipDurationMs = 200;
 	const selectItem = [
-		{ value: 'selecting', label: '選択モード' },
-		{ value: 'sorting', label: '並べ替えモード' }
+		{ value: 'selecting', label: $t('tagEditor.mode.selecting') },
+		{ value: 'sorting', label: $t('tagEditor.mode.sorting') }
 	];
 	$effect(() => {
 		if (tagsToDisplay) {
@@ -154,7 +154,11 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, '削除完了', '削除失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.deleteCompleted'),
+				$t('tagEditor.actions.deleteFailed')
+			);
 			//originalTags = $state.snapshot(tagsToDisplay);
 			//selectedTagIds = new Set();
 		}
@@ -164,8 +168,8 @@
 	async function moveSelectedTags(atag: string, isPrv: boolean) {
 		if (selectedCount === 0 || !selectedBookmark) {
 			toastStore.error({
-				title: 'エラー',
-				description: '移動するタグが選択されていません。'
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.noTagsSelected')
 			});
 			return;
 		}
@@ -177,8 +181,8 @@
 
 			if (!destinationBookmark) {
 				toastStore.error({
-					title: 'エラー',
-					description: '移動先のブックマークが見つかりませんでした。'
+					title: $t('bookmark.error'),
+					description: $t('tagEditor.errors.destinationNotFound')
 				});
 				return;
 			}
@@ -202,8 +206,8 @@
 					);
 					if (!decryptedContent) {
 						toastStore.error({
-							title: 'エラー',
-							description: '既存の非公開タグの復号に失敗しました。'
+							title: $t('bookmark.error'),
+							description: $t('tagEditor.errors.decryptionFailed')
 						});
 						return;
 					}
@@ -229,12 +233,19 @@
 			);
 			console.log(destinationEventParams);
 			if (!destinationEventParams) {
-				toastStore.error({ title: 'エラー', description: '移動先のイベント作成に失敗しました。' });
+				toastStore.error({
+					title: $t('bookmark.error'),
+					description: $t('tagEditor.errors.destinationEventCreationFailed')
+				});
 				return;
 			}
 
 			// 5. 移動先のブックマークを更新し、成功したら移動元を更新
-			await publishEvent(destinationEventParams, '移動（追加）完了', '移動（追加）失敗');
+			await publishEvent(
+				destinationEventParams,
+				$t('tagEditor.actions.moveAddCompleted'),
+				$t('tagEditor.actions.moveAddFailed')
+			);
 
 			// 移動先の更新が成功した場合のみ、移動元の更新に進む
 			const sourceEventParams = await createEventParametersForBookmark(
@@ -244,16 +255,23 @@
 			);
 			console.log(sourceEventParams);
 			if (sourceEventParams) {
-				await publishEvent(sourceEventParams, '移動（削除）完了', '移動（削除）失敗');
+				await publishEvent(
+					sourceEventParams,
+					$t('tagEditor.actions.moveDeleteCompleted'),
+					$t('tagEditor.actions.moveDeleteFailed')
+				);
 
 				toastStore.success({
-					title: '移動完了',
-					description: `${selectedCount}個のタグを移動しました。`
+					title: $t('tagEditor.actions.moveCompleted'),
+					description: `${selectedCount}${$t('tagEditor.success.moveCompleted')}`
 				});
 			}
 		} catch (error) {
 			console.error('タグの移動中にエラーが発生しました:', error);
-			toastStore.error({ title: 'エラー', description: 'タグの移動に失敗しました。' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.moveFailed')
+			});
 		}
 	}
 
@@ -262,8 +280,8 @@
 
 		if (!selectedBookmark) {
 			toastStore.error({
-				title: 'エラー',
-				description: 'ブックマークが選択されていません。'
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.noBookmarkSelected')
 			});
 			return;
 		}
@@ -278,7 +296,11 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, 'タグ追加完了', 'タグ追加失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.tagAddCompleted'),
+				$t('tagEditor.actions.tagAddFailed')
+			);
 		}
 	}
 
@@ -293,8 +315,8 @@
 	async function updateTags() {
 		if (!selectedBookmark) {
 			toastStore.error({
-				title: 'エラー',
-				description: 'ブックマークが選択されていません。'
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.noBookmarkSelected')
 			});
 			return;
 		}
@@ -303,7 +325,11 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, '更新完了', '更新失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.updateCompleted'),
+				$t('tagEditor.actions.updateFailed')
+			);
 		}
 	}
 
@@ -316,7 +342,10 @@
 		if (!selectedBookmark) return;
 		const tagIndex = tagsToDisplay.findIndex((t) => t.id === id);
 		if (tagIndex === -1) {
-			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.editFailed')
+			});
 			return;
 		}
 
@@ -327,7 +356,11 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, '更新完了', '更新失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.updateCompleted'),
+				$t('tagEditor.actions.updateFailed')
+			);
 		}
 	}
 
@@ -338,10 +371,17 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, 'タイトル更新完了', 'タイトル更新失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.titleUpdateCompleted'),
+				$t('tagEditor.actions.titleUpdateFailed')
+			);
 			editingTitle = false;
 		} else {
-			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.editFailed')
+			});
 			editingTitle = false;
 		}
 	}
@@ -353,11 +393,18 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, '説明更新完了', '説明更新失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.descriptionUpdateCompleted'),
+				$t('tagEditor.actions.descriptionUpdateFailed')
+			);
 			console.log('end');
 			editingDescription = false;
 		} else {
-			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.editFailed')
+			});
 			editingDescription = false;
 		}
 	}
@@ -369,10 +416,17 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(ev, '画像更新完了', '画像更新失敗');
+			await publishEvent(
+				ev,
+				$t('tagEditor.actions.imageUpdateCompleted'),
+				$t('tagEditor.actions.imageUpdateFailed')
+			);
 			editingImage = false;
 		} else {
-			toastStore.error({ title: 'ERROR', description: 'failed to edit' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.editFailed')
+			});
 			editingImage = false;
 		}
 	}
@@ -384,7 +438,10 @@
 		isPrivate: boolean
 	): Promise<EventParameters | null> {
 		if (!bookmark) {
-			toastStore.error({ title: 'エラー', description: 'ブックマークが指定されていません。' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.noBookmarkSpecified')
+			});
 			return null;
 		}
 
@@ -398,8 +455,8 @@
 				);
 				if (!encryptedContent) {
 					toastStore.error({
-						title: 'エラー',
-						description: 'タグの暗号化に失敗しました。'
+						title: $t('bookmark.error'),
+						description: $t('tagEditor.errors.encryptionFailed')
 					});
 					return null;
 				}
@@ -412,8 +469,8 @@
 			} catch (error) {
 				console.error('タグの更新中にエラーが発生しました (非公開):', error);
 				toastStore.error({
-					title: 'エラー',
-					description: 'タグの更新に失敗しました。詳細をコンソールで確認してください。'
+					title: $t('bookmark.error'),
+					description: $t('tagEditor.errors.privateUpdateFailed')
 				});
 				return null;
 			}
@@ -470,7 +527,7 @@
 								class="h-[240px] w-full rounded object-cover"
 							/>
 						{:else}
-							<span class="text-lg">画像なし</span>
+							<span class="text-lg">{$t('bookmark.noImage')}</span>
 						{/if}
 					</div>
 					{#if editable}
@@ -480,25 +537,29 @@
 									type="text"
 									bind:value={tempImage}
 									class="w-full flex-1 rounded-md border p-2"
-									placeholder="画像URL"
+									placeholder={$t('bookmark.imageUrlPlaceholder')}
 								/>
 								<div class="mt-2 flex flex-wrap items-center justify-end gap-1">
-									<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white"
-										>保存</button
-									>
+									<button onclick={saveImage} class="rounded-md bg-blue-500 px-4 py-2 text-white">
+										{$t('common.save')}
+									</button>
 									<button
 										onclick={() => (editingImage = false)}
-										class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
+										class="rounded-md bg-gray-500 px-4 py-2 text-white"
 									>
+										{$t('common.cancel')}
+									</button>
 								</div>
 							</div>
 						{:else}
 							<button
 								onclick={() => (editingImage = true)}
-								class=" float-end m-1 self-end rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-								>修正</button
+								class="float-end m-1 self-end rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
 							>
-						{/if}{/if}
+								{$t('common.edit')}
+							</button>
+						{/if}
+					{/if}
 				</div>
 
 				<div class="flex flex-col">
@@ -507,16 +568,18 @@
 							type="text"
 							bind:value={tempTitle}
 							class="mb-2 rounded-md border p-2 text-2xl font-bold"
-							placeholder="タイトル"
+							placeholder={$t('bookmark.titlePlaceholder')}
 						/>
 						<div class="mb-2 flex justify-end gap-2">
-							<button onclick={saveTitle} class="rounded-md bg-blue-500 px-4 py-2 text-white"
-								>保存</button
-							>
+							<button onclick={saveTitle} class="rounded-md bg-blue-500 px-4 py-2 text-white">
+								{$t('common.save')}
+							</button>
 							<button
 								onclick={() => (editingTitle = false)}
-								class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
+								class="rounded-md bg-gray-500 px-4 py-2 text-white"
 							>
+								{$t('common.cancel')}
+							</button>
 						</div>
 					{:else}
 						<div class="flex items-center justify-between">
@@ -524,14 +587,16 @@
 								class="mb-2 text-2xl font-bold text-neutral-900 dark:text-white"
 								style="white-space: pre-wrap; word-break: break-word;"
 							>
-								{selectedBookmark.title || 'タイトルがありません'}
+								{selectedBookmark.title || $t('bookmark.noTitle')}
 							</h2>
 							{#if editable}
 								<button
 									onclick={() => (editingTitle = true)}
 									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-									>修正</button
-								>{/if}
+								>
+									{$t('common.edit')}
+								</button>
+							{/if}
 						</div>
 					{/if}
 
@@ -539,16 +604,18 @@
 						<textarea
 							bind:value={tempDescription}
 							class="flex-1 rounded-md border p-2"
-							placeholder="説明"
+							placeholder={$t('bookmark.descriptionPlaceholder')}
 						></textarea>
 						<div class="mt-2 flex justify-end gap-2">
-							<button onclick={saveDescription} class="rounded-md bg-blue-500 px-4 py-2 text-white"
-								>保存</button
-							>
+							<button onclick={saveDescription} class="rounded-md bg-blue-500 px-4 py-2 text-white">
+								{$t('common.save')}
+							</button>
 							<button
 								onclick={() => (editingDescription = false)}
-								class="rounded-md bg-gray-500 px-4 py-2 text-white">キャンセル</button
+								class="rounded-md bg-gray-500 px-4 py-2 text-white"
 							>
+								{$t('common.cancel')}
+							</button>
 						</div>
 					{:else}
 						<div class="flex items-center justify-between">
@@ -556,14 +623,16 @@
 								class="text-neutral-600 dark:text-neutral-300"
 								style="white-space: pre-wrap; word-break: break-word;"
 							>
-								{selectedBookmark.description || '説明がありません'}
+								{selectedBookmark.description || $t('bookmark.noDescription')}
 							</p>
 							{#if editable}
 								<button
 									onclick={() => (editingDescription = true)}
 									class="rounded-md bg-neutral-200 px-3 py-1 text-sm font-medium dark:bg-neutral-700"
-									>修正</button
-								>{/if}
+								>
+									{$t('common.edit')}
+								</button>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -580,8 +649,11 @@
 				<span
 					class="rounded bg-secondary-100 px-2 py-1 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-200"
 				>
-					更新日時: {formatAbsoluteDateFromUnix(selectedBookmark.event.created_at)}
-				</span>{/if}
+					{$t('bookmark.updatedAt')}: {formatAbsoluteDateFromUnix(
+						selectedBookmark.event.created_at
+					)}
+				</span>
+			{/if}
 		</div>
 		<div class="mb-4 flex items-center justify-between">
 			{#if editable}
@@ -607,11 +679,12 @@
 										value={item.value}
 										label={item.label}>{item.label}</Select.Item
 									>
-								{/each}</Select.Viewport
-							>
-						</Select.Content></Select.Portal
-					>
-				</Select.Root>{/if}
+								{/each}
+							</Select.Viewport>
+						</Select.Content>
+					</Select.Portal>
+				</Select.Root>
+			{/if}
 			<div class="flex flex-wrap items-center justify-center gap-1">
 				<button
 					class="rounded-md px-3 py-1 text-sm font-medium transition-colors {isPrivate
@@ -619,7 +692,7 @@
 						: 'bg-blue-500 text-white'}"
 					onclick={() => (isPrivate = false)}
 				>
-					公開
+					{$t('bookmark.public')}
 				</button>
 				<button
 					disabled={!editable}
@@ -628,7 +701,7 @@
 						: 'bg-neutral-200 dark:bg-neutral-700'}"
 					onclick={() => (isPrivate = true)}
 				>
-					非公開
+					{$t('bookmark.private')}
 				</button>
 			</div>
 		</div>
@@ -645,10 +718,11 @@
 						disabled={isSorting}
 					/>
 					<span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-						{isSorting ? 'タグをドラッグして並べ替えてください' : '全て選択'}
+						{isSorting ? $t('bookmark.dragToSort') : $t('bookmark.selectAll')}
 					</span>
 				</label>
-			</div>{/if}
+			</div>
+		{/if}
 		<div
 			use:dndzone={{
 				items: displayTags,
@@ -696,7 +770,7 @@
 	<div
 		class="rounded-lg bg-neutral-50 p-8 text-center text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
 	>
-		ブックマークが選択されていません
+		{$t('bookmark.noSelection')}
 	</div>
 {/if}
 
@@ -707,7 +781,8 @@
 		<div class="flex items-center space-x-2">
 			{#if selectedCount > 0 && !isSorting}
 				<span class="text-sm font-bold">
-					{selectedCount}個選択中
+					{selectedCount}
+					{$t('bookmark.selectedCountSuffix')}
 				</span>
 			{/if}
 			{#if !isSorting}
@@ -722,13 +797,13 @@
 					onclick={cancelSorting}
 					class="rounded-md bg-gray-600 px-4 py-2 text-sm font-medium hover:bg-gray-700"
 				>
-					キャンセル
+					{$t('common.cancel')}
 				</button>
 				<button
 					onclick={updateTags}
 					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-blue-700"
 				>
-					適応
+					{$t('common.apply')}
 				</button>
 			{/if}
 		</div>

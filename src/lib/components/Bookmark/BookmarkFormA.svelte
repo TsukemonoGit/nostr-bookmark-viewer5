@@ -3,6 +3,7 @@
 	import { nip33Regex } from '$lib/utils/regex';
 	import { toastStore } from '$lib/utils/util';
 	import { nip19 } from 'nostr-tools';
+	import { t } from '@konemono/svelte5-i18n';
 
 	interface Props {
 		onSubmit: (data: string[]) => void;
@@ -20,7 +21,10 @@
 	function handleSubmit() {
 		const checkedId = checkId(addressableId.trim());
 		if (!checkedId) {
-			toastStore.error({ title: 'ERROR', description: 'invalid id' });
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('addressableForm.errors.invalidId')
+			});
 			return;
 		}
 		const formData = ['a', addressableId, relay].filter(Boolean);
@@ -59,26 +63,26 @@
 			for="addressableId"
 			class="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
 		>
-			Addressable ID / Naddr
+			{$t('addressableForm.addressableIdLabel')}
 		</label>
 		<input
 			id="addressableId"
 			type="text"
 			bind:value={addressableId}
-			placeholder="kind:pubkey:d-tag 形式、またはnaddr1～"
+			placeholder={$t('addressableForm.addressableIdPlaceholder')}
 			class="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
 		/>
 	</div>
 
 	<div>
 		<label for="relay" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-			Relay URL（オプション）
+			{$t('addressableForm.relayLabel')}
 		</label>
 		<input
 			id="relay"
 			type="url"
 			bind:value={relay}
-			placeholder="wss://relay.example.com"
+			placeholder={$t('addressableForm.relayPlaceholder')}
 			class="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-white"
 		/>
 	</div>
@@ -90,6 +94,6 @@
 		}}
 		class="h-input rounded-input shadow-mini focus-visible:ring-offset-background inline-flex items-center justify-center bg-red-600 px-[50px] text-[15px] font-semibold text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
 	>
-		OK
+		{$t('addressableForm.submit')}
 	</button>
 </div>

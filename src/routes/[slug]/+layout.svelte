@@ -8,12 +8,13 @@
 	} from '$lib/nostr/nostrSubscriptions';
 	import { kind10002, queryClient } from '$lib/utils/stores.svelte';
 	import { QueryClient, QueryClientProvider, type QueryClientConfig } from '@tanstack/svelte-query';
+	import { t } from '@konemono/svelte5-i18n';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	let isLoadingRelays = $state(false);
 	let loadingMessage = $state('');
-	let progress = $state(0); // 進捗バー用（今回は使っていませんが残してあります）
+	let progress = $state(0);
 
 	onMount(() => {
 		let isMounted = true;
@@ -23,17 +24,17 @@
 
 			isLoadingRelays = true;
 			progress = 0;
-			loadingMessage = 'リレーリストを取得中...';
+			loadingMessage = $t('relay.loadingRelayList');
 
 			progress = 30;
 			const relayEvent = await fetchLatestRelayList(data.pubkey);
-			//console.log(relayEvent);
+
 			if (relayEvent && isMounted) {
 				kind10002.set(relayEvent);
 				serRelays(relayEvent.tags);
 
 				progress = 70;
-				loadingMessage = 'ブックマークデータを取得中...';
+				loadingMessage = $t('relay.loadingBookmarkData');
 				subscribeBookmarkData(data.pubkey);
 			}
 
@@ -52,11 +53,9 @@
 	const config: QueryClientConfig = {
 		defaultOptions: {
 			queries: {
-				staleTime: 1 * 60 * 60 * 1000, //1時間, //30分　キャッシュされたデータがstateTimeを超えたら新しいデータを取得しようとするが再フェッチが∞なので手動で再フェッチしないと更新されない。また再フェッチで更新されるデータはstaleTimeを過ぎたデータだけ。
+				staleTime: 1 * 60 * 60 * 1000,
 				refetchInterval: Infinity,
-				gcTime: 1 * 60 * 60 * 1000 //1時間　クエリがまだ使用されている間は何もしません。クエリが使用されなくなった時点でキャッシュが開始されます。時間が経過すると、キャッシュが大きくならないようにデータは "ガベージコレクション "されます。
-				//ガベージコレクション（garbage collection）とは、コンピュータプログラムの実行環境などが備える機能の一つで、実行中のプログラムが占有していたメモリ領域のうち不要になったものを自動的に解放し、空き領域として再利用できるようにするもの。そのような処理を実行するプログラムを「ガベージコレクタ」（garbage collector）という。// Rename `cacheTime` to `gcTime`
-				//https://github.com/TanStack/query/blob/a300d484750edb4b64bdefcc86abaac305d73b13/docs/framework/react/guides/migrating-to-v5.md#rename-cachetime-to-gctime
+				gcTime: 1 * 60 * 60 * 1000
 			}
 		}
 	};
@@ -65,9 +64,7 @@
 
 	let SvelteQueryDevtools: any = $state();
 
-	// Conditionally load SvelteQueryDevtools during development
 	if (import.meta.env.MODE === 'development') {
-		// Dynamically import SvelteQueryDevtools only in development mode
 		import('@tanstack/svelte-query-devtools').then((module) => {
 			SvelteQueryDevtools = module.SvelteQueryDevtools;
 		});

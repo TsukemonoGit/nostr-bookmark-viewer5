@@ -10,7 +10,7 @@
 	import { toastStore } from '$lib/utils/util';
 	import { Toaster } from '@skeletonlabs/skeleton-svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
-
+	import '$lib/i18n/index.ts';
 	let { children } = $props();
 
 	onMount(async () => {

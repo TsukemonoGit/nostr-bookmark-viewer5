@@ -6,6 +6,7 @@
 	import BookmarkFormA from './BookmarkFormA.svelte';
 	import BookmarkFormT from './BookmarkFormT.svelte';
 	import BookmarkFormR from './BookmarkFormR.svelte';
+	import { t } from '@konemono/svelte5-i18n';
 
 	interface Props {
 		initTag: string[];
@@ -14,7 +15,6 @@
 	}
 	let { initTag, onConformEditTag, isOpen = $bindable(false) }: Props = $props();
 
-	// initTagの最初の要素からフォームコンポーネントを決定
 	const FormComponent = (() => {
 		const tag = initTag[0];
 		switch (tag) {
@@ -53,18 +53,18 @@
 			<Dialog.Title
 				class="flex w-full items-center justify-center text-lg font-semibold tracking-tight"
 			>
-				Edit Bookmark
+				{$t('bookmarkEdit.title')}
 			</Dialog.Title>
 			<Separator.Root class="bg-muted -mx-5 mt-5 mb-6 block h-px" />
 			<Dialog.Description class="text-foreground-alt text-sm">
-				ブックマークのタグを編集
+				{$t('bookmarkEdit.description')}
 			</Dialog.Description>
 
 			<div class="pt-7 pb-11">
 				{#if FormComponent}
 					<FormComponent onSubmit={handleFormSubmit} initialTag={initTag} />
 				{:else}
-					<p>適切なフォームがありません。</p>
+					<p>{$t('bookmarkEdit.noForm')}</p>
 				{/if}
 			</div>
 
@@ -73,7 +73,7 @@
 			>
 				<div>
 					<X class="text-foreground size-5" />
-					<span class="sr-only">Close</span>
+					<span class="sr-only">{$t('bookmarkEdit.close')}</span>
 				</div>
 			</Dialog.Close>
 		</Dialog.Content>

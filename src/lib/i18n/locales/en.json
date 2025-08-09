@@ -1,0 +1,153 @@
+{
+	"title": "Bookmark arekore suru yatu",
+	"login": {
+		"heading": "Login with Nostr",
+		"subtitle": "Connect your Nostr identity to view your profile",
+		"button": "Login with Nostr",
+		"connecting": "Connecting...",
+		"needAccount": "Need a Nostr account?",
+		"tip": {
+			"installExtension": "Install a Nostr extension like Alby or nos2x",
+			"useWebSigner": "Or use a web signer service"
+		},
+		"success": "Logged in successfully",
+		"error": {
+			"browserRequired": "Browser environment required",
+			"failed": "Login failed or cancelled"
+		}
+	},
+	"relay": {
+		"loadingRelayList": "Fetching relay list...",
+		"loadingBookmarkData": "Fetching bookmark data..."
+	},
+	"bookmark": {
+		"menu": "Menu",
+		"title": "Bookmarks",
+		"deleteItem": "Deleting item",
+		"deleteSuccess": "Deletion successful",
+		"deleteFail": "Deletion failed",
+		"removedFromMap": "Removed item from $bookmarkItemsMap",
+		"deleteError": "Error occurred during deletion",
+		"createNewList": "Creating new list",
+		"error": "ERROR",
+		"requiredDTag": "d tag is required",
+		"eventCreated": "Event to be created:",
+		"createSuccess": "Creation successful",
+		"createFail": "Creation failed",
+		"sections": {
+			"BookmarkList": "Bookmark List",
+			"Bookmarksets": "Bookmark Sets",
+			"Genericlists": "Generic Lists"
+		},
+		"noImage": "No image",
+		"imageUrlPlaceholder": "Image URL",
+		"titlePlaceholder": "Title",
+		"descriptionPlaceholder": "Description",
+		"noTitle": "No title",
+		"noDescription": "No description",
+		"updatedAt": "Updated at",
+		"public": "Public",
+		"private": "Private",
+		"dragToSort": "Drag tags to sort",
+		"selectAll": "Select all",
+		"noSelection": "No bookmark selected",
+		"selectedCountSuffix": "selected"
+	},
+	"bookmarkEdit": {
+		"title": "Edit Bookmark",
+		"description": "Edit tags of the bookmark",
+		"noForm": "No appropriate form found.",
+		"close": "Close"
+	},
+	"moveBookmark": {
+		"trigger": "Move to another list",
+		"title": "Select bookmark destination",
+		"sections": {
+			"BookmarkList": "Bookmark",
+			"Bookmarksets": "Bookmark Sets",
+			"Genericlists": "Other Lists"
+		},
+		"public": "Move to public list",
+		"private": "Move to private list",
+		"close": "Close"
+	},
+	"common": {
+		"save": "Save",
+		"cancel": "Cancel",
+		"edit": "Edit",
+		"apply": "Apply"
+	},
+	"tagEditor": {
+		"mode": {
+			"selecting": "Selection Mode",
+			"sorting": "Sort Mode"
+		},
+		"actions": {
+			"deleteCompleted": "Deletion Completed",
+			"deleteFailed": "Deletion Failed",
+			"moveCompleted": "Move Completed",
+			"moveFailed": "Move Failed",
+			"moveAddCompleted": "Move (Add) Completed",
+			"moveAddFailed": "Move (Add) Failed",
+			"moveDeleteCompleted": "Move (Delete) Completed",
+			"moveDeleteFailed": "Move (Delete) Failed",
+			"tagAddCompleted": "Tag Addition Completed",
+			"tagAddFailed": "Tag Addition Failed",
+			"updateCompleted": "Update Completed",
+			"updateFailed": "Update Failed",
+			"titleUpdateCompleted": "Title Update Completed",
+			"titleUpdateFailed": "Title Update Failed",
+			"descriptionUpdateCompleted": "Description Update Completed",
+			"descriptionUpdateFailed": "Description Update Failed",
+			"imageUpdateCompleted": "Image Update Completed",
+			"imageUpdateFailed": "Image Update Failed"
+		},
+		"errors": {
+			"noTagsSelected": "No tags selected for move.",
+			"destinationNotFound": "Destination bookmark not found.",
+			"decryptionFailed": "Failed to decrypt existing private tags.",
+			"destinationEventCreationFailed": "Failed to create destination event.",
+			"moveFailed": "Failed to move tags.",
+			"noBookmarkSelected": "No bookmark selected.",
+			"editFailed": "failed to edit",
+			"noBookmarkSpecified": "No bookmark specified.",
+			"encryptionFailed": "Failed to encrypt tags.",
+			"privateUpdateFailed": "Failed to update tags. Check console for details."
+		},
+		"success": {
+			"moveCompleted": " tags moved."
+		}
+	},
+	"hashtagForm": {
+		"label": "Hashtag",
+		"placeholder": "nostr",
+		"submit": "OK"
+	},
+	"urlForm": {
+		"urlLabel": "URL",
+		"urlPlaceholder": "https://example.com",
+		"titleLabel": "Title (Optional)",
+		"titlePlaceholder": "Bookmark title",
+		"submit": "OK"
+	},
+	"eventForm": {
+		"eventIdLabel": "Event ID / Note / Nevent",
+		"eventIdPlaceholder": "Hex format event ID, note1~, or nevent1~",
+		"relayLabel": "Relay URL (Optional)",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "Invalid ID"
+		}
+	},
+	"addressableForm": {
+		"addressableIdLabel": "Addressable ID / Naddr",
+		"addressableIdPlaceholder": "kind:pubkey:d-tag format, or naddr1~",
+		"relayLabel": "Relay URL (Optional)",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "Invalid ID"
+		}
+	}
+}
