@@ -23,6 +23,11 @@
 
 	let loadingStatus: 'loading' | 'error' | 'loaded' = $state('loading');
 
+	// urlが変更された時にloadingStatusをリセット
+	$effect(() => {
+		loadingStatus = 'loading';
+	});
+
 	$effect(() => {
 		if (loadingStatus === 'error') {
 			untrack(() => {
@@ -34,22 +39,29 @@
 
 <div
 	{title}
-	class="relative flex items-center justify-center overflow-hidden bg-neutral-800"
+	class="relative flex items-center justify-center overflow-hidden bg-neutral-300 dark:bg-neutral-700"
 	style="height: {size}px; width: {size}px;"
 >
-	{#if url && url !== ''}
+	{#if url && url !== '' && loadingStatus !== 'error'}
 		<img
 			src={url}
 			onload={() => (loadingStatus = 'loaded')}
 			onerror={() => (loadingStatus = 'error')}
 			alt={name}
-			class="t-0 l-0 absolute object-cover"
+			class="absolute top-0 left-0 object-cover"
 			style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
 			loading="lazy"
 		/>
-		{#if loadingStatus === 'error' || loadingStatus === 'loading'}
-			<span class="t-0 l-0 absolute overflow-hidden"> {name}</span>{/if}
+		{#if loadingStatus === 'loading'}
+			<div class="flex h-full w-full items-center justify-center text-center">
+				{name}
+			</div>
+		{/if}
 	{:else}
-		<span class="t-0 l-0 absolute overflow-hidden"> {name}</span>
+		<div
+			class="flex h-full w-full items-center justify-center text-center text-xs text-neutral-500 dark:text-neutral-500"
+		>
+			{name}
+		</div>
 	{/if}
 </div>

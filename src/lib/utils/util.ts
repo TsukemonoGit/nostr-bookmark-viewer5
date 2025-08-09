@@ -1,5 +1,6 @@
 import type { nip19 } from 'nostr-tools';
 import { createToaster } from '@skeletonlabs/skeleton-svelte';
+import { hexRegex, nip33Regex } from './regex';
 
 export const toastStore = createToaster();
 export function parseNaddr(tag: string[]): nip19.AddressPointer {
@@ -74,3 +75,20 @@ export function datetime(unixtime: number) {
 
 	return time.toISOString();
 }
+
+export const repostedId = (
+	tags: string[][]
+): { tag: string[] | undefined; kind: number | undefined } => {
+	const kindtag = tags.find((tag) => tag[0] === 'k');
+	const kind = kindtag ? Number(kindtag[1]) : undefined;
+	return {
+		tag: tags
+			.slice()
+			.reverse()
+			.find(
+				(tag) =>
+					(tag[0] === 'e' && hexRegex.test(tag[1])) || (tag[0] === 'a' && nip33Regex.test(tag[1]))
+			),
+		kind: kind
+	};
+};
