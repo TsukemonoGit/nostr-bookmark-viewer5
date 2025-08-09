@@ -7,7 +7,12 @@ import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async () => {
 	if (browser) {
-		setLocale(window.navigator.language);
+		// ブラウザ言語から適切な言語コードを抽出
+		const browserLang = window.navigator.language.split('-')[0]; // ja-JP -> ja
+		const supportedLocales = ['en', 'ja'];
+		const locale = supportedLocales.includes(browserLang) ? browserLang : 'en';
+
+		await setLocale(locale);
 	}
 	await waitLocale();
 };
