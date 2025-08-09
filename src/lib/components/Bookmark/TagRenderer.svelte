@@ -17,7 +17,7 @@
 	};
 </script>
 
-<div class="w-full flex-1 p-1" use:viewport={null} onenterViewport={handleEnterViewport}>
+<div class="w-full flex-1" use:viewport={null} onenterViewport={handleEnterViewport}>
 	{#if hasLoaded}
 		{#if tag[0] === 'e'}
 			<NoteEvent {tag} />

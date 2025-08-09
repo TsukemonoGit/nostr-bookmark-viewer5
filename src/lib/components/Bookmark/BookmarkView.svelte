@@ -662,12 +662,11 @@
 			{#each displayTags as item (item.id)}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<div
-						class="my-1 flex items-center rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
+						class="my-1 flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-800 {isTagSelected(
 							item.id
 						)
 							? 'ring-2 ring-blue-500'
 							: ''} {isSorting ? 'cursor-grab' : ''}"
-						style="white-space: pre-wrap; word-break: break-word;"
 					>
 						{#if editable}
 							{#if isSorting}
