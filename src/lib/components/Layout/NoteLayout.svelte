@@ -3,8 +3,10 @@
 	import type { Snippet } from 'svelte';
 	import UserAvatar from './UserAvatar.svelte';
 	import { datetime, formatAbsoluteDateFromUnix } from '$lib/utils/util';
+	import DisplayName from './DisplayName.svelte';
 
 	interface Props {
+		tags: string[][];
 		profile?: UserProfile | undefined;
 		created_at?: number | undefined;
 		hasError?: boolean;
@@ -19,6 +21,7 @@
 
 	let {
 		profile,
+		tags,
 		hasError = false,
 		created_at,
 		name,
@@ -50,7 +53,11 @@
 			</div>
 			<div class="note-name">
 				{#if profile?.name || profile?.display_name}
-					{profile?.display_name}@{profile?.name || 'no name'}
+					<DisplayName
+						height={21}
+						name="{profile?.display_name}@{profile?.name || 'no name'}"
+						{tags}
+					/>
 				{:else}
 					<div class="name placeholder"></div>
 				{/if}

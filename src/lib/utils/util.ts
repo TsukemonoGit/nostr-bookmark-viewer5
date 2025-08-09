@@ -1,4 +1,4 @@
-import type { nip19 } from 'nostr-tools';
+import { nip19 } from 'nostr-tools';
 import { createToaster } from '@skeletonlabs/skeleton-svelte';
 import { hexRegex, nip33Regex } from './regex';
 
@@ -91,4 +91,15 @@ export const repostedId = (
 			),
 		kind: kind
 	};
+};
+
+//profileがなかったときとかに画面に表示させるpubの省略文字
+export const displayShortPub = (hex: string): string => {
+	if (!hex) return '';
+	try {
+		const pub = nip19.npubEncode(hex);
+		return `${pub.slice(0, 13)}...${pub.slice(pub.length - 2)}`;
+	} catch (error) {
+		return `${hex.slice(0, 13)}...${hex.slice(hex.length - 2)}`;
+	}
 };
