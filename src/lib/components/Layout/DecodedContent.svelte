@@ -28,7 +28,8 @@
 				type: TokenType.URL,
 				content: `https://njump.me/${part.metadata?.plainNip19 || ''}`,
 				start: 0,
-				end: 0
+				end: 0,
+				metadata: { text: part.content }
 			} as Token}
 		/>
 		<!-- {:else if decoded.type === "nevent"}
