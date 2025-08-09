@@ -3,7 +3,7 @@
 	import { parseNaddr } from '$lib/utils/util';
 	import type { QueryKey } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
-	import { type Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { pipe } from 'rxjs';
 	import { latest, type EventPacket } from 'rx-nostr';
@@ -53,7 +53,9 @@
 	$effect(() => {
 		const event = $data?.event;
 		if (event && onChange) {
-			onChange(event);
+			untrack(() => {
+				onChange(event);
+			});
 		}
 	});
 </script>

@@ -3,7 +3,7 @@
 	import type { QueryKey } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
 	import type { EventPacket } from 'rx-nostr';
-	import { type Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import type { Readable } from 'svelte/store';
 
 	interface Props {
@@ -43,7 +43,9 @@
 	$effect(() => {
 		const event = $data?.event;
 		if (event && onChange) {
-			onChange(event);
+			untrack(() => {
+				onChange(event);
+			});
 		}
 	});
 </script>

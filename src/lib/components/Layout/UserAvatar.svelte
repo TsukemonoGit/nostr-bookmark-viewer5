@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	interface Props {
 		url: string | undefined;
 		name: string | undefined;
@@ -23,7 +25,9 @@
 
 	$effect(() => {
 		if (loadingStatus === 'error') {
-			handleStateError();
+			untrack(() => {
+				handleStateError();
+			});
 		}
 	});
 </script>
