@@ -1,25 +1,13 @@
-import '$lib/i18n/index.ts';
+// +layout.ts
 import { browser } from '$app/environment';
-import type { LayoutLoad } from './$types';
+import '$lib/i18n'; // Import to initialize. Important :)
 import { setLocale, waitLocale } from '@konemono/svelte5-i18n';
 
-export const load: LayoutLoad = async ({ data }) => {
-	// サーバーサイドで検出された言語を優先
-	const serverLocale = data.locale;
+import type { LayoutLoad } from './$types';
 
+export const load: LayoutLoad = async () => {
 	if (browser) {
-		// クライアントサイドでは、まずサーバーの言語設定を使用
-		await setLocale(serverLocale);
-
-		// その後、保存された設定があれば適用
-		const savedLocale = localStorage.getItem('preferred-locale');
-		if (savedLocale && savedLocale !== serverLocale) {
-			await setLocale(savedLocale);
-		}
-	} else {
-		// サーバーサイドでは既に設定済みなので再設定不要
+		setLocale(window.navigator.language);
 	}
-
 	await waitLocale();
-	return { locale: serverLocale };
 };
