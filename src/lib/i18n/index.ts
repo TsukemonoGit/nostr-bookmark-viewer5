@@ -7,8 +7,8 @@ registerLocale('en', () => import('./locales/en.json'));
 
 // 初期化
 initI18n({
-	defaultLocale: 'ja',
+	defaultLocale: 'en',
 	supportedLocales: ['ja', 'en'],
-	fallbackLocale: 'ja',
+	fallbackLocale: 'en',
 	debug: false
 });
