@@ -1,4 +1,6 @@
 {
+	"title": "しょさい",
+	"description": "Nostrのブックマークを整理整頓するツール",
 	"login": {
 		"heading": "Nostrでログイン",
 		"subtitle": "Nostrに接続してプロフィールを表示",

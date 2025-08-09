@@ -1,4 +1,6 @@
 {
+	"title": "Shosai",
+	"description": "Nostr's bookmark organization tool",
 	"login": {
 		"heading": "Login with Nostr",
 		"subtitle": "Connect your Nostr identity to view your profile",
