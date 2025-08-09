@@ -7,6 +7,7 @@
 	import JsonView from './JsonView.svelte';
 	import { queryClient } from '$lib/utils/stores.svelte';
 	import { encodetoNaddr, encodetoNevent } from '$lib/utils/encode';
+	import type { EventPacket } from 'rx-nostr';
 
 	// MenubarからDropdownMenuに変更
 	interface Props {
@@ -32,7 +33,10 @@
 			openTagEditor = true;
 		} else if (e.id === 'json') {
 			try {
-				event = queryClient.get()?.getQueryData([tag[1]] as QueryKey) as NostrEvent | null;
+				const packet = queryClient.get()?.getQueryData([tag[1]] as QueryKey) as EventPacket | null;
+				if (packet) {
+					event = packet.event;
+				}
 			} catch (error) {
 				console.log(error);
 			}
