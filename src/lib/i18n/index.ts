@@ -1,14 +1,14 @@
-// src/lib/i18n/index.ts
-
+// src/lib/i18n/index.ts（初期化部分）
 import { initI18n, registerLocale } from '@konemono/svelte5-i18n';
 
-const defaultLocale = 'en';
-
-// 動的インポート方式で言語ファイルを登録
+// 言語ファイルを登録
 registerLocale('ja', () => import('./locales/ja.json'));
 registerLocale('en', () => import('./locales/en.json'));
 
+// 初期化
 initI18n({
-	defaultLocale: defaultLocale,
-	supportedLocales: ['ja', 'en']
+	defaultLocale: 'ja',
+	supportedLocales: ['ja', 'en'],
+	fallbackLocale: 'ja',
+	debug: false
 });
