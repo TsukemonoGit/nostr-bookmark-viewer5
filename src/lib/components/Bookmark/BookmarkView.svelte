@@ -64,7 +64,9 @@
 	];
 	$effect(() => {
 		if (tagsToDisplay) {
-			displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
+			untrack(async () => {
+				displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
+			});
 		}
 	});
 	$effect(() => {
