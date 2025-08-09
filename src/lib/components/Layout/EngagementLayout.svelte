@@ -51,7 +51,7 @@
 	</div>
 </div>
 <div class="original-note">
-	{@render originalNote()}
+	{@render originalNote?.()}
 </div>
 
 <style lang="postcss">

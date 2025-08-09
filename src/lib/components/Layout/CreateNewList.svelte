@@ -50,10 +50,8 @@
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-	<Dialog.Trigger
-		class="mb-2 flex w-full items-center gap-1 rounded-md bg-neutral-200 px-4 py-2 text-left font-semibold text-neutral-800 transition-colors hover:bg-neutral-300 active:bg-neutral-400"
-	>
-		<Plus size="20" />New Bookmark List
+	<Dialog.Trigger class="mb-2 btn flex w-full items-center gap-1 rounded-md   preset-tonal-primary">
+		<Plus size="20" />Create New
 	</Dialog.Trigger>
 	<Dialog.Portal>
 		<Dialog.Overlay

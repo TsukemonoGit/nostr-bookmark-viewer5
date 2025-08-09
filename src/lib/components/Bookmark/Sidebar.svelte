@@ -87,7 +87,9 @@
 <nav class="h-full overflow-y-auto p-2 text-sm">
 	{#each Object.entries(items) as [key, store]}
 		<section class="mb-4">
-			<h2 class="mb-2 text-2xl font-bold text-neutral-600 dark:text-neutral-400">
+			<h2
+				class="sticky top-0 mb-2 rounded-sm bg-neutral-100/50 text-2xl font-bold text-neutral-700 backdrop-blur-sm dark:bg-neutral-900/50 dark:text-neutral-300"
+			>
 				{$t(`bookmark.sections.${key}`)}
 			</h2>
 
@@ -114,3 +116,10 @@
 		</section>
 	{/each}
 </nav>
+
+<style lang="postcss">
+	@reference "tailwindcss";
+	button.selected {
+		@apply bg-neutral-300 font-semibold dark:bg-neutral-700;
+	}
+</style>
