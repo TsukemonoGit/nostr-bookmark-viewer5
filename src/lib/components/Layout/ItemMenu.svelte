@@ -70,7 +70,7 @@
 			{#each menuItem as menu}
 				<DropdownMenu.Item
 					class="data-highlighted:bg-muted flex h-10 items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium select-none hover:bg-neutral-300 focus-visible:outline-none dark:hover:bg-neutral-600"
-					onSelect={() => onSelect(menu)}
+					onclick={() => onSelect(menu)}
 				>
 					<menu.Icon class="mr-1" size="20" />{menu.label}
 				</DropdownMenu.Item>
