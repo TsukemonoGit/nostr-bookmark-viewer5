@@ -44,6 +44,13 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>Shosai</title>
+	<meta property="og:title" content={'Shosai'} />
+	<!-- <meta property="og:image" content={`${page.url.origin}/ogp.webp`} /> -->
+
+	<meta name="description" content={"Nostr's bookmark organization tool"} />
+
+	<meta property="og:description" content={"Nostr's bookmark organization tool"} />
 </svelte:head>
 
 {@render children?.()}

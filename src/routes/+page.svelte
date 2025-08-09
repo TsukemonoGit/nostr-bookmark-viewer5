@@ -29,10 +29,6 @@
 	}
 </script>
 
-<svelte:head>
-	<title>{$t('title')}</title>
-</svelte:head>
-
 <div class="flex min-h-screen items-center justify-center p-4">
 	<div class="w-full max-w-md space-y-6">
 		<div class="space-y-2 text-center">
