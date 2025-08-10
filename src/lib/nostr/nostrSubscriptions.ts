@@ -21,7 +21,8 @@ import { derived, writable } from 'svelte/store';
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
 	verifier,
 	eoseTimeout: 3000,
-	okTimeout: 3000
+	okTimeout: 3000,
+	authenticator: 'auto' //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
 });
 rxNostr.setDefaultRelays(defaultRelays);
 rxNostr.createConnectionStateObservable().subscribe((packet) => {
@@ -316,4 +317,16 @@ export async function publishSignEvent(ev: Nostr.Event): Promise<OkPacket[]> {
 			}
 		});
 	});
+}
+
+export async function relaysReconnectChallenge() {
+	const defoRelays = rxNostr.getDefaultRelays();
+	await Promise.all(
+		Object.keys(defoRelays)
+			.filter((key) => rxNostr.getRelayStatus(key)?.connection === 'error')
+			.map((key) => {
+				console.log(`Reconnecting relay: ${key}`);
+				return rxNostr.reconnect(key);
+			})
+	);
 }

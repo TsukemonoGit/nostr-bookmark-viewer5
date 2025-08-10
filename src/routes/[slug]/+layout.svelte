@@ -4,7 +4,8 @@
 	import {
 		fetchLatestRelayList,
 		subscribeBookmarkData,
-		serRelays
+		serRelays,
+		relaysReconnectChallenge
 	} from '$lib/nostr/nostrSubscriptions';
 	import { kind10002, queryClient } from '$lib/utils/stores.svelte';
 	import { QueryClient, QueryClientProvider, type QueryClientConfig } from '@tanstack/svelte-query';
@@ -69,8 +70,15 @@
 			SvelteQueryDevtools = module.SvelteQueryDevtools;
 		});
 	}
+
+	function onVisibilityChange() {
+		if (document?.visibilityState === 'visible') {
+			relaysReconnectChallenge();
+		}
+	}
 </script>
 
+<svelte:document on:visibilitychange={onVisibilityChange} />
 <QueryClientProvider client={queryClient.get()}>
 	{@render children?.()}
 	{#if SvelteQueryDevtools}
