@@ -8,7 +8,7 @@ export const kind10002 = createCustomStore<Nostr.Event | null>(null);
 export const loginUser = createCustomStore<string | undefined>(undefined);
 export const queryClient = createCustomStore<QueryClient | undefined>(undefined);
 export const nostrShare = createCustomStore<HTMLElement | null>(null);
-export const shareText = createCustomStore<string | undefined>(undefined);
+export const shareText = createCustomStore<string>('');
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数
