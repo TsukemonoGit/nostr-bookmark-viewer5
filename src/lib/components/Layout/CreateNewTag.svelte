@@ -30,9 +30,7 @@
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-	<Dialog.Trigger
-		class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300 dark:disabled:bg-red-700"
-	>
+	<Dialog.Trigger class="btn-icon preset-filled-primary-500 ">
 		<Plus />
 	</Dialog.Trigger>
 	<Dialog.Portal>

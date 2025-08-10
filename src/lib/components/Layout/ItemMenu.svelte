@@ -29,8 +29,6 @@
 	let event: NostrEvent | null = $state(null);
 
 	function onSelect(e: any) {
-		console.log(e, e.id === 'json');
-
 		if (e.id === 'edit') {
 			//console.log('編集モードをアクティブにします');
 			openTagEditor = true;
@@ -56,7 +54,7 @@
 		} else if (e.id === 'share') {
 			// nostr-shareをクリック
 			const share = nostrShare.get();
-			console.log(share);
+			//console.log(share);
 			if (share) {
 				const link =
 					tag[0] === 'e'

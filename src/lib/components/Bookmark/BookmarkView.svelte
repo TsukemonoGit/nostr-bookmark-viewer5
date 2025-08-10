@@ -803,7 +803,7 @@
 
 {#if selectedBookmark && editable}
 	<div
-		class="fixed right-4 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-100 p-4 shadow-xl dark:bg-neutral-900"
+		class="fixed right-8 bottom-4 z-50 flex items-center space-x-4 rounded-lg bg-neutral-100 p-4 shadow-xl dark:bg-neutral-900"
 	>
 		<div class="flex items-center space-x-2">
 			{#if selectedCount > 0 && !isSorting}
