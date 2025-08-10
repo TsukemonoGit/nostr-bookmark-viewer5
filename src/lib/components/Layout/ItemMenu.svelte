@@ -24,7 +24,7 @@
 		...(tag[0] === 'a' || tag[0] === 'e'
 			? [{ id: 'njump', label: 'Open in njump', Icon: ExternalLink }]
 			: []),
-		...(tag[0] === 'a' || tag[0] === 'e' ? [{ id: 'share', label: 'share', Icon: Share }] : [])
+		...(tag[0] === 'a' || tag[0] === 'e' ? [{ id: 'share', label: 'Share', Icon: Share }] : [])
 	]);
 	let event: NostrEvent | null = $state(null);
 
