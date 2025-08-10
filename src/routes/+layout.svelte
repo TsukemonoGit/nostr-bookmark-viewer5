@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { browser } from '$app/environment';
 	import { waitNostr } from 'nip07-awaiter';
 	import { nip19 } from 'nostr-tools';
@@ -9,7 +9,7 @@
 	import { page } from '$app/state';
 	import { toastStore } from '$lib/utils/util';
 	import { Toaster } from '@skeletonlabs/skeleton-svelte';
-	import { loginUser } from '$lib/utils/stores.svelte';
+	import { loginUser, nostrShare, shareText } from '$lib/utils/stores.svelte';
 
 	import { t } from '@konemono/svelte5-i18n';
 	let { children } = $props();
@@ -41,6 +41,14 @@
 			});
 		}
 	});
+	let nostrShareElement: HTMLElement | null = $state(null);
+	$effect(() => {
+		if (nostrShareElement) {
+			untrack(() => {
+				nostrShare.set(nostrShareElement);
+			});
+		}
+	});
 </script>
 
 <svelte:head>
@@ -56,3 +64,10 @@
 
 {@render children?.()}
 <Toaster toaster={toastStore}></Toaster>
+<nostr-share data-text={shareText.get()} bind:this={nostrShareElement}></nostr-share>
+
+<style>
+	nostr-share::part(button) {
+		display: none;
+	}
+</style>

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { ExternalLink, FileJson, Menu, Pencil } from '@lucide/svelte';
+	import { ExternalLink, FileJson, Menu, Pencil, Share } from '@lucide/svelte';
 	import { DropdownMenu } from 'bits-ui';
 	import TagEditor from '../Bookmark/TagEditor.svelte';
 	import { type QueryKey } from '@tanstack/svelte-query';
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import JsonView from './JsonView.svelte';
-	import { queryClient } from '$lib/utils/stores.svelte';
+	import { nostrShare, queryClient, shareText } from '$lib/utils/stores.svelte';
 	import { encodetoNaddr, encodetoNevent } from '$lib/utils/encode';
 	import type { EventPacket } from 'rx-nostr';
 
@@ -13,18 +13,21 @@
 	interface Props {
 		tag: string[];
 		onConformEditTag: (tag: string[]) => void;
+		editable: boolean;
 	}
-	let { tag, onConformEditTag }: Props = $props();
+	let { tag, onConformEditTag, editable }: Props = $props();
 	let openTagEditor = $state(false);
 	let openJsonView = $state(false);
 	let menuItem = $derived([
-		{ id: 'edit', label: 'Edit', Icon: Pencil },
+		...(editable ? [{ id: 'edit', label: 'Edit', Icon: Pencil }] : []),
 		{ id: 'json', label: 'View Json', Icon: FileJson },
 		...(tag[0] === 'a' || tag[0] === 'e'
 			? [{ id: 'njump', label: 'Open in njump', Icon: ExternalLink }]
-			: [])
+			: []),
+		...(tag[0] === 'a' || tag[0] === 'e' ? [{ id: 'share', label: 'share', Icon: Share }] : [])
 	]);
 	let event: NostrEvent | null = $state(null);
+
 	function onSelect(e: any) {
 		console.log(e, e.id === 'json');
 
@@ -50,6 +53,27 @@
 					: encodetoNaddr(tag[1]);
 			console.log(link);
 			window.open(`https://njump.me/${link}`, '_blank', 'noopener,noreferrer');
+		} else if (e.id === 'share') {
+			// nostr-shareをクリック
+			const share = nostrShare.get();
+			console.log(share);
+			if (share) {
+				const link =
+					tag[0] === 'e'
+						? encodetoNevent({ id: tag[1], author: event?.pubkey, kind: event?.kind })
+						: encodetoNaddr(tag[1]);
+
+				shareText.set(`nostr:${link}`);
+
+				// Shadow DOM内のボタンを取得してクリック
+				const shadowRoot = share.shadowRoot;
+				if (shadowRoot) {
+					const button = shadowRoot.querySelector('button[part="button"]') as HTMLButtonElement;
+					if (button) {
+						button.click();
+					}
+				}
+			}
 		}
 	}
 </script>
@@ -78,5 +102,8 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
+<TagEditor bind:isOpen={openTagEditor} initTag={tag} {onConformEditTag} />
+<JsonView {event} {tag} bind:isOpen={openJsonView} />
+
 <TagEditor bind:isOpen={openTagEditor} initTag={tag} {onConformEditTag} />
 <JsonView {event} {tag} bind:isOpen={openJsonView} />

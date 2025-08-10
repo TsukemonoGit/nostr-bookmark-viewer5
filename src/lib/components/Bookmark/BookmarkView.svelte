@@ -782,12 +782,12 @@
 							{/if}
 						{/if}
 						<TagRenderer tag={item.tag} />
-						{#if editable}
-							<ItemMenu
-								tag={item.tag}
-								onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
-							/>
-						{/if}
+
+						<ItemMenu
+							tag={item.tag}
+							onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
+							{editable}
+						/>
 					</div>
 				</div>
 			{/each}
