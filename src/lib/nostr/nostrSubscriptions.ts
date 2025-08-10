@@ -5,7 +5,6 @@ import {
 	uniq,
 	type AcceptableDefaultRelaysConfig,
 	type EventPacket,
-	type OkPacketAgainstEvent,
 	type OkPacket
 } from 'rx-nostr';
 import { tap, type Observable, type OperatorFunction } from 'rxjs';
@@ -32,6 +31,9 @@ rxNostr.createConnectionStateObservable().subscribe((packet) => {
 });
 
 const [tie, tieMap] = createTie();
+export function getRelaysById(id: string): string[] {
+	return Array.from(tieMap.get(id) || []);
+}
 
 export function serRelays(relays: AcceptableDefaultRelaysConfig) {
 	rxNostr.setDefaultRelays(relays);

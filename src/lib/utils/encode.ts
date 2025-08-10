@@ -23,11 +23,11 @@ export function encodetoNpub(str: string): string {
 	}
 }
 
-export function encodetoNaddr(str: string | undefined): string {
+export function encodetoNaddr(str: string | undefined, relays?: string[]): string {
 	if (!str) return '';
 	const naddr = parseNaddr(['a', str]);
 	try {
-		return nip19.naddrEncode(naddr);
+		return nip19.naddrEncode({ ...naddr, ...(relays && relays.length > 0 ? { relays } : {}) });
 	} catch (error) {
 		return str;
 	}
