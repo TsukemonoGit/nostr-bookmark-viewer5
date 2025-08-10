@@ -147,8 +147,6 @@
 
 	.note-body {
 		position: relative;
-		white-space: pre-wrap;
-		word-break: break-word;
 	}
 
 	.placeholder {

@@ -13,7 +13,7 @@
 		// リアクションがあった時間
 		created_at?: number | undefined;
 		// 元のノートのコンポーネント
-		originalNote: Snippet;
+		originalNote?: Snippet;
 		tags: string[][];
 	}
 

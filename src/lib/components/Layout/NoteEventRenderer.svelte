@@ -13,6 +13,7 @@
 	import Reaction from './Reaction.svelte';
 	import UrlDisplay from './UrlDisplay.svelte';
 	import { TokenType, type Token } from '@konemono/nostr-content-parser';
+	import Kind9735 from './Kind9735.svelte';
 
 	interface Props {
 		event: Nostr.Event;
@@ -72,7 +73,7 @@
 		{/snippet}
 	</EngagementLayout>
 {:else if event.kind === 9735}
-	<!--<PostWithEngagement {event} {profile} /> -->
+	<Kind9735 {event} {profile} />
 {:else}
 	<NoteLayout {profile} created_at={event?.created_at} tags={metadata?.tags || []}>
 		{#snippet replyUser()}
