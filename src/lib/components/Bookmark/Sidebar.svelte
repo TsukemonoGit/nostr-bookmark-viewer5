@@ -12,6 +12,7 @@
 	import Link from '../Layout/Link.svelte';
 	import { goto } from '$app/navigation';
 	import About from './About.svelte';
+	import { tick } from 'svelte';
 
 	interface Props {
 		pubkey: string;
@@ -33,7 +34,7 @@
 			.sort((a, b) => (a.title || a.identifier || '').localeCompare(b.title || b.identifier || ''))
 	});
 
-	function handleItemClick(atag: string) {
+	async function handleItemClick(atag: string) {
 		selectedAtag = atag;
 		onItemSelect?.();
 	}
@@ -89,15 +90,6 @@
 	function goToTop() {
 		// Topページに戻る処理
 		goto('/');
-	}
-
-	function showAuthorInfo() {
-		// 作者情報を表示する処理
-		toastStore.info({
-			title: '作者情報',
-			description: 'Created by Your Name',
-			duration: 5000
-		});
 	}
 </script>
 

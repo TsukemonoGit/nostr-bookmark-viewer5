@@ -50,6 +50,7 @@
 				tempTitle = selectedBookmark.title || '';
 				tempDescription = selectedBookmark.description || '';
 				tempImage = selectedBookmark.image || '';
+				isSorting = false;
 			});
 		}
 	});
@@ -63,21 +64,21 @@
 		{ value: 'sorting', label: $t('tagEditor.mode.sorting') }
 	];
 	$effect(() => {
-		if (tagsToDisplay) {
-			untrack(async () => {
-				displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
-			});
-		}
+		tagsToDisplay;
+
+		untrack(async () => {
+			displayTags = tagsToDisplay.filter((item) => !excludedTags.has(item.tag[0]));
+		});
 	});
 	$effect(() => {
 		isPrivate;
-		if (selectedBookmark) {
-			untrack(async () => {
-				selectedTagIds = new Set();
-				originalTags = await getTagsToDisplay();
-				tagsToDisplay = [...originalTags];
-			});
-		}
+		selectedBookmark; //nullでも動かす
+
+		untrack(async () => {
+			selectedTagIds = new Set();
+			originalTags = await getTagsToDisplay();
+			tagsToDisplay = [...originalTags];
+		});
 	});
 
 	$effect(() => {

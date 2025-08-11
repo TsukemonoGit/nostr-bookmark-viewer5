@@ -25,7 +25,11 @@
 
 	// urlが変更された時にloadingStatusをリセット
 	$effect(() => {
-		loadingStatus = 'loading';
+		url;
+
+		untrack(() => {
+			loadingStatus = 'loading';
+		});
 	});
 
 	$effect(() => {
