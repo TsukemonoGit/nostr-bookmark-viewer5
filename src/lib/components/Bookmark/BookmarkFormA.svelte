@@ -27,7 +27,7 @@
 			});
 			return;
 		}
-		const formData = ['a', addressableId, relay].filter(Boolean);
+		const formData = ['a', checkedId, relay].filter(Boolean);
 		onSubmit(formData);
 	}
 
