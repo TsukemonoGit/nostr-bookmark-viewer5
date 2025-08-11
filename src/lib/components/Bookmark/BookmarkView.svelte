@@ -539,6 +539,7 @@
 {#if selectedBookmark}
 	<div
 		class="mx-auto max-w-4xl overflow-x-hidden rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800"
+		style="overflow-anchor: auto;"
 	>
 		{#if selectedBookmark.event.kind !== 10003}
 			<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-[0.3fr_0.7fr]">

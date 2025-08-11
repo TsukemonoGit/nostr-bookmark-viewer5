@@ -71,6 +71,7 @@
 		<main
 			bind:this={mainContent}
 			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-20 md:max-w-[calc(100vw-256px)] dark:bg-black"
+			style="overflow-anchor: auto;"
 		>
 			<BookmarkView selectedBookmark={selectedItem} />
 		</main>
