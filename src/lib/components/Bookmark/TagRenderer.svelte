@@ -7,7 +7,7 @@
 	import { viewport } from '$lib/utils/useViewportAction';
 
 	let hasLoaded = $state(false);
-	let { tag }: { tag: string[] } = $props();
+	let { tag, setRelayHint } = $props<{ tag: string[]; setRelayHint?: (relay: string) => void }>();
 
 	const handleEnterViewport = () => {
 		//console.log('in,', noteId);
@@ -20,9 +20,9 @@
 <div class="w-full flex-1" use:viewport={null} onenterViewport={handleEnterViewport}>
 	{#if hasLoaded}
 		{#if tag[0] === 'e'}
-			<NoteEvent {tag} />
+			<NoteEvent {tag} {setRelayHint} />
 		{:else if tag[0] === 'a'}
-			<NaddrEvent {tag} />
+			<NaddrEvent {tag} {setRelayHint} />
 		{:else if tag[0] === 'r'}
 			{#if tag[1]?.startsWith('ws')}
 				<Relay {tag} />

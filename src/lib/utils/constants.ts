@@ -23,3 +23,20 @@ export const defaultRelays = [
 
 	'wss://nostr.bitcoiner.social'
 ];
+
+export const eventSearchRelays = [
+	'wss://nostr-pub.wellorder.net',
+	'wss://saltivka.org',
+	'wss://relay.damus.io',
+	'wss://relay.nostr.bg',
+	'wss://nostr.wine',
+	'wss://nos.lol',
+	'wss://nostr.mom',
+	'wss://atlas.nostr.land',
+	'wss://relay.snort.social',
+	'wss://offchain.pub',
+	'wss://relay.primal.net',
+	'wss://relay.nostr.band',
+	'wss://public.relaying.io',
+	'wss://relay.noswhere.com'
+];

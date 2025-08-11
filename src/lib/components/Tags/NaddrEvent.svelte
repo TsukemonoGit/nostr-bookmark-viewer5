@@ -7,8 +7,9 @@
 	import Metadata from '../Nostr/Metadata.svelte';
 	import Naddr from '../Nostr/Naddr.svelte';
 	import { type Event as NostrEvent } from 'nostr-typedef';
+	import SearchEvent from './SearchEvent.svelte';
 
-	let { tag }: { tag: string[] } = $props(); //ex. ["a",<kind:pubkey:identifier>,<relayURL>]
+	let { tag, setRelayHint }: { tag: string[]; setRelayHint?: (relay: string) => void } = $props(); //ex. ["a",<kind:pubkey:identifier>,<relayURL>]
 
 	// tagからIDとリレーURLを抽出
 	let naddrId = $derived(tag[1]);
@@ -41,18 +42,21 @@
 		{/snippet}
 		{#snippet nodata()}
 			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
-			{#await queryClient.get()?.removeQueries({ queryKey: [naddrId] }) then}
-				<Naddr id={naddrId} relays={validRelayUrl}>
-					{#snippet loading()}
-						<EmptyCard>Loading {naddrAdress}</EmptyCard>
-					{/snippet}
-					{#snippet nodata()}
-						<EmptyCard>Not Found {naddrAdress}</EmptyCard>
-					{/snippet}
-					{#snippet content({ event })}
-						{@render eventWithMetadata(event)}
-					{/snippet}
-				</Naddr>{/await}
+			{#if validRelayUrl && validRelayUrl.length > 0}
+				{#await queryClient.get()?.removeQueries({ queryKey: [naddrId] }) then}
+					<Naddr id={naddrId} relays={validRelayUrl}>
+						{#snippet loading()}
+							<EmptyCard>Loading {naddrAdress}</EmptyCard>
+						{/snippet}
+						{#snippet nodata()}
+							<SearchEvent {tag} {setRelayHint}>Nodata {naddrAdress}</SearchEvent>
+						{/snippet}
+						{#snippet content({ event })}
+							{@render eventWithMetadata(event)}
+						{/snippet}
+					</Naddr>{/await}
+			{:else}
+				<SearchEvent {tag} {setRelayHint}>Nodata {naddrAdress}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render eventWithMetadata(event)}

@@ -499,6 +499,41 @@
 		}
 		return ev;
 	}
+
+	const setRelayHint = async (item: DndTagItem, relayhint: string) => {
+		if (!selectedBookmark) return;
+		console.log(item, relayhint);
+		// tagsToDisplay内の該当アイテムを見つける
+		const tagIndex = tagsToDisplay.findIndex((t) => t.id === item.id);
+		if (tagIndex === -1) {
+			return;
+		}
+		const updatedTag = [...item.tag];
+
+		// 既存のリレーヒントがあれば上書き、なければ追加
+		if (updatedTag.length > 2) {
+			updatedTag[2] = relayhint;
+		} else {
+			updatedTag.push(relayhint);
+		}
+		//書き込むタグ
+		const tagsToSave = tagsToDisplay.map(
+			(t, index) => (index === tagIndex ? { ...t, tag: updatedTag } : t).tag
+		);
+
+		// 修正: createEventParametersForBookmark を使用
+		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
+		if (ev) {
+			await publishEvent(ev, $t('tagEditor.actions.updateRelayhint'));
+			editingImage = false;
+		} else {
+			toastStore.error({
+				title: $t('bookmark.error'),
+				description: $t('tagEditor.errors.updateRelayhint')
+			});
+			editingImage = false;
+		}
+	};
 </script>
 
 {#if selectedBookmark}
@@ -754,7 +789,7 @@
 								/>
 							{/if}
 						{/if}
-						<TagRenderer tag={item.tag} />
+						<TagRenderer tag={item.tag} setRelayHint={(relay) => setRelayHint(item, relay)} />
 
 						<ItemMenu
 							tag={item.tag}

@@ -81,7 +81,17 @@
 		"unknownError": "不明なエラー",
 		"publishSuccess": "{action} 完了",
 		"publishFailed": "{action} 完了",
-		"publishError": "{action} エラー"
+		"publishError": "{action} エラー",
+		"search_event": "イベントを検索",
+		"search": "検索",
+		"searching": "検索中...",
+		"overall_status": "全体のステータス",
+		"waiting": "待機中",
+		"event_not_found": "イベントが見つかりませんでした。",
+		"timeout": "タイムアウトしました。イベントが見つかりませんでした。",
+		"found_event": "見つかったイベント",
+		"seen_on_relays": "見つかったリレー",
+		"set_relay_hint": "リレーヒントを設定"
 	},
 	"deleteItem": {
 		"title": "削除確認",
@@ -103,7 +113,8 @@
 			"moveDelete": "移動（削除）",
 			"move": "移動",
 			"tagAdd": "追加",
-			"update": "更新"
+			"update": "更新",
+			"updateRelayhint": "リレーヒントの更新"
 		},
 		"errors": {
 			"noTagsSelected": "移動するタグが選択されていません。",
@@ -115,7 +126,8 @@
 			"editFailed": "編集に失敗しました",
 			"noBookmarkSpecified": "ブックマークが指定されていません。",
 			"encryptionFailed": "タグの暗号化に失敗しました。",
-			"privateUpdateFailed": "タグの更新に失敗しました。詳細をコンソールで確認してください。"
+			"privateUpdateFailed": "タグの更新に失敗しました。詳細をコンソールで確認してください。",
+			"updateRelayhint": "リレーヒントの更新に失敗しました"
 		},
 		"success": {
 			"moveCompleted": "個のタグを移動しました。"

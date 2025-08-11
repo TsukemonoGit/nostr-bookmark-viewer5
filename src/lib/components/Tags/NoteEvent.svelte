@@ -7,8 +7,9 @@
 	import NoteEventRenderer from '../Layout/NoteEventRenderer.svelte';
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import { queryClient } from '$lib/utils/stores.svelte';
+	import SearchEvent from './SearchEvent.svelte';
 
-	let { tag } = $props<{ tag: string[] }>(); // ex: ["e", <hexid>, <relayURL>]
+	let { tag, setRelayHint } = $props<{ tag: string[]; setRelayHint: (relay: string) => void }>(); // ex: ["e", <hexid>, <relayURL>]
 
 	// tagからIDとリレーURLを抽出
 	let noteId = $derived(tag[1]);
@@ -46,18 +47,20 @@
 		{/snippet}
 		{#snippet nodata()}
 			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
-			{#await queryClient.get()?.removeQueries({ queryKey: [noteId] }) then}
-				<Note id={noteId} relays={validRelayUrl}>
-					{#snippet loading()}
-						<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
-					{/snippet}
-					{#snippet nodata()}
-						<EmptyCard>Not Found {noteIdEncoded}</EmptyCard>
-					{/snippet}
-					{#snippet content({ event })}
-						{@render noteWithMetadata(event)}
-					{/snippet}
-				</Note>{/await}
+			{#if validRelayUrl && validRelayUrl.length > 0}
+				{#await queryClient.get()?.removeQueries({ queryKey: [noteId] }) then}
+					<Note id={noteId} relays={validRelayUrl}>
+						{#snippet loading()}
+							<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
+						{/snippet}
+						{#snippet nodata()}
+							<SearchEvent {tag} {setRelayHint}>Nodata {noteIdEncoded}</SearchEvent>
+						{/snippet}
+						{#snippet content({ event })}
+							{@render noteWithMetadata(event)}
+						{/snippet}
+					</Note>{/await}{:else}
+				<SearchEvent {tag} {setRelayHint}>Nodata {noteIdEncoded}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render noteWithMetadata(event)}
