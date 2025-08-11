@@ -64,7 +64,7 @@
 					{/if}
 				</div>
 			{/if}
-			<div class="flex flex-auto justify-end"><RelayStatus /><GlobalMenu /></div>
+			<div class="flex flex-auto items-center justify-end gap-1"><GlobalMenu /><RelayStatus /></div>
 		</header>
 
 		<!-- Mobile Content -->
