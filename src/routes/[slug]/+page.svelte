@@ -38,7 +38,7 @@
 <div class="flex h-screen w-full overflow-hidden">
 	<!-- Desktop Sidebar -->
 	<aside
-		class="hidden w-64 shrink-0 border-r border-neutral-300 bg-neutral-100 md:block dark:border-neutral-700 dark:bg-neutral-900"
+		class="hidden w-[256px] shrink-0 border-r border-neutral-300 bg-neutral-100 md:block dark:border-neutral-700 dark:bg-neutral-900"
 	>
 		<Sidebar bind:selectedAtag pubkey={data.pubkey} />
 	</aside>
@@ -70,7 +70,7 @@
 		<!-- Mobile Content -->
 		<main
 			bind:this={mainContent}
-			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-20 dark:bg-black"
+			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-20 md:max-w-[calc(100vw-256px)] dark:bg-black"
 		>
 			<BookmarkView selectedBookmark={selectedItem} />
 		</main>
