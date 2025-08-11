@@ -9,7 +9,11 @@
 	import { queryClient } from '$lib/utils/stores.svelte';
 	import SearchEvent from './SearchEvent.svelte';
 
-	let { tag, setRelayHint } = $props<{ tag: string[]; setRelayHint: (relay: string) => void }>(); // ex: ["e", <hexid>, <relayURL>]
+	let { tag, setRelayHint, editable } = $props<{
+		tag: string[];
+		setRelayHint: (relay: string) => void;
+		editable?: boolean;
+	}>(); // ex: ["e", <hexid>, <relayURL>]
 
 	// tagからIDとリレーURLを抽出
 	let noteId = $derived(tag[1]);
@@ -54,13 +58,13 @@
 							<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 						{/snippet}
 						{#snippet nodata()}
-							<SearchEvent {tag} {setRelayHint}>Nodata {noteIdEncoded}</SearchEvent>
+							<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>
 						{/snippet}
 						{#snippet content({ event })}
 							{@render noteWithMetadata(event)}
 						{/snippet}
 					</Note>{/await}{:else}
-				<SearchEvent {tag} {setRelayHint}>Nodata {noteIdEncoded}</SearchEvent>{/if}
+				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render noteWithMetadata(event)}

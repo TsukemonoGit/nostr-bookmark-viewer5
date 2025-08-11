@@ -20,9 +20,10 @@
 	interface Props {
 		tag: string[];
 		children?: any;
+		editable?: boolean;
 		setRelayHint?: (relay: string) => void;
 	}
-	let { tag, children, setRelayHint }: Props = $props();
+	let { tag, children, setRelayHint, editable = false }: Props = $props();
 
 	let isOpen = $state(false);
 	let filter: Filter | null = $derived.by(() => {
@@ -186,10 +187,11 @@
 
 					{#each seenOnList as relay}
 						<div class="flex w-full flex-wrap gap-1">
-							<button
-								class="preset-outlined-primary-500 btn-sm"
-								onclick={() => setRelayHint?.(relay)}>{$t('common.set_relay_hint')}</button
-							>
+							{#if editable}
+								<button
+									class="preset-outlined-primary-500 btn-sm"
+									onclick={() => setRelayHint?.(relay)}>{$t('common.set_relay_hint')}</button
+								>{/if}
 							{relay}
 						</div>
 					{/each}

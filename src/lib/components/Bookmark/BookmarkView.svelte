@@ -789,7 +789,11 @@
 								/>
 							{/if}
 						{/if}
-						<TagRenderer tag={item.tag} setRelayHint={(relay) => setRelayHint(item, relay)} />
+						<TagRenderer
+							tag={item.tag}
+							setRelayHint={(relay) => setRelayHint(item, relay)}
+							{editable}
+						/>
 
 						<ItemMenu
 							tag={item.tag}

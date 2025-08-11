@@ -9,7 +9,11 @@
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import SearchEvent from './SearchEvent.svelte';
 
-	let { tag, setRelayHint }: { tag: string[]; setRelayHint?: (relay: string) => void } = $props(); //ex. ["a",<kind:pubkey:identifier>,<relayURL>]
+	let {
+		tag,
+		setRelayHint,
+		editable
+	}: { tag: string[]; setRelayHint?: (relay: string) => void; editable?: boolean } = $props(); //ex. ["a",<kind:pubkey:identifier>,<relayURL>]
 
 	// tagからIDとリレーURLを抽出
 	let naddrId = $derived(tag[1]);
@@ -49,14 +53,14 @@
 							<EmptyCard>Loading {naddrAdress}</EmptyCard>
 						{/snippet}
 						{#snippet nodata()}
-							<SearchEvent {tag} {setRelayHint}>Nodata {naddrAdress}</SearchEvent>
+							<SearchEvent {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent>
 						{/snippet}
 						{#snippet content({ event })}
 							{@render eventWithMetadata(event)}
 						{/snippet}
 					</Naddr>{/await}
 			{:else}
-				<SearchEvent {tag} {setRelayHint}>Nodata {naddrAdress}</SearchEvent>{/if}
+				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render eventWithMetadata(event)}

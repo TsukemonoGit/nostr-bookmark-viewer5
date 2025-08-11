@@ -7,7 +7,11 @@
 	import { viewport } from '$lib/utils/useViewportAction';
 
 	let hasLoaded = $state(false);
-	let { tag, setRelayHint } = $props<{ tag: string[]; setRelayHint?: (relay: string) => void }>();
+	let { tag, setRelayHint, editable } = $props<{
+		tag: string[];
+		setRelayHint?: (relay: string) => void;
+		editable?: boolean;
+	}>();
 
 	const handleEnterViewport = () => {
 		//console.log('in,', noteId);
@@ -20,9 +24,9 @@
 <div class="w-full flex-1" use:viewport={null} onenterViewport={handleEnterViewport}>
 	{#if hasLoaded}
 		{#if tag[0] === 'e'}
-			<NoteEvent {tag} {setRelayHint} />
+			<NoteEvent {tag} {setRelayHint} {editable} />
 		{:else if tag[0] === 'a'}
-			<NaddrEvent {tag} {setRelayHint} />
+			<NaddrEvent {tag} {setRelayHint} {editable} />
 		{:else if tag[0] === 'r'}
 			{#if tag[1]?.startsWith('ws')}
 				<Relay {tag} />
