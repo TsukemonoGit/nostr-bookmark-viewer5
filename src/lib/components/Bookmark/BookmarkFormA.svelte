@@ -7,53 +7,61 @@
 
 	interface Props {
 		onSubmit: (data: string[]) => void;
-		// 新しく追加したprops
-		initialTag?: string[];
+		initialTag?: string[]; // ['a', id, relay] 形式
 	}
 
-	// propsの初期値を設定
 	let { onSubmit, initialTag }: Props = $props();
 
-	// $state変数をpropsの初期値で設定
 	let addressableId = $state(encodetoNaddr(initialTag?.[1]) || '');
 	let relay = $state(initialTag?.[2] || '');
 
 	function handleSubmit() {
-		const checkedId = checkId(addressableId.trim());
-		if (!checkedId) {
+		const checked = checkId(addressableId.trim());
+		if (!checked.id) {
 			toastStore.error({
 				title: $t('bookmark.error'),
 				description: $t('addressableForm.errors.invalidId')
 			});
 			return;
 		}
-		const formData = ['a', checkedId, relay].filter(Boolean);
+
+		// relay優先順位: 入力値 > checkIdのrelays(wss優先) > undefined
+		const relayFromId = pickPreferredRelay(checked.relays);
+		const relayToUse = relay || relayFromId || '';
+
+		const formData = relayToUse ? ['a', checked.id, relayToUse] : ['a', checked.id];
+
 		onSubmit(formData);
 	}
 
-	function checkId(eventId: string): string | null {
-		//先頭にnostr:がついていたら削除
+	function checkId(eventId: string): { id: string | null; relays?: string[] } {
 		const id = eventId.startsWith('nostr:') ? eventId.substring(6) : eventId;
-		//naddrで始まる場合はでコードチャレンジ
-		//nip33Regex.test()で合格したら追加可能
+
 		try {
 			if (id.startsWith('naddr1')) {
 				const decoded = nip19.decode(id);
-				if (!decoded) return null;
-				if (decoded.type === 'naddr') {
-					const data = decoded.data;
-					return `${data.kind}:${data.pubkey}:${data.identifier}`;
-				} else {
-					return null;
-				}
+				if (!decoded || decoded.type !== 'naddr') return { id: null };
+				const data = decoded.data;
+				return {
+					id: `${data.kind}:${data.pubkey}:${data.identifier}`,
+					...(data.relays && data.relays.length > 0 ? { relays: data.relays } : {})
+				};
 			}
-		} catch (error) {
-			return null;
+		} catch {
+			return { id: null };
 		}
+
 		if (nip33Regex.test(id)) {
-			return id;
+			return { id };
 		}
-		return null;
+		return { id: null };
+	}
+
+	// wss:// を優先的に返す
+	function pickPreferredRelay(relays?: string[]): string | undefined {
+		if (!relays || relays.length === 0) return undefined;
+		const secureRelay = relays.find((r) => r.startsWith('wss://'));
+		return secureRelay || relays[0];
 	}
 </script>
 
@@ -87,11 +95,10 @@
 		/>
 	</div>
 </div>
+
 <div class="mt-1 flex w-full justify-end">
 	<button
-		onclick={() => {
-			handleSubmit();
-		}}
+		onclick={handleSubmit}
 		class="h-input rounded-input shadow-mini focus-visible:ring-offset-background inline-flex items-center justify-center bg-red-600 px-[50px] text-[15px] font-semibold text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
 	>
 		{$t('addressableForm.submit')}
