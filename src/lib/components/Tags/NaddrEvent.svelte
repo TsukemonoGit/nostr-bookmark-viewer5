@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { encodetoNaddr } from '$lib/utils/encode';
+	import { queryClient } from '$lib/utils/stores.svelte';
 
 	import EmptyCard from '../EmptyCard.svelte';
 	import NoteEventRenderer from '../Layout/NoteEventRenderer.svelte';
@@ -39,18 +40,19 @@
 			<EmptyCard>Loading {naddrAdress}</EmptyCard>
 		{/snippet}
 		{#snippet nodata()}
-			<!-- リレーURLが指定されている場合の再試行 -->
-			<Naddr id={naddrId} relays={validRelayUrl}>
-				{#snippet loading()}
-					<EmptyCard>Loading {naddrAdress}</EmptyCard>
-				{/snippet}
-				{#snippet nodata()}
-					<EmptyCard>Not Found {naddrAdress}</EmptyCard>
-				{/snippet}
-				{#snippet content({ event })}
-					{@render eventWithMetadata(event)}
-				{/snippet}
-			</Naddr>
+			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
+			{#await queryClient.get()?.removeQueries({ queryKey: [naddrId] }) then}
+				<Naddr id={naddrId} relays={validRelayUrl}>
+					{#snippet loading()}
+						<EmptyCard>Loading {naddrAdress}</EmptyCard>
+					{/snippet}
+					{#snippet nodata()}
+						<EmptyCard>Not Found {naddrAdress}</EmptyCard>
+					{/snippet}
+					{#snippet content({ event })}
+						{@render eventWithMetadata(event)}
+					{/snippet}
+				</Naddr>{/await}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render eventWithMetadata(event)}

@@ -2,10 +2,10 @@
 	import { Plus, X } from '@lucide/svelte';
 	import { Dialog, Separator, Tabs } from 'bits-ui';
 
-	import BookmarkFormE from '../Bookmark/BookmarkFormE.svelte';
-	import BookmarkFormA from '../Bookmark/BookmarkFormA.svelte';
-	import BookmarkFormT from '../Bookmark/BookmarkFormT.svelte';
-	import BookmarkFormR from '../Bookmark/BookmarkFormR.svelte';
+	import BookmarkFormE from '../../Bookmark/BookmarkFormE.svelte';
+	import BookmarkFormA from '../../Bookmark/BookmarkFormA.svelte';
+	import BookmarkFormT from '../../Bookmark/BookmarkFormT.svelte';
+	import BookmarkFormR from '../../Bookmark/BookmarkFormR.svelte';
 
 	let isOpen = $state(false);
 

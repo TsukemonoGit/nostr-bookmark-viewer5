@@ -4,9 +4,10 @@
 
 	import { parseContent, TokenType, type Token } from '@konemono/nostr-content-parser';
 	import * as nip19 from 'nostr-tools/nip19';
-	import UrlDisplay from './UrlDisplay.svelte';
-	import CustomEmoji from './CustomEmoji.svelte';
+
 	import DecodedContent from './DecodedContent.svelte';
+	import CustomEmoji from '../Layout/CustomEmoji.svelte';
+	import UrlDisplay from '../Layout/UrlDisplay.svelte';
 
 	interface Props {
 		event: Partial<Nostr.Event>;

@@ -3,9 +3,9 @@
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 	import { Github, House } from '@lucide/svelte';
 	import type { EventParameters } from 'nostr-typedef';
-	import ConfirmDeleteList from '../Layout/ConfirmDeleteList.svelte';
+	import ConfirmDeleteList from '../Layout/Dialog/ConfirmDeleteList.svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
-	import CreateNewList from '../Layout/CreateNewList.svelte';
+	import CreateNewList from '../Layout/Dialog/CreateNewList.svelte';
 	import type { CreateData } from '$lib/types/utiles';
 	import { toastStore } from '$lib/utils/util';
 	import { t } from '@konemono/svelte5-i18n';

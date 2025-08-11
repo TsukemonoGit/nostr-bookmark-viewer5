@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ExternalLink, FileJson, Menu, Pencil, Share } from '@lucide/svelte';
 	import { DropdownMenu } from 'bits-ui';
-	import TagEditor from '../Bookmark/TagEditor.svelte';
+	import TagEditor from '../../Bookmark/TagEditor.svelte';
 	import { type QueryKey } from '@tanstack/svelte-query';
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import JsonView from './JsonView.svelte';

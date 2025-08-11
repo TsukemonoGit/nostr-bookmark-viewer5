@@ -7,7 +7,7 @@ import {
 	type EventPacket,
 	type OkPacket
 } from 'rx-nostr';
-import { tap, type Observable, type OperatorFunction } from 'rxjs';
+import { Subscription, tap, type Observable, type OperatorFunction } from 'rxjs';
 import { verifier } from '@rx-nostr/crypto';
 import * as Nostr from 'nostr-typedef';
 import { createTie } from './operators';
@@ -15,7 +15,7 @@ import { bookmarkableTagsSet, defaultRelays } from '$lib/utils/constants';
 import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 import { relayStateMap } from '$lib/utils/stores.svelte';
 import { createQuery, useQueryClient, type QueryKey } from '@tanstack/svelte-query';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
 	verifier,
@@ -31,6 +31,11 @@ rxNostr.createConnectionStateObservable().subscribe((packet) => {
 });
 
 const [tie, tieMap] = createTie();
+
+export function resetNostr() {
+	bookmarkItemsMap.set(new Map<string, BookmarkItem>());
+}
+
 export function getRelaysById(id: string): string[] {
 	return Array.from(tieMap.get(id) || []);
 }
@@ -132,26 +137,34 @@ function createInitialKind10003Event(pubkey: string): Nostr.Event {
 		created_at: 0
 	};
 }
-
+let subscription: Subscription;
 // bookmarks購読（relay listが確定してから呼ばれる）
 export function subscribeBookmarkData(pubkey: string) {
 	if (!rxNostr) return;
 	const initialEvent = createInitialKind10003Event(pubkey);
+
 	const initialBookmarkItem = eventToBookmarkItem(initialEvent);
+
 	// writableストアのsetメソッドで初期化
 	const initialMap = new Map<string, BookmarkItem>();
 	initialMap.set(initialBookmarkItem.atag, initialBookmarkItem);
+
 	bookmarkItemsMap.set(initialMap);
 
 	const req = createRxForwardReq();
-	rxNostr
+	//購読中のものがあったら終わらせる（トップページに戻って別ユーザーで開きなおしたときに前のユーザーのブクマが取得されていたので）
+	if (subscription) {
+		subscription.unsubscribe();
+	}
+
+	subscription = rxNostr
 		.use(req)
 		.pipe(tie, uniq())
 		.subscribe({
 			next: (packet) => {
 				const evt = packet.event;
 				if (!evt) return;
-
+				//	console.log(evt);
 				switch (evt.kind) {
 					case 10003:
 						upsertByAtag(evt);
