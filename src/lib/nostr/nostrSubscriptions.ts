@@ -19,7 +19,7 @@ import { derived, get, writable } from 'svelte/store';
 
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
 	verifier,
-	eoseTimeout: 3000,
+	eoseTimeout: 10000,
 	okTimeout: 3000,
 	authenticator: 'auto' //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
 });
