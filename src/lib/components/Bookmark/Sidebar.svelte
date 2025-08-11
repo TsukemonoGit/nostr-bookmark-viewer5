@@ -52,7 +52,7 @@
 		};
 
 		try {
-			await publishEvent(ev, $t('bookmark.deleteSuccess'), $t('bookmark.deleteFail'));
+			await publishEvent(ev, $t('tagEditor.actions.delete'));
 
 			$bookmarkItemsMap.delete(item.atag);
 			$bookmarkItemsMap = $bookmarkItemsMap;
@@ -84,7 +84,7 @@
 		};
 
 		console.log($t('bookmark.eventCreated'), ev);
-		await publishEvent(ev, $t('bookmark.createSuccess'), $t('bookmark.createFail'));
+		await publishEvent(ev, $t('bookmark.create'));
 	}
 
 	function goToTop() {

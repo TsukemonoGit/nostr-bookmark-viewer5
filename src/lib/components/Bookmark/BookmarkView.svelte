@@ -155,11 +155,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.deleteCompleted'),
-				$t('tagEditor.actions.deleteFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.delete'));
 			//originalTags = $state.snapshot(tagsToDisplay);
 			//selectedTagIds = new Set();
 		}
@@ -174,7 +170,7 @@
 			});
 			return;
 		}
-
+		const count = selectedCount;
 		try {
 			// 1. 移動先のブックマークを取得
 			const destinationBookmarkMap = get(bookmarkItemsMap);
@@ -242,11 +238,7 @@
 			}
 
 			// 5. 移動先のブックマークを更新し、成功したら移動元を更新
-			await publishEvent(
-				destinationEventParams,
-				$t('tagEditor.actions.moveAddCompleted'),
-				$t('tagEditor.actions.moveAddFailed')
-			);
+			await publishEvent(destinationEventParams, $t('tagEditor.actions.publish'));
 
 			// 移動先の更新が成功した場合のみ、移動元の更新に進む
 			const sourceEventParams = await createEventParametersForBookmark(
@@ -256,15 +248,11 @@
 			);
 			console.log(sourceEventParams);
 			if (sourceEventParams) {
-				await publishEvent(
-					sourceEventParams,
-					$t('tagEditor.actions.moveDeleteCompleted'),
-					$t('tagEditor.actions.moveDeleteFailed')
-				);
+				await publishEvent(sourceEventParams, $t('tagEditor.actions.moveDelete'));
 
 				toastStore.success({
-					title: $t('tagEditor.actions.moveCompleted'),
-					description: `${selectedCount}${$t('tagEditor.success.moveCompleted')}`
+					title: $t('common.publishSuccess', { action: $t('tagEditor.actions.move') }),
+					description: `${count}${$t('tagEditor.success.moveCompleted')}`
 				});
 			}
 		} catch (error) {
@@ -297,11 +285,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.tagAddCompleted'),
-				$t('tagEditor.actions.tagAddFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.tagAdd'));
 		}
 	}
 
@@ -326,11 +310,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.updateCompleted'),
-				$t('tagEditor.actions.updateFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.update'));
 		}
 	}
 
@@ -357,11 +337,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.updateCompleted'),
-				$t('tagEditor.actions.updateFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.update'));
 		}
 	}
 
@@ -381,11 +357,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.titleUpdateCompleted'),
-				$t('tagEditor.actions.titleUpdateFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.update'));
 			editingTitle = false;
 		} else {
 			toastStore.error({
@@ -412,11 +384,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.descriptionUpdateCompleted'),
-				$t('tagEditor.actions.descriptionUpdateFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.update'));
 			console.log('end');
 			editingDescription = false;
 		} else {
@@ -444,11 +412,7 @@
 		// 修正: createEventParametersForBookmark を使用
 		const ev = await createEventParametersForBookmark(selectedBookmark, tagsToSave, isPrivate);
 		if (ev) {
-			await publishEvent(
-				ev,
-				$t('tagEditor.actions.imageUpdateCompleted'),
-				$t('tagEditor.actions.imageUpdateFailed')
-			);
+			await publishEvent(ev, $t('tagEditor.actions.update'));
 			editingImage = false;
 		} else {
 			toastStore.error({
