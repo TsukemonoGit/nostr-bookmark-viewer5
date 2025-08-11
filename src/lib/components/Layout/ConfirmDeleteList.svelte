@@ -10,14 +10,17 @@
 		disabled?: boolean;
 		onConfirm: () => void;
 		item: BookmarkItem;
+		isSelected?: boolean;
 	}
-	let { disabled = false, onConfirm, item }: Props = $props();
+	let { disabled = false, onConfirm, item, isSelected = false }: Props = $props();
 </script>
 
 <Dialog.Root bind:open={isOpen}>
 	<Dialog.Trigger
 		{disabled}
-		class="rounded p-1 text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500 hover:text-white"
+		class="rounded p-1 text-neutral-500 transition-opacity hover:bg-red-500 hover:text-white {isSelected
+			? 'opacity-100'
+			: 'opacity-0 group-hover:opacity-100'}"
 		aria-label={$t('common.delete')}
 	>
 		<Trash2 size="16" />

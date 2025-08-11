@@ -125,7 +125,11 @@
 							{item.title || item.identifier || item.event.kind}
 						</button>
 						{#if editable}
-							<ConfirmDeleteList onConfirm={() => handleDeleteItem(item)} {item} />
+							<ConfirmDeleteList
+								onConfirm={() => handleDeleteItem(item)}
+								{item}
+								isSelected={selectedAtag === item.atag}
+							/>
 						{/if}
 					</li>
 				{/each}
