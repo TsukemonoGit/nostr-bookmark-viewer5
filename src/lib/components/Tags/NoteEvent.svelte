@@ -6,6 +6,7 @@
 	import Note from '../Nostr/Note.svelte';
 	import NoteEventRenderer from '../Layout/NoteEventRenderer.svelte';
 	import { type Event as NostrEvent } from 'nostr-typedef';
+	import { queryClient } from '$lib/utils/stores.svelte';
 
 	let { tag } = $props<{ tag: string[] }>(); // ex: ["e", <hexid>, <relayURL>]
 
@@ -44,18 +45,19 @@
 			<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 		{/snippet}
 		{#snippet nodata()}
-			<!-- リレーURLが指定されている場合の再試行 -->
-			<Note id={noteId} relays={validRelayUrl}>
-				{#snippet loading()}
-					<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
-				{/snippet}
-				{#snippet nodata()}
-					<EmptyCard>Not Found {noteIdEncoded}</EmptyCard>
-				{/snippet}
-				{#snippet content({ event })}
-					{@render noteWithMetadata(event)}
-				{/snippet}
-			</Note>
+			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
+			{#await queryClient.get()?.removeQueries({ queryKey: [noteId] }) then}
+				<Note id={noteId} relays={validRelayUrl}>
+					{#snippet loading()}
+						<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
+					{/snippet}
+					{#snippet nodata()}
+						<EmptyCard>Not Found {noteIdEncoded}</EmptyCard>
+					{/snippet}
+					{#snippet content({ event })}
+						{@render noteWithMetadata(event)}
+					{/snippet}
+				</Note>{/await}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render noteWithMetadata(event)}

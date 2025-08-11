@@ -3,7 +3,6 @@
 	import NoteLayout from './NoteLayout.svelte';
 	import type { UserProfile } from '$lib/types/utiles';
 	import { encodetoNpub } from '$lib/utils/encode';
-	import Content from './Content.svelte';
 	import { isAddressableKind, isReplaceableKind } from 'nostr-tools/kinds';
 	import Replasable from './Replasable.svelte';
 	import EngagementLayout from './EngagementLayout.svelte';
@@ -14,6 +13,7 @@
 	import UrlDisplay from './UrlDisplay.svelte';
 	import { TokenType, type Token } from '@konemono/nostr-content-parser';
 	import Kind9735 from './Kind9735.svelte';
+	import Content from '../Content/Content.svelte';
 
 	interface Props {
 		event: Nostr.Event;

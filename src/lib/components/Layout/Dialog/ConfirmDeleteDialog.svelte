@@ -2,7 +2,7 @@
 	import { t } from '@konemono/svelte5-i18n';
 	import { X } from '@lucide/svelte';
 	import { Dialog, Separator } from 'bits-ui';
-	import TagRenderer from '../Bookmark/TagRenderer.svelte';
+	import TagRenderer from '../../Bookmark/TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
 
 	let isOpen = $state(false);

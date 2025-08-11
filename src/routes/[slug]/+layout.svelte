@@ -5,7 +5,8 @@
 		fetchLatestRelayList,
 		subscribeBookmarkData,
 		serRelays,
-		relaysReconnectChallenge
+		relaysReconnectChallenge,
+		resetNostr
 	} from '$lib/nostr/nostrSubscriptions';
 	import { kind10002, queryClient } from '$lib/utils/stores.svelte';
 	import { QueryClient, QueryClientProvider, type QueryClientConfig } from '@tanstack/svelte-query';
@@ -22,6 +23,8 @@
 
 		async function init() {
 			if (!data.pubkey) return;
+
+			resetNostr();
 
 			isLoadingRelays = true;
 			progress = 0;

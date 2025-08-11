@@ -10,15 +10,15 @@
 	import { formatAbsoluteDateFromUnix, toastStore } from '$lib/utils/util';
 	import type { EventParameters } from 'nostr-typedef';
 
-	import ConfirmDeleteDialog from '../Layout/ConfirmDeleteDialog.svelte';
+	import ConfirmDeleteDialog from '../Layout/Dialog/ConfirmDeleteDialog.svelte';
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
 	import { loginUser } from '$lib/utils/stores.svelte';
-	import CreateNewTag from '../Layout/CreateNewTag.svelte';
+	import CreateNewTag from '../Layout/Dialog/CreateNewTag.svelte';
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';
 	import { publishEvent } from '$lib/nostr/publish';
-	import ItemMenu from '../Layout/ItemMenu.svelte';
+	import ItemMenu from '../Layout/Dialog/ItemMenu.svelte';
 
 	interface Props {
 		selectedBookmark: BookmarkItem | null;

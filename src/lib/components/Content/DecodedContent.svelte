@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { TokenType, type Token } from '@konemono/nostr-content-parser';
 	import { nip19 } from 'nostr-tools';
-	import UrlDisplay from './UrlDisplay.svelte';
-	import UserName from './UserName.svelte';
+	import UrlDisplay from '../Layout/UrlDisplay.svelte';
+	import UserName from '../Layout/UserName.svelte';
 
 	interface Props {
 		decoded: nip19.DecodedResult;

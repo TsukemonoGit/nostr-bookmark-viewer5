@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Link from './Link.svelte';
+	import Link from '../Layout/Link.svelte';
 
 	let videoError: boolean = $state(false);
 	let videoLoad: boolean = $state(false);

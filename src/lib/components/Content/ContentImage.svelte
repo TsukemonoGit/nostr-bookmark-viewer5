@@ -1,6 +1,6 @@
 <!--ContentImage.svelte-->
 <script lang="ts">
-	import Link from './Link.svelte';
+	import Link from '../Layout/Link.svelte';
 
 	let imgError: boolean = $state(false);
 	let imgLoad: boolean = $state(false);

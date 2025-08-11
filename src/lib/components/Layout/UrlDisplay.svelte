@@ -2,9 +2,10 @@
 	import type { Token } from '@konemono/nostr-content-parser';
 	import UrlType from './UrlType.svelte';
 	import Link from './Link.svelte';
-	import ContentImage from './ContentImage.svelte';
+
 	import OgpLoad from './OgpLoad.svelte';
-	import ContentVideo from './ContentVideo.svelte';
+	import ContentImage from '../Content/ContentImage.svelte';
+	import ContentVideo from '../Content/ContentVideo.svelte';
 
 	interface Props {
 		part: Token;
