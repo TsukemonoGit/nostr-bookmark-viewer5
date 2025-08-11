@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { publishEvent } from '$lib/nostr/publish';
 	import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
-	import { Plus, Trash2 } from '@lucide/svelte';
+	import { Github, House } from '@lucide/svelte';
 	import type { EventParameters } from 'nostr-typedef';
 	import ConfirmDeleteList from '../Layout/ConfirmDeleteList.svelte';
 	import { loginUser } from '$lib/utils/stores.svelte';
@@ -9,6 +9,9 @@
 	import type { CreateData } from '$lib/types/utiles';
 	import { toastStore } from '$lib/utils/util';
 	import { t } from '@konemono/svelte5-i18n';
+	import Link from '../Layout/Link.svelte';
+	import { goto } from '$app/navigation';
+	import About from './About.svelte';
 
 	interface Props {
 		pubkey: string;
@@ -82,6 +85,20 @@
 		console.log($t('bookmark.eventCreated'), ev);
 		await publishEvent(ev, $t('bookmark.createSuccess'), $t('bookmark.createFail'));
 	}
+
+	function goToTop() {
+		// Topページに戻る処理
+		goto('/');
+	}
+
+	function showAuthorInfo() {
+		// 作者情報を表示する処理
+		toastStore.info({
+			title: '作者情報',
+			description: 'Created by Your Name',
+			duration: 5000
+		});
+	}
 </script>
 
 <nav class="h-full overflow-y-auto p-2 text-sm">
@@ -115,6 +132,27 @@
 			</ul>
 		</section>
 	{/each}
+
+	<!-- フッター項目 -->
+	<section class="mt-10 border-t border-neutral-200 pt-3 dark:border-neutral-700">
+		<div class="flex flex-col space-y-1 opacity-70">
+			<button
+				onclick={goToTop}
+				class="flex items-center gap-2 rounded px-2 py-1 text-left text-xs transition-colors hover:bg-neutral-200 hover:opacity-100 dark:hover:bg-neutral-800"
+			>
+				<House size={14} />
+				{$t('footer.top')}
+			</button>
+			<Link
+				href="https://github.com/TsukemonoGit/nostr-bookmark-viewer5"
+				class="flex items-center gap-2 rounded px-2 py-1 text-left text-xs transition-colors hover:bg-neutral-200 hover:opacity-100 dark:hover:bg-neutral-800"
+			>
+				<Github size={14} />
+				GitHub
+			</Link>
+			<About />
+		</div>
+	</section>
 </nav>
 
 <style lang="postcss">

@@ -7,19 +7,21 @@
 
 	interface Props {
 		pubhex: string;
+		relays?: string[];
 	}
 
-	let { pubhex }: Props = $props();
+	let { pubhex, relays }: Props = $props();
 
 	let pubString = $derived(displayShortPub(pubhex));
 
 	const userName = (metadata: Nostr.Event) => {
 		const usrProfile = profile(metadata);
 
-		if (usrProfile && usrProfile.display_name && usrProfile.display_name !== '') {
+		if (!usrProfile) return pubString;
+
+		if (usrProfile.display_name && usrProfile.display_name !== '') {
 			return usrProfile.display_name;
-		}
-		if (usrProfile && usrProfile.name && usrProfile.name !== '') {
+		} else if (usrProfile.name && usrProfile.name !== '') {
 			return usrProfile.name;
 		}
 
@@ -36,7 +38,7 @@
 	}
 </script>
 
-<Metadata pubkey={pubhex}>
+<Metadata pubkey={pubhex} {relays}>
 	{#snippet loading()}
 		<span class="inline-flex text-sm break-all">@{pubString}</span>{/snippet}
 	{#snippet nodata()}

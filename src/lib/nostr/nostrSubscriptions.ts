@@ -325,7 +325,7 @@ export async function relaysReconnectChallenge() {
 	const defoRelays = rxNostr.getDefaultRelays();
 	await Promise.all(
 		Object.keys(defoRelays)
-			.filter((key) => rxNostr.getRelayStatus(key)?.connection === 'error')
+			.filter((key) => defoRelays[key].read && rxNostr.getRelayStatus(key)?.connection === 'error')
 			.map((key) => {
 				console.log(`Reconnecting relay: ${key}`);
 				return rxNostr.reconnect(key);

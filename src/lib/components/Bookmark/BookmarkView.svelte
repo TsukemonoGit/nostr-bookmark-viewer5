@@ -681,12 +681,14 @@
 					)}
 				</span>
 			{/if}
-			<ItemMenu
-				tag={['a', selectedBookmark.atag]}
-				event={selectedBookmark.event}
-				onConformEditTag={(editedTag) => {}}
-				editable={false}
-			/>
+			<div class="ml-auto">
+				<ItemMenu
+					tag={['a', selectedBookmark.atag]}
+					event={selectedBookmark.event}
+					onConformEditTag={(editedTag) => {}}
+					editable={false}
+				/>
+			</div>
 		</div>
 		<div class="mb-4 flex items-center justify-between">
 			{#if editable}
