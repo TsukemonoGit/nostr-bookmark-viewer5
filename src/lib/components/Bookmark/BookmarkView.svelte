@@ -748,7 +748,7 @@
 							{:else}
 								<input
 									type="checkbox"
-									class="form-checkbox m-1 h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+									class="form-checkbox m-1 h-6 w-6 rounded text-blue-600 focus:ring-blue-500"
 									checked={isTagSelected(item.id)}
 									onchange={() => toggleTagSelection(item.id)}
 								/>
