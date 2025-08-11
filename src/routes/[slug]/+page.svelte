@@ -87,7 +87,9 @@
 		></div>
 
 		<!-- Sidebar -->
-		<aside class="absolute top-0 left-0 h-full w-64 bg-neutral-100 shadow-lg dark:bg-neutral-900">
+		<aside
+			class="absolute top-0 left-0 grid h-full w-64 grid-rows-[auto_1fr] bg-neutral-100 shadow-lg dark:bg-neutral-900"
+		>
 			<!-- Close Button -->
 			<div
 				class="flex items-center justify-between border-b border-neutral-300 px-4 py-3 dark:border-neutral-700"
