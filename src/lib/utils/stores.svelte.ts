@@ -9,11 +9,16 @@ export const loginUser = createCustomStore<string | undefined>(undefined);
 export const queryClient = createCustomStore<QueryClient | undefined>(undefined);
 export const nostrShare = createCustomStore<HTMLElement | null>(null);
 export const shareText = createCustomStore<string>('');
+
+export const commonMenu = createCustomStore<{ checked: boolean; labelKey: string }[]>([
+	{ checked: true, labelKey: 'commonMenu.enableWarning' }
+]);
+
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数
 function createCustomStore<T>(initialValue: T) {
-	let state: T = $state.raw(initialValue);
+	let state: T = $state(initialValue);
 	let subscribers: Array<(value: T) => void> = [];
 
 	return {

@@ -29,6 +29,10 @@
 			return undefined;
 		}
 	});
+
+	let warning: string[] | undefined = $derived(
+		event?.tags.find((item) => item[0] === 'content-warning')
+	);
 </script>
 
 {#if event.kind === 6 || event.kind === 7 || event.kind === 16}
@@ -75,7 +79,12 @@
 {:else if event.kind === 9735}
 	<Kind9735 {event} {profile} />
 {:else}
-	<NoteLayout {profile} created_at={event?.created_at} tags={metadata?.tags || []}>
+	<NoteLayout
+		{profile}
+		created_at={event?.created_at}
+		tags={metadata?.tags || []}
+		warningText={warning !== undefined ? (warning.length > 1 ? warning[1] : '') : undefined}
+	>
 		{#snippet replyUser()}
 			{@const replyUserList = event.tags
 				.filter((tag) => tag[0] === 'p' && typeof tag[1] === 'string')

@@ -4,6 +4,8 @@
 	import UserAvatar from './UserAvatar.svelte';
 	import { datetime, formatAbsoluteDateFromUnix } from '$lib/utils/util';
 	import DisplayName from './DisplayName.svelte';
+	import WarningHide from './WarningHide.svelte';
+	import { commonMenu } from '$lib/utils/stores.svelte';
 
 	interface Props {
 		tags: string[][];
@@ -11,14 +13,13 @@
 		created_at?: number | undefined;
 		hasError?: boolean;
 
-		name?: Snippet;
+		warningText?: string | undefined; // ワーニングメッセージ
 
+		name?: Snippet;
 		content?: Snippet;
 		error?: Snippet;
-
 		replyUser?: Snippet;
 	}
-
 	let {
 		profile,
 		tags,
@@ -29,7 +30,8 @@
 		content,
 		error,
 
-		replyUser
+		replyUser,
+		warningText
 	}: Props = $props();
 </script>
 
@@ -75,6 +77,9 @@
 			<div class="note-body">
 				{#if content}
 					{@render content()}
+					{#if warningText !== undefined && commonMenu.get()[0].checked}
+						<WarningHide text={warningText} />
+					{/if}
 				{:else}
 					<div class="content placeholder"></div>
 				{/if}

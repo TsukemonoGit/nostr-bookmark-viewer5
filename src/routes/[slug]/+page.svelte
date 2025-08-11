@@ -6,6 +6,7 @@
 	import type { LayoutData } from './$types';
 	import { untrack } from 'svelte';
 	import { t } from '@konemono/svelte5-i18n';
+	import GlobalMenu from '$lib/components/menu/GlobalMenu.svelte';
 
 	let { data }: { data: LayoutData } = $props();
 	let selectedAtag: string | null = $state(null);
@@ -63,13 +64,13 @@
 					{/if}
 				</div>
 			{/if}
-			<div class="flex flex-auto justify-end"><RelayStatus /></div>
+			<div class="flex flex-auto justify-end"><RelayStatus /><GlobalMenu /></div>
 		</header>
 
 		<!-- Mobile Content -->
 		<main
 			bind:this={mainContent}
-			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-16 dark:bg-black"
+			class="max-w-full flex-1 overflow-x-hidden overflow-y-auto bg-white p-1 pb-20 dark:bg-black"
 		>
 			<BookmarkView selectedBookmark={selectedItem} />
 		</main>
