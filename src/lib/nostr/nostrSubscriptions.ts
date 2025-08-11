@@ -15,11 +15,11 @@ import { bookmarkableTagsSet, defaultRelays } from '$lib/utils/constants';
 import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 import { relayStateMap } from '$lib/utils/stores.svelte';
 import { createQuery, useQueryClient, type QueryKey } from '@tanstack/svelte-query';
-import { derived, get, writable } from 'svelte/store';
+import { derived, writable, type Writable } from 'svelte/store';
 
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
 	verifier,
-	eoseTimeout: 10000,
+	eoseTimeout: 7000,
 	okTimeout: 3000,
 	authenticator: 'auto' //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
 });
@@ -344,4 +344,173 @@ export async function relaysReconnectChallenge() {
 				return rxNostr.reconnect(key);
 			})
 	);
+}
+
+export type RelayEventStatus = {
+	url: string;
+	status: 'waiting' | 'receiving' | 'completed' | 'timeout';
+	eventIds: Set<string>;
+};
+
+export type RelayTrackingOptions = {
+	timeout?: number;
+};
+// 新しい全体ステータスの型を定義
+export type OverallStatus = 'fetching' | 'completed' | 'timeout';
+
+export function useRelayEventTracking(
+	filters: Nostr.Filter[],
+	operator?: OperatorFunction<EventPacket, EventPacket> | null,
+	relays?: string[],
+	options: RelayTrackingOptions = {}
+): {
+	relayEventStatus: Writable<Record<string, RelayEventStatus>>;
+	overallStatus: Writable<OverallStatus>; // 追加
+	event: Writable<Nostr.Event | null>;
+	cleanup: () => void;
+} {
+	const { timeout = 15000 } = options;
+
+	if (Object.entries(rxNostr.getDefaultRelays()).length <= 0) {
+		throw new Error('No default relays configured');
+	}
+
+	const targetRelays = relays || Object.keys(rxNostr.getDefaultRelays());
+
+	// 全体のイベント取得状況
+	const overallStatus = writable<OverallStatus>('fetching'); // 追加
+
+	// リレーごとのイベント取得状況
+	const relayEventStatus = writable<Record<string, RelayEventStatus>>(
+		Object.fromEntries(
+			targetRelays.map((url) => [
+				url,
+				{
+					url,
+					status: 'waiting' as const,
+					event: null,
+					eventIds: new Set<string>()
+				}
+			])
+		)
+	);
+
+	// 見つかった最新のイベント
+	const eventStore = writable<Nostr.Event | null>(null);
+
+	let isCompleted = false;
+	let timeoutHandle: any;
+
+	const req = createRxBackwardReq();
+
+	const obs: Observable<EventPacket> = rxNostr
+		.use(req, {
+			relays: targetRelays
+		})
+		.pipe(tie, operator ? operator : tap());
+
+	// タイムアウト設定
+	timeoutHandle = setTimeout(() => {
+		if (!isCompleted) {
+			isCompleted = true;
+			console.log('Request timeout');
+			req.over();
+
+			// 全体ステータスをtimeoutに更新
+			overallStatus.set('timeout'); // 追加
+
+			// まだイベントを受信していないリレーをtimeout状態に
+			relayEventStatus.update((statuses) => {
+				const updated = { ...statuses };
+				Object.keys(updated).forEach((relayUrl) => {
+					if (updated[relayUrl].status === 'waiting') {
+						updated[relayUrl].status = 'timeout';
+					} else if (updated[relayUrl].status === 'receiving') {
+						updated[relayUrl].status = 'completed';
+					}
+				});
+				return updated;
+			});
+		}
+	}, timeout);
+
+	const sub = obs.subscribe({
+		next: (packet: EventPacket) => {
+			if (isCompleted) return;
+
+			// ... (既存のイベント更新ロジック)
+			eventStore.update((currentEvent) => {
+				if (!currentEvent || packet.event.created_at > currentEvent.created_at) {
+					return packet.event;
+				}
+				return currentEvent;
+			});
+
+			const fromRelay = packet.from;
+			relayEventStatus.update((statuses) => {
+				const updated = { ...statuses };
+				if (!updated[fromRelay]) {
+					updated[fromRelay] = {
+						url: fromRelay,
+						status: 'receiving',
+						eventIds: new Set()
+					};
+				}
+				updated[fromRelay].status = 'receiving';
+				updated[fromRelay].eventIds.add(packet.event.id);
+				return updated;
+			});
+		},
+		complete: () => {
+			if (!isCompleted) {
+				isCompleted = true;
+				clearTimeout(timeoutHandle);
+				console.log('Request completed');
+
+				// 全体ステータスをcompletedに更新
+				overallStatus.set('completed'); // 追加
+
+				// 全リレーの状態を最終化
+				relayEventStatus.update((statuses) => {
+					const updated = { ...statuses };
+					Object.keys(updated).forEach((relayUrl) => {
+						if (updated[relayUrl].status === 'waiting') {
+							updated[relayUrl].status = 'timeout';
+						} else if (updated[relayUrl].status === 'receiving') {
+							updated[relayUrl].status = 'completed';
+						}
+					});
+					return updated;
+				});
+			}
+		},
+		error: (e) => {
+			console.log('Request error:', e);
+			if (!isCompleted) {
+				isCompleted = true;
+				clearTimeout(timeoutHandle);
+				req.over();
+
+				// エラー時も全体ステータスをcompletedとして扱うか、専用の'error'状態を追加する
+				overallStatus.set('completed'); // または 'error' を追加
+			}
+		}
+	});
+
+	req.emit(filters);
+
+	const cleanup = () => {
+		if (timeoutHandle) {
+			clearTimeout(timeoutHandle);
+		}
+		sub.unsubscribe();
+		req.over();
+	};
+
+	return {
+		relayEventStatus,
+		overallStatus, // 追加
+		event: eventStore,
+		cleanup
+	};
 }
