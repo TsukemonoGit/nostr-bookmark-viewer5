@@ -16,8 +16,7 @@
 	let { initTag, onConformEditTag, isOpen = $bindable(false) }: Props = $props();
 
 	const FormComponent = (() => {
-		const tag = initTag[0];
-		switch (tag) {
+		switch (initTag[0]) {
 			case 'e':
 				return BookmarkFormE;
 			case 'a':
