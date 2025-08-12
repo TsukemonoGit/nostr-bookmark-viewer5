@@ -256,8 +256,8 @@ export function useReq(
 				req.over();
 			});
 		},
-		staleTime: 60 * 1000,
-		gcTime: 10 * 60 * 1000
+		staleTime: Infinity,
+		gcTime: Infinity
 	});
 
 	return result;
