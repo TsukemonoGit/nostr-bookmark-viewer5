@@ -19,7 +19,9 @@
 	let { event, isOpen = $bindable(false), tag, setRelayHint, editable = false }: Props = $props();
 	const bloadcastEvent = async (ev: NostrEvent) => {
 		await publishEvent(ev, $t('common.bloadcast'));
-
+		const client = queryClient.get();
+		if (!client) return;
+		client.refetchQueries({ queryKey: [tag[1]] });
 		isOpen = false;
 	};
 	let formattedJson = $derived(formatEvent(event));
