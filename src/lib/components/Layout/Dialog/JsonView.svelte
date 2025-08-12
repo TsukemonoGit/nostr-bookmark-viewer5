@@ -28,12 +28,12 @@
 		// イベントIDはtagの2番目の要素、つまりtag[1]に格納されていると仮定
 		const queryKeyToRefetch = [tag[1]];
 
-		// 3. キャッシュを無効化して再フェッチを強制
-		await client.invalidateQueries({ queryKey: queryKeyToRefetch });
-
+		// 3. 再フェッチ
+		await client.refetchQueries({ queryKey: queryKeyToRefetch });
 		// 4. ダイアログを閉じる
 		isOpen = false;
 	};
+
 	let formattedJson = $derived(formatEvent(event));
 	function formatEvent(ev: NostrEvent | null): string | null {
 		if (!ev) return null;
