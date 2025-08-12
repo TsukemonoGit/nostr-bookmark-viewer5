@@ -797,6 +797,7 @@
 						/>
 
 						<ItemMenu
+							setRelayHint={(relay) => setRelayHint(item, relay)}
 							tag={item.tag}
 							onConformEditTag={(editedTag) => saveTagEdit(item.id, editedTag)}
 							{editable}

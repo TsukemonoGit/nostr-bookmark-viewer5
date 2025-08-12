@@ -16,8 +16,17 @@
 		onConformEditTag: (tag: string[]) => void;
 		editable: boolean;
 		event?: NostrEvent | null;
+		setRelayHint?: (relay: string) => void;
+		bloadcast?: (event: NostrEvent) => void;
 	}
-	let { tag, onConformEditTag, editable, event = $bindable(null) }: Props = $props();
+	let {
+		tag,
+		onConformEditTag,
+		editable,
+		event = $bindable(null),
+		setRelayHint,
+		bloadcast
+	}: Props = $props();
 	let openTagEditor = $state(false);
 	let openJsonView = $state(false);
 	let menuItem = $derived([
@@ -105,4 +114,4 @@
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
 <TagEditor bind:isOpen={openTagEditor} initTag={tag} {onConformEditTag} />
-<JsonView {event} {tag} bind:isOpen={openJsonView} />
+<JsonView {event} {tag} bind:isOpen={openJsonView} {setRelayHint} {editable} />

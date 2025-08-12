@@ -10,16 +10,15 @@
 		getRelaysById,
 		useRelayEventTracking,
 		type RelayEventStatus,
-		type OverallStatus,
-		useReq
+		type OverallStatus
 	} from '$lib/nostr/nostrSubscriptions';
 	import { writable, type Writable } from 'svelte/store';
 	import { onDestroy, tick } from 'svelte';
 	import Metadata from '../Nostr/Metadata.svelte';
 	import { t } from '@konemono/svelte5-i18n';
 	import { publishEvent } from '$lib/nostr/publish';
-	import { queryClient } from '$lib/utils/stores.svelte';
-	import type { QueryKey } from '@tanstack/svelte-query';
+
+	import EventActions from '../EventActions.svelte';
 
 	interface Props {
 		tag: string[];
@@ -51,7 +50,7 @@
 	let foundEvent: Writable<Event | null> = $state(writable(null));
 	let overallStatus: Writable<OverallStatus | null> = $state(writable(null));
 	let cleanupFunction: (() => void) | null = null;
-	let seenOnList: string[] = $state([]);
+	let seenOnRelays: string[] = $state([]);
 
 	const searchEvent = () => {
 		if (filter) {
@@ -61,7 +60,7 @@
 
 			overallStatus.set(null);
 			foundEvent.set(null);
-			seenOnList = [];
+			seenOnRelays = [];
 
 			const {
 				relayEventStatus,
@@ -76,7 +75,7 @@
 
 			const eventUnsubscribe = foundEvent.subscribe((e) => {
 				if (e) {
-					seenOnList = getRelaysById(e.id);
+					seenOnRelays = getRelaysById(e.id);
 				}
 			});
 
@@ -192,26 +191,13 @@
 						{/snippet}
 					</Metadata>
 				{/if}
-				{#if $foundEvent}
-					<button
-						class="mt-2 btn preset-outlined-secondary-500"
-						onclick={() => bloadcastEvent($foundEvent)}>{$t('common.bloadcast')}</button
-					>
-				{/if}
-				{#if seenOnList.length > 0}
-					<h3 class="mt-4 mb-2 font-semibold">{$t('common.seen_on_relays')}:</h3>
-
-					{#each seenOnList as relay}
-						<div class="flex w-full flex-wrap gap-1">
-							{#if editable}
-								<button
-									class="preset-outlined-primary-500 btn-sm"
-									onclick={() => setRelayHint?.(relay)}>{$t('common.set_relay_hint')}</button
-								>{/if}
-							{relay}
-						</div>
-					{/each}
-				{/if}
+				<EventActions
+					event={$foundEvent}
+					{seenOnRelays}
+					{bloadcastEvent}
+					{setRelayHint}
+					{editable}
+				/>
 			</div>
 			<Dialog.Close
 				class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"

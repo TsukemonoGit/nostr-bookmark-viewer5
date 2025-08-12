@@ -1,15 +1,27 @@
 <script lang="ts">
+	import EventActions from '$lib/components/EventActions.svelte';
+	import { getRelaysById } from '$lib/nostr/nostrSubscriptions';
+	import { publishEvent } from '$lib/nostr/publish';
+	import { queryClient } from '$lib/utils/stores.svelte';
+	import { t } from '@konemono/svelte5-i18n';
 	import { X } from '@lucide/svelte';
 	import { Dialog } from 'bits-ui';
 	import { type Event as NostrEvent } from 'nostr-typedef';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		tag: string[];
 		event: NostrEvent | null;
 		isOpen?: boolean;
+		editable?: boolean;
+		setRelayHint?: (relay: string) => void;
 	}
-	let { event, isOpen = $bindable(false), tag }: Props = $props();
+	let { event, isOpen = $bindable(false), tag, setRelayHint, editable = false }: Props = $props();
+	const bloadcastEvent = async (ev: NostrEvent) => {
+		await publishEvent(ev, $t('common.bloadcast'));
 
+		isOpen = false;
+	};
 	let formattedJson = $derived(formatEvent(event));
 	function formatEvent(ev: NostrEvent | null): string | null {
 		if (!ev) return null;
@@ -19,6 +31,15 @@
 			return null;
 		}
 	}
+	let seenOnRelays: string[] = $state([]);
+	$effect(() => {
+		if (isOpen && event) {
+			untrack(() => {
+				//開くごとに更新
+				seenOnRelays = getRelaysById(event.id);
+			});
+		}
+	});
 	//$inspect(isOpen);
 </script>
 
@@ -51,6 +72,8 @@
 			{:else}
 				<div class="rounded-lg px-4 py-2 text-center shadow-md">イベントが見つかりませんでした</div>
 			{/if}
+			<EventActions {event} {seenOnRelays} {bloadcastEvent} {setRelayHint} {editable} />
+
 			<Dialog.Close
 				class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
 			>
