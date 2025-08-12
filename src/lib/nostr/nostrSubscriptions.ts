@@ -213,6 +213,7 @@ export function useReq(
 	const result = createQuery<EventPacket | null, Error>({
 		queryKey,
 		queryFn: ({ signal }) => {
+			//りフェッチクエリーしたときにuniqueリセットされてほしいからここに書く
 			const keyFn = (packet: EventPacket): string => packet.event.id;
 			const [unique, uniMap] = createUniq(keyFn);
 
