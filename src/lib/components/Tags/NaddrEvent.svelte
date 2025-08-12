@@ -8,9 +8,7 @@
 	import Naddr from '../Nostr/Naddr.svelte';
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import SearchEvent from './SearchEvent.svelte';
-	import { tick } from 'svelte';
-	import type { QueryKey } from '@tanstack/svelte-query';
-	import type { Event } from 'nostr-typedef';
+
 	let {
 		tag,
 		setRelayHint,
@@ -25,14 +23,7 @@
 	// リレーURLの有効性チェック
 	let validRelayUrl = $derived(relayUrl && relayUrl !== '' ? [relayUrl] : undefined);
 	let view = $state(true);
-	const bloadcast = async (event: Event) => {
-		const client = queryClient.get();
-		if (!client) return;
-		view = false;
-		client.removeQueries({ queryKey: [naddrId] as QueryKey });
-		await tick();
-		view = true;
-	};
+	let retryWithRelay = $state(false);
 </script>
 
 <!-- NoteEventRenderer with Metadataのsnippet定義 -->
@@ -51,30 +42,25 @@
 {/snippet}
 
 {#if naddrId && view}
-	<Naddr id={naddrId}>
+	<Naddr
+		id={naddrId}
+		{...retryWithRelay && validRelayUrl ? { relays: validRelayUrl } : {}}
+		onNodata={() => {
+			if (!retryWithRelay && validRelayUrl && validRelayUrl.length > 0) {
+				queryClient.get()?.removeQueries({ queryKey: [naddrId] });
+				retryWithRelay = true;
+			}
+		}}
+	>
 		{#snippet loading()}
 			<EmptyCard>Loading {naddrAdress}</EmptyCard>
 		{/snippet}
 		{#snippet nodata()}
-			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
-			{#if validRelayUrl && validRelayUrl.length > 0}
-				{#await queryClient.get()?.removeQueries({ queryKey: [naddrId] }) then}
-					<Naddr id={naddrId} relays={validRelayUrl}>
-						{#snippet loading()}
-							<EmptyCard>Loading {naddrAdress}</EmptyCard>
-						{/snippet}
-						{#snippet nodata()}
-							<SearchEvent {tag} {setRelayHint} {editable} {bloadcast}
-								>Nodata {naddrAdress}</SearchEvent
-							>
-						{/snippet}
-						{#snippet content({ event })}
-							{@render eventWithMetadata(event)}
-						{/snippet}
-					</Naddr>{/await}
+			{#if !retryWithRelay}
+				<EmptyCard>Retrying with relay...</EmptyCard>
 			{:else}
-				<SearchEvent {bloadcast} {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent
-				>{/if}
+				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent>
+			{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render eventWithMetadata(event)}

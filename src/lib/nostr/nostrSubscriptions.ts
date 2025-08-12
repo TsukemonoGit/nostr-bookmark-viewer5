@@ -22,18 +22,12 @@ import { createTie } from './operators';
 import { bookmarkableTagsSet, defaultRelays } from '$lib/utils/constants';
 import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 import { relayStateMap } from '$lib/utils/stores.svelte';
-import {
-	createQuery,
-	useQueryClient,
-	type QueryKey,
-	type CreateQueryResult,
-	type QueryObserverResult
-} from '@tanstack/svelte-query';
+import { createQuery, type QueryKey, type CreateQueryResult } from '@tanstack/svelte-query';
 import { derived, writable, type Writable } from 'svelte/store';
 
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
 	verifier,
-	eoseTimeout: 7000,
+	eoseTimeout: 5000,
 	okTimeout: 3000,
 	authenticator: 'auto' //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
 });
