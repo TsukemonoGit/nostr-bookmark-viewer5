@@ -1,11 +1,9 @@
-<!--Note.svelte-->
 <script lang="ts">
-	import { useReq, type ReqStatus } from '$lib/nostr/nostrSubscriptions';
-	import type { QueryKey } from '@tanstack/svelte-query';
+	import { useReq } from '$lib/nostr/nostrSubscriptions';
+	import type { CreateQueryResult } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
-	import { createUniq, type EventPacket } from 'rx-nostr';
+	import type { EventPacket } from 'rx-nostr';
 	import { untrack, type Snippet } from 'svelte';
-	import type { Readable } from 'svelte/store';
 
 	interface Props {
 		relays?: string[] | undefined;
@@ -17,47 +15,33 @@
 		onChange?: (data: Nostr.Event) => void;
 	}
 
-	let { relays = undefined, id, error, loading, nodata, content, onChange }: Props = $props();
+	let { relays, id, error, loading, nodata, content, onChange }: Props = $props();
 
-	let queryKey: QueryKey = $derived([id] as QueryKey);
+	let queryKey = $derived([id]);
 	let filters = $derived([{ ids: [id], limit: 1 }]);
-
 	let max3relays = $derived(relays?.slice(0, 3));
-	const keyFn = (packet: EventPacket): string => packet.event.id;
-	const [unique, eventIds] = createUniq(keyFn);
-	// useReqをリアクティブに呼び出し、結果を直接抽出
-	let result: {
-		data: Readable<EventPacket | null | undefined>;
-		status: Readable<ReqStatus>;
-		error: Readable<Error>;
-	} = $derived(
-		useReq(queryKey, filters, unique, max3relays) as {
-			data: Readable<EventPacket | null | undefined>;
-			status: Readable<ReqStatus>;
-			error: Readable<Error>;
-		}
-	);
-	let data = $derived(result.data);
-	let status = $derived(result.status);
-	let errorData = $derived(result.error);
 
-	// データが取得されたときにonChangeを呼び出す副作用
+	// useReq は unique を内部で持つため渡さない
+	let result: CreateQueryResult<EventPacket | null, Error> = $derived(
+		useReq(queryKey, filters, undefined, max3relays)
+	);
+	let data: EventPacket | null | undefined = $derived($result?.data);
+	// onChange呼び出し
 	$effect(() => {
-		const event = $data?.event;
-		if (event && onChange) {
+		if (data) {
 			untrack(() => {
-				onChange(event);
+				onChange?.(data.event);
 			});
 		}
 	});
 </script>
 
-{#if $status === 'loading' && !$data}
+{#if $result.isPending}
 	{@render loading?.()}
-{:else if $errorData}
-	{@render error?.($errorData)}
-{:else if $data && $data.event}
-	{@render content?.({ event: $data.event })}
+{:else if $result.isError}
+	{@render error?.($result.error)}
+{:else if data}
+	{@render content?.({ event: data.event })}
 {:else}
 	{@render nodata?.()}
 {/if}

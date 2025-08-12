@@ -8,14 +8,27 @@ import {
 	type OkPacket,
 	createUniq
 } from 'rx-nostr';
-import { Subscription, tap, type Observable, type OperatorFunction } from 'rxjs';
+import {
+	Subject,
+	Subscription,
+	takeUntil,
+	tap,
+	type Observable,
+	type OperatorFunction
+} from 'rxjs';
 import { verifier } from '@rx-nostr/crypto';
 import * as Nostr from 'nostr-typedef';
 import { createTie } from './operators';
 import { bookmarkableTagsSet, defaultRelays } from '$lib/utils/constants';
 import { bookmarkItemsMap, type BookmarkItem } from '$lib/types/bookmark.svelte';
 import { relayStateMap } from '$lib/utils/stores.svelte';
-import { createQuery, useQueryClient, type QueryKey } from '@tanstack/svelte-query';
+import {
+	createQuery,
+	useQueryClient,
+	type QueryKey,
+	type CreateQueryResult,
+	type QueryObserverResult
+} from '@tanstack/svelte-query';
 import { derived, writable, type Writable } from 'svelte/store';
 
 const rxNostr: ReturnType<typeof createRxNostr> = createRxNostr({
@@ -194,102 +207,60 @@ export type ReqStatus = 'loading' | 'success' | 'error' | 'nodata';
 export function useReq(
 	queryKey: QueryKey,
 	filters: Nostr.Filter[],
-	operator?: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
+	operator?: OperatorFunction<EventPacket, EventPacket> | undefined,
 	relays?: string[]
-) {
-	// console.log(filters);
-	const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
-	//console.log(_queryClient);
+): CreateQueryResult<EventPacket | null, Error> {
+	const result = createQuery<EventPacket | null, Error>({
+		queryKey,
+		queryFn: ({ signal }) => {
+			const keyFn = (packet: EventPacket): string => packet.event.id;
+			const [unique, uniMap] = createUniq(keyFn);
 
-	if (!_queryClient) {
-		console.log('!_queryClient error');
-		throw Error();
-	}
+			const req = createRxBackwardReq();
+			const obs = rxNostr.use(req, { relays }).pipe(tie, unique, operator ? operator : tap());
 
-	if (Object.entries(rxNostr.getDefaultRelays()).length <= 0) {
-		console.log('DefaultRelays error', queryKey);
-		throw Error();
-	}
-	// console.log(rxNostr.getDefaultRelays());
+			return new Promise<EventPacket | null>((resolve, reject) => {
+				const unsubscribe$ = new Subject<void>();
+				let hasData = false;
 
-	const req = createRxBackwardReq();
+				signal.addEventListener('abort', () => {
+					unsubscribe$.next();
+					unsubscribe$.complete();
+				});
 
-	const status = writable<ReqStatus>('loading');
-	const error = writable<Error>();
+				obs.pipe(takeUntil(unsubscribe$)).subscribe({
+					next: (data) => {
+						hasData = true;
+						// TanStack Queryのキャッシュを直接更新する
+						// resolveは最初のデータ取得時のみ
+						resolve(data);
 
-	//一定時間立って削除したデータの再取得できるように
-	const obs: Observable<EventPacket | EventPacket[]> = rxNostr.use(req, { relays: relays }).pipe(
-		tie,
-		operator ? operator : tap() // operatorがある場合は適用、ない場合は何もしないオペレーター(tapなど)
-	);
-
-	const query = createQuery({
-		queryKey: queryKey,
-		//staleTime: Infinity,
-		//gcTime: Infinity, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
-		queryFn: (): Promise<EventPacket | EventPacket[] | null> => {
-			return new Promise((resolve, reject) => {
-				let fulfilled = false;
-
-				obs.subscribe({
-					next: (v: EventPacket | EventPacket[]) => {
-						//  console.log(v);
-						//  clearTimeoutIfExists();
-						if (fulfilled) {
-							_queryClient.setQueryData(queryKey, v);
-						} else {
-							resolve(v);
-							fulfilled = true;
-						}
-					},
-
-					complete: () => {
-						//   clearTimeoutIfExists();
-						//console.log("complete");
-						status.set('success');
-
-						if (!fulfilled) {
-							resolve(null); // データが一度も来ていない場合は undefined を返す
-						}
+						// queryClient.setQueryData(queryKey, data);
 					},
 					error: (e) => {
-						//   clearTimeoutIfExists();
-						console.log('error', e);
-						status.set('error');
-						error.set(e);
-
-						if (!fulfilled) {
-							reject(e); // エラーの場合は Promise を reject
-							fulfilled = true;
+						reject(e);
+						unsubscribe$.next();
+						unsubscribe$.complete();
+					},
+					complete: () => {
+						// ストリームが完了したら、データがなければnullで解決
+						if (!hasData) {
+							resolve(null);
 						}
+						unsubscribe$.next();
+						unsubscribe$.complete();
 					}
 				});
+
 				req.emit(filters);
 				req.over();
 			});
-		}
+		},
+		staleTime: 60 * 1000,
+		gcTime: 10 * 60 * 1000
 	});
 
-	return {
-		data: derived(query, ($query) => $query.data),
-		status: derived([query, status], ([$query, $status]) => {
-			//console.log($query.data);
-			if ($query.isSuccess) {
-				return 'success';
-				// } else if ($query.isError) {
-				//   return "error";
-			} else {
-				return $status;
-			}
-		}),
-		error: derived([query, error], ([$query, $error]) => {
-			//  if ($query.isError) {
-			//       return $query.error;
-			//   } else {
-			return $error;
-			//  }
-		})
-	};
+	return result;
 }
 
 const maxWaitingTime = 5000; // 3秒

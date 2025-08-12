@@ -19,15 +19,15 @@
 	import { publishEvent } from '$lib/nostr/publish';
 
 	import EventActions from '../EventActions.svelte';
+	import { queryClient } from '$lib/utils/stores.svelte';
 
 	interface Props {
 		tag: string[];
 		children?: any;
 		editable?: boolean;
 		setRelayHint?: (relay: string) => void;
-		bloadcast?: (event: Event) => void;
 	}
-	let { tag, children, setRelayHint, editable = false, bloadcast }: Props = $props();
+	let { tag, children, setRelayHint, editable = false }: Props = $props();
 
 	let isOpen = $state(false);
 	let filter: Filter | null = $derived.by(() => {
@@ -98,9 +98,21 @@
 		}
 	});
 
-	const bloadcastEvent = async (event: Event) => {
-		await publishEvent(event, $t('common.bloadcast'));
-		bloadcast?.(event);
+	const bloadcastEvent = async (ev: Event) => {
+		await publishEvent(ev, $t('common.bloadcast'));
+
+		// 1. queryClientのインスタンスを取得
+		const client = queryClient.get();
+		if (!client) return;
+
+		// 2. 関連するクエリキーを特定
+		// イベントIDはtagの2番目の要素、つまりtag[1]に格納されていると仮定
+		const queryKeyToRefetch = [tag[1]];
+
+		// 3. キャッシュを無効化して再フェッチを強制
+		await client.invalidateQueries({ queryKey: queryKeyToRefetch });
+
+		// 4. ダイアログを閉じる
 		isOpen = false;
 	};
 </script>

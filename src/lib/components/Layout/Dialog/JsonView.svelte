@@ -15,22 +15,23 @@
 		isOpen?: boolean;
 		editable?: boolean;
 		setRelayHint?: (relay: string) => void;
-		bloadcast?: (event: NostrEvent) => void;
 	}
-	let {
-		event,
-		isOpen = $bindable(false),
-		tag,
-		setRelayHint,
-		editable = false,
-		bloadcast
-	}: Props = $props();
+	let { event, isOpen = $bindable(false), tag, setRelayHint, editable = false }: Props = $props();
 	const bloadcastEvent = async (ev: NostrEvent) => {
 		await publishEvent(ev, $t('common.bloadcast'));
-		/* 	const client = queryClient.get();
+
+		// 1. queryClientのインスタンスを取得
+		const client = queryClient.get();
 		if (!client) return;
-		client.refetchQueries({ queryKey: [tag[1]] }); */
-		bloadcast?.(ev);
+
+		// 2. 関連するクエリキーを特定
+		// イベントIDはtagの2番目の要素、つまりtag[1]に格納されていると仮定
+		const queryKeyToRefetch = [tag[1]];
+
+		// 3. キャッシュを無効化して再フェッチを強制
+		await client.invalidateQueries({ queryKey: queryKeyToRefetch });
+
+		// 4. ダイアログを閉じる
 		isOpen = false;
 	};
 	let formattedJson = $derived(formatEvent(event));

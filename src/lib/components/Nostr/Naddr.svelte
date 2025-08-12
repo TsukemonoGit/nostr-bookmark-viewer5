@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { useReq, type ReqStatus } from '$lib/nostr/nostrSubscriptions';
+	import { useReq } from '$lib/nostr/nostrSubscriptions';
 	import { parseNaddr } from '$lib/utils/util';
-	import type { QueryKey } from '@tanstack/svelte-query';
+	import type { QueryKey, CreateQueryResult } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
 	import { untrack, type Snippet } from 'svelte';
-	import type { Readable } from 'svelte/store';
 	import { pipe } from 'rxjs';
-	import { createUniq, latest, type EventPacket } from 'rx-nostr';
+	import { latest, type EventPacket } from 'rx-nostr';
 
 	interface Props {
-		relays?: string[] | undefined;
+		relays?: string[];
 		id: string; //<kind:pubkey:identifier>
 		error?: Snippet<[Error]>;
 		nodata?: Snippet;
@@ -20,8 +19,9 @@
 
 	let { relays = undefined, id, error, loading, nodata, content, onChange }: Props = $props();
 
+	// naddrを解析
 	let naddrAdress = $derived(parseNaddr(['a', id]));
-	let queryKey: QueryKey = $derived([id] as QueryKey);
+	let queryKey: QueryKey = $derived([id]);
 	let filters = $derived([
 		{
 			kinds: [naddrAdress.kind],
@@ -32,41 +32,37 @@
 	]);
 
 	let max3relays = $derived(relays?.slice(0, 3));
-	const keyFn = (packet: EventPacket): string => packet.event.id;
-	const [unique, eventIds] = createUniq(keyFn);
-	// useReqをリアクティブに呼び出し、結果を直接抽出
-	let result: {
-		data: Readable<EventPacket | null | undefined>;
-		status: Readable<ReqStatus>;
-		error: Readable<Error>;
-	} = $derived(
-		useReq(queryKey, filters, pipe(latest(), unique), max3relays) as {
-			data: Readable<EventPacket | null | undefined>;
-			status: Readable<ReqStatus>;
-			error: Readable<Error>;
-		}
-	);
-	let data = $derived(result.data);
-	let status = $derived(result.status);
-	let errorData = $derived(result.error);
 
-	// データが取得されたときにonChangeを呼び出す副作用
+	// CreateQueryResultを直接取得
+	let result: CreateQueryResult<EventPacket | null, Error> = $derived(
+		useReq(queryKey, filters, pipe(latest()), max3relays) as CreateQueryResult<
+			EventPacket | null,
+			Error
+		>
+	);
+
+	// onChange呼び出し（最新イベントIDの重複防止付き）
+	let lastEventId = $state<string | undefined>(undefined);
+
 	$effect(() => {
-		const event = $data?.event;
-		if (event && onChange) {
-			untrack(() => {
-				onChange(event);
-			});
+		if ($result?.data && 'event' in $result.data) {
+			const event = $result.data.event;
+			if (event.id !== lastEventId) {
+				lastEventId = event.id;
+				untrack(() => {
+					onChange?.(event);
+				});
+			}
 		}
 	});
 </script>
 
-{#if $status === 'loading' && !$data}
+{#if $result.isPending}
 	{@render loading?.()}
-{:else if $errorData}
-	{@render error?.($errorData)}
-{:else if $data && $data.event}
-	{@render content?.({ event: $data.event })}
+{:else if $result.isError}
+	{@render error?.($result.error)}
+{:else if $result.data && 'event' in $result.data}
+	{@render content?.({ event: $result.data.event })}
 {:else}
 	{@render nodata?.()}
 {/if}

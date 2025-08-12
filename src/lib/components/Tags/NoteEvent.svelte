@@ -8,9 +8,6 @@
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import { queryClient } from '$lib/utils/stores.svelte';
 	import SearchEvent from './SearchEvent.svelte';
-	import { tick } from 'svelte';
-	import { type QueryKey } from '@tanstack/svelte-query';
-	import type { Event } from 'nostr-typedef';
 
 	let { tag, setRelayHint, editable } = $props<{
 		tag: string[];
@@ -32,14 +29,6 @@
 	let validRelayUrl = $derived(relayUrl && relayUrl !== '' ? [relayUrl] : undefined);
 
 	let view = $state(true);
-	const bloadcast = async (event: Event) => {
-		const client = queryClient.get();
-		if (!client) return;
-		view = false;
-		client.removeQueries({ queryKey: [noteId] as QueryKey });
-		await tick();
-		view = true;
-	};
 </script>
 
 <!-- NoteEventRenderer with Metadataのsnippet定義 -->
@@ -71,16 +60,13 @@
 							<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 						{/snippet}
 						{#snippet nodata()}
-							<SearchEvent {bloadcast} {tag} {setRelayHint} {editable}
-								>Nodata {noteIdEncoded}</SearchEvent
-							>
+							<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>
 						{/snippet}
 						{#snippet content({ event })}
 							{@render noteWithMetadata(event)}
 						{/snippet}
 					</Note>{/await}{:else}
-				<SearchEvent {bloadcast} {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent
-				>{/if}
+				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render noteWithMetadata(event)}

@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { useReq, type ReqStatus } from '$lib/nostr/nostrSubscriptions';
-	import type { QueryKey } from '@tanstack/svelte-query';
+	import type { QueryKey, CreateQueryResult } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
 	import { latest, type EventPacket } from 'rx-nostr';
 	import { untrack, type Snippet } from 'svelte';
-	import type { Readable } from 'svelte/store';
 	import { pipe } from 'rxjs';
 
 	interface Props {
@@ -19,30 +18,19 @@
 
 	let { relays = undefined, pubkey, error, loading, nodata, content, onChange }: Props = $props();
 
-	let queryKey: QueryKey = $derived([`0:${pubkey}:`] as QueryKey);
-	let filters = $derived([{ kinds: [0], authors: [pubkey], limit: 1 }]);
+	let queryKey = $state([`0:${pubkey}:`] as const);
+	let filters = $state([{ kinds: [0], authors: [pubkey], limit: 1 }]);
+	let max3relays = $state(relays?.slice(0, 3));
 
-	let max3relays = $derived(relays?.slice(0, 3));
-
-	// useReqをリアクティブに呼び出し、結果を直接抽出
-	let result: {
-		data: Readable<EventPacket | null | undefined>;
-		status: Readable<ReqStatus>;
-		error: Readable<Error>;
-	} = $derived(
-		useReq(queryKey, filters, pipe(latest()), max3relays) as {
-			data: Readable<EventPacket | null | undefined>;
-			status: Readable<ReqStatus>;
-			error: Readable<Error>;
-		}
+	let result: CreateQueryResult<EventPacket | null, Error> = $state(
+		useReq(queryKey, filters, pipe(latest()), max3relays) as CreateQueryResult<
+			EventPacket | null,
+			Error
+		>
 	);
-	let data = $derived(result.data);
-	let status = $derived(result.status);
-	let errorData = $derived(result.error);
 
-	// データが取得されたときにonChangeを呼び出す副作用
 	$effect(() => {
-		const event = $data?.event;
+		const event = $result?.data?.event;
 		if (event && onChange) {
 			untrack(() => {
 				onChange(event);
@@ -51,12 +39,12 @@
 	});
 </script>
 
-{#if $status === 'loading' && !$data}
+{#if $result.isPending && !$result.data}
 	{@render loading?.()}
-{:else if $errorData}
-	{@render error?.($errorData)}
-{:else if $data && $data.event}
-	{@render content?.({ metadata: $data.event })}
+{:else if $result.isError}
+	{@render error?.($result.error)}
+{:else if $result.data && $result.data.event}
+	{@render content?.({ metadata: $result.data.event })}
 {:else}
 	{@render nodata?.()}
 {/if}
