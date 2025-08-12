@@ -8,7 +8,9 @@
 	import Naddr from '../Nostr/Naddr.svelte';
 	import { type Event as NostrEvent } from 'nostr-typedef';
 	import SearchEvent from './SearchEvent.svelte';
-
+	import { tick } from 'svelte';
+	import type { QueryKey } from '@tanstack/svelte-query';
+	import type { Event } from 'nostr-typedef';
 	let {
 		tag,
 		setRelayHint,
@@ -22,6 +24,15 @@
 
 	// リレーURLの有効性チェック
 	let validRelayUrl = $derived(relayUrl && relayUrl !== '' ? [relayUrl] : undefined);
+	let view = $state(true);
+	const bloadcast = async (event: Event) => {
+		const client = queryClient.get();
+		if (!client) return;
+		view = false;
+		client.removeQueries({ queryKey: [naddrId] as QueryKey });
+		await tick();
+		view = true;
+	};
 </script>
 
 <!-- NoteEventRenderer with Metadataのsnippet定義 -->
@@ -39,7 +50,7 @@
 	</Metadata>
 {/snippet}
 
-{#if naddrId}
+{#if naddrId && view}
 	<Naddr id={naddrId}>
 		{#snippet loading()}
 			<EmptyCard>Loading {naddrAdress}</EmptyCard>
@@ -53,14 +64,17 @@
 							<EmptyCard>Loading {naddrAdress}</EmptyCard>
 						{/snippet}
 						{#snippet nodata()}
-							<SearchEvent {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent>
+							<SearchEvent {tag} {setRelayHint} {editable} {bloadcast}
+								>Nodata {naddrAdress}</SearchEvent
+							>
 						{/snippet}
 						{#snippet content({ event })}
 							{@render eventWithMetadata(event)}
 						{/snippet}
 					</Naddr>{/await}
 			{:else}
-				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent>{/if}
+				<SearchEvent {bloadcast} {tag} {setRelayHint} {editable}>Nodata {naddrAdress}</SearchEvent
+				>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render eventWithMetadata(event)}

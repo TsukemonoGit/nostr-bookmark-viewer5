@@ -1,3 +1,4 @@
+<!--Note.svelte-->
 <script lang="ts">
 	import { useReq, type ReqStatus } from '$lib/nostr/nostrSubscriptions';
 	import type { QueryKey } from '@tanstack/svelte-query';
@@ -54,7 +55,7 @@
 	{@render loading?.()}
 {:else if $errorData}
 	{@render error?.($errorData)}
-{:else if $data?.event}
+{:else if $data && $data.event}
 	{@render content?.({ event: $data.event })}
 {:else}
 	{@render nodata?.()}

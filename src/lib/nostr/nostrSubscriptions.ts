@@ -224,8 +224,8 @@ export function useReq(
 
 	const query = createQuery({
 		queryKey: queryKey,
-		staleTime: Infinity,
-		gcTime: Infinity, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
+		//staleTime: Infinity,
+		//gcTime: Infinity, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
 		queryFn: (): Promise<EventPacket | EventPacket[] | null> => {
 			return new Promise((resolve, reject) => {
 				let fulfilled = false;

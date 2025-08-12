@@ -10,20 +10,25 @@
 		getRelaysById,
 		useRelayEventTracking,
 		type RelayEventStatus,
-		type OverallStatus
+		type OverallStatus,
+		useReq
 	} from '$lib/nostr/nostrSubscriptions';
 	import { writable, type Writable } from 'svelte/store';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import Metadata from '../Nostr/Metadata.svelte';
 	import { t } from '@konemono/svelte5-i18n';
+	import { publishEvent } from '$lib/nostr/publish';
+	import { queryClient } from '$lib/utils/stores.svelte';
+	import type { QueryKey } from '@tanstack/svelte-query';
 
 	interface Props {
 		tag: string[];
 		children?: any;
 		editable?: boolean;
 		setRelayHint?: (relay: string) => void;
+		bloadcast?: (event: Event) => void;
 	}
-	let { tag, children, setRelayHint, editable = false }: Props = $props();
+	let { tag, children, setRelayHint, editable = false, bloadcast }: Props = $props();
 
 	let isOpen = $state(false);
 	let filter: Filter | null = $derived.by(() => {
@@ -93,6 +98,12 @@
 			searchEvent();
 		}
 	});
+
+	const bloadcastEvent = async (event: Event) => {
+		await publishEvent(event, $t('common.bloadcast'));
+		bloadcast?.(event);
+		isOpen = false;
+	};
 </script>
 
 <div
@@ -181,7 +192,12 @@
 						{/snippet}
 					</Metadata>
 				{/if}
-
+				{#if $foundEvent}
+					<button
+						class="mt-2 btn preset-outlined-secondary-500"
+						onclick={() => bloadcastEvent($foundEvent)}>{$t('common.bloadcast')}</button
+					>
+				{/if}
 				{#if seenOnList.length > 0}
 					<h3 class="mt-4 mb-2 font-semibold">{$t('common.seen_on_relays')}:</h3>
 
