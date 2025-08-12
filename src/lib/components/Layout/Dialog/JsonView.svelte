@@ -67,7 +67,7 @@
 			<!-- イベントのJSON内容を表示する部分 -->
 			{#if formattedJson}
 				<div
-					class="mt-4 max-h-[70vh] overflow-auto rounded-lg bg-neutral-100 p-4 dark:bg-neutral-900"
+					class="mt-4 max-h-[30vh] overflow-auto rounded-lg bg-neutral-100 p-4 dark:bg-neutral-900"
 				>
 					<pre class="text-sm break-words whitespace-pre-wrap"><code>{formattedJson}</code></pre>
 				</div>
