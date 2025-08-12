@@ -29,7 +29,6 @@
 	let validRelayUrl = $derived(relayUrl && relayUrl !== '' ? [relayUrl] : undefined);
 
 	let view = $state(true);
-	let retryWithRelay = $state(false);
 </script>
 
 <!-- NoteEventRenderer with Metadataのsnippet定義 -->
@@ -48,25 +47,26 @@
 {/snippet}
 
 {#if noteId && view}
-	<Note
-		id={noteId}
-		{...retryWithRelay && validRelayUrl ? { relays: validRelayUrl } : {}}
-		onNodata={() => {
-			if (!retryWithRelay && validRelayUrl && validRelayUrl.length > 0) {
-				queryClient.get()?.removeQueries({ queryKey: [noteId] });
-				retryWithRelay = true;
-			}
-		}}
-	>
+	<Note id={noteId}>
 		{#snippet loading()}
 			<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
 		{/snippet}
 		{#snippet nodata()}
-			{#if !retryWithRelay}
-				<EmptyCard>Retrying with relay...</EmptyCard>
-			{:else}
-				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>
-			{/if}
+			<!-- リレーURLが指定されている場合の再試行する前にnodataになってるデータを削除 -->
+			{#if validRelayUrl && validRelayUrl.length > 0}
+				{#await queryClient.get()?.removeQueries({ queryKey: [noteId] }) then}
+					<Note id={noteId} relays={validRelayUrl}>
+						{#snippet loading()}
+							<EmptyCard>Loading {noteIdEncoded}</EmptyCard>
+						{/snippet}
+						{#snippet nodata()}
+							<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>
+						{/snippet}
+						{#snippet content({ event })}
+							{@render noteWithMetadata(event)}
+						{/snippet}
+					</Note>{/await}{:else}
+				<SearchEvent {tag} {setRelayHint} {editable}>Nodata {noteIdEncoded}</SearchEvent>{/if}
 		{/snippet}
 		{#snippet content({ event })}
 			{@render noteWithMetadata(event)}

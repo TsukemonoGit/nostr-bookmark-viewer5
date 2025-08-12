@@ -13,10 +13,9 @@
 		loading?: Snippet;
 		content?: Snippet<[{ event: Nostr.Event }]>;
 		onChange?: (data: Nostr.Event) => void;
-		onNodata?: () => void;
 	}
 
-	let { relays, id, error, loading, nodata, content, onChange, onNodata }: Props = $props();
+	let { relays, id, error, loading, nodata, content, onChange }: Props = $props();
 
 	let queryKey = $derived([id]);
 	let filters = $derived([{ ids: [id], limit: 1 }]);
@@ -27,21 +26,11 @@
 		useReq(queryKey, filters, undefined, max3relays)
 	);
 	let data: EventPacket | null | undefined = $derived($result?.data);
-
 	// onChange呼び出し
 	$effect(() => {
 		if (data) {
 			untrack(() => {
 				onChange?.(data.event);
-			});
-		}
-	});
-
-	// onNodata呼び出し
-	$effect(() => {
-		if (!$result.isPending && !$result.isError && !data) {
-			untrack(() => {
-				onNodata?.();
 			});
 		}
 	});

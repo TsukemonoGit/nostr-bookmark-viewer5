@@ -15,19 +15,9 @@
 		loading?: Snippet;
 		content?: Snippet<[{ event: Nostr.Event }]>;
 		onChange?: (data: Nostr.Event) => void;
-		onNodata?: () => void;
 	}
 
-	let {
-		relays = undefined,
-		id,
-		error,
-		loading,
-		nodata,
-		content,
-		onChange,
-		onNodata
-	}: Props = $props();
+	let { relays = undefined, id, error, loading, nodata, content, onChange }: Props = $props();
 
 	// naddrを解析
 	let naddrAdress = $derived(parseNaddr(['a', id]));
@@ -63,15 +53,6 @@
 					onChange?.(event);
 				});
 			}
-		}
-	});
-
-	// onNodata呼び出し
-	$effect(() => {
-		if (!$result.isPending && !$result.isError && (!$result.data || !('event' in $result.data))) {
-			untrack(() => {
-				onNodata?.();
-			});
 		}
 	});
 </script>
