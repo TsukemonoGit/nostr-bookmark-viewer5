@@ -83,7 +83,16 @@
 			{:else}
 				<div class="rounded-lg px-4 py-2 text-center shadow-md">イベントが見つかりませんでした</div>
 			{/if}
-			<EventActions {event} {seenOnRelays} {bloadcastEvent} {setRelayHint} {editable} />
+			<EventActions
+				{event}
+				{seenOnRelays}
+				{bloadcastEvent}
+				setRelayHint={(relay: string) => {
+					setRelayHint?.(relay);
+					isOpen = false;
+				}}
+				{editable}
+			/>
 
 			<Dialog.Close
 				class="focus-visible:ring-foreground focus-visible:ring-offset-background absolute top-5 right-5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-[0.98]"
