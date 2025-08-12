@@ -15,13 +15,22 @@
 		isOpen?: boolean;
 		editable?: boolean;
 		setRelayHint?: (relay: string) => void;
+		bloadcast?: (event: NostrEvent) => void;
 	}
-	let { event, isOpen = $bindable(false), tag, setRelayHint, editable = false }: Props = $props();
+	let {
+		event,
+		isOpen = $bindable(false),
+		tag,
+		setRelayHint,
+		editable = false,
+		bloadcast
+	}: Props = $props();
 	const bloadcastEvent = async (ev: NostrEvent) => {
 		await publishEvent(ev, $t('common.bloadcast'));
-		const client = queryClient.get();
+		/* 	const client = queryClient.get();
 		if (!client) return;
-		client.refetchQueries({ queryKey: [tag[1]] });
+		client.refetchQueries({ queryKey: [tag[1]] }); */
+		bloadcast?.(ev);
 		isOpen = false;
 	};
 	let formattedJson = $derived(formatEvent(event));

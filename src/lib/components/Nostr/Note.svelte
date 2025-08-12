@@ -3,7 +3,7 @@
 	import { useReq, type ReqStatus } from '$lib/nostr/nostrSubscriptions';
 	import type { QueryKey } from '@tanstack/svelte-query';
 	import type Nostr from 'nostr-typedef';
-	import type { EventPacket } from 'rx-nostr';
+	import { createUniq, type EventPacket } from 'rx-nostr';
 	import { untrack, type Snippet } from 'svelte';
 	import type { Readable } from 'svelte/store';
 
@@ -23,14 +23,15 @@
 	let filters = $derived([{ ids: [id], limit: 1 }]);
 
 	let max3relays = $derived(relays?.slice(0, 3));
-
+	const keyFn = (packet: EventPacket): string => packet.event.id;
+	const [unique, eventIds] = createUniq(keyFn);
 	// useReqをリアクティブに呼び出し、結果を直接抽出
 	let result: {
 		data: Readable<EventPacket | null | undefined>;
 		status: Readable<ReqStatus>;
 		error: Readable<Error>;
 	} = $derived(
-		useReq(queryKey, filters, undefined, max3relays) as {
+		useReq(queryKey, filters, unique, max3relays) as {
 			data: Readable<EventPacket | null | undefined>;
 			status: Readable<ReqStatus>;
 			error: Readable<Error>;

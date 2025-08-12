@@ -114,4 +114,4 @@
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
 <TagEditor bind:isOpen={openTagEditor} initTag={tag} {onConformEditTag} />
-<JsonView {event} {tag} bind:isOpen={openJsonView} {setRelayHint} {editable} />
+<JsonView {event} {tag} bind:isOpen={openJsonView} {setRelayHint} {bloadcast} {editable} />

@@ -6,7 +6,7 @@
 	import { untrack, type Snippet } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { pipe } from 'rxjs';
-	import { latest, type EventPacket } from 'rx-nostr';
+	import { createUniq, latest, type EventPacket } from 'rx-nostr';
 
 	interface Props {
 		relays?: string[] | undefined;
@@ -32,14 +32,15 @@
 	]);
 
 	let max3relays = $derived(relays?.slice(0, 3));
-
+	const keyFn = (packet: EventPacket): string => packet.event.id;
+	const [unique, eventIds] = createUniq(keyFn);
 	// useReqをリアクティブに呼び出し、結果を直接抽出
 	let result: {
 		data: Readable<EventPacket | null | undefined>;
 		status: Readable<ReqStatus>;
 		error: Readable<Error>;
 	} = $derived(
-		useReq(queryKey, filters, pipe(latest()), max3relays) as {
+		useReq(queryKey, filters, pipe(latest(), unique), max3relays) as {
 			data: Readable<EventPacket | null | undefined>;
 			status: Readable<ReqStatus>;
 			error: Readable<Error>;

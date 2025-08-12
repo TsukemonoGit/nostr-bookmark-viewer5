@@ -190,7 +190,6 @@ export function subscribeBookmarkData(pubkey: string) {
 	]);
 }
 export type ReqStatus = 'loading' | 'success' | 'error' | 'nodata';
-const keyFn = (packet: EventPacket): string => packet.event.id;
 
 export function useReq(
 	queryKey: QueryKey,
@@ -198,8 +197,6 @@ export function useReq(
 	operator?: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
 	relays?: string[]
 ) {
-	const [unique, eventIds] = createUniq(keyFn);
-
 	// console.log(filters);
 	const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
 	//console.log(_queryClient);
@@ -223,7 +220,6 @@ export function useReq(
 	//一定時間立って削除したデータの再取得できるように
 	const obs: Observable<EventPacket | EventPacket[]> = rxNostr.use(req, { relays: relays }).pipe(
 		tie,
-		unique,
 		operator ? operator : tap() // operatorがある場合は適用、ない場合は何もしないオペレーター(tapなど)
 	);
 
@@ -252,14 +248,11 @@ export function useReq(
 						//console.log("complete");
 						status.set('success');
 
-						eventIds.clear();
-
 						if (!fulfilled) {
 							resolve(null); // データが一度も来ていない場合は undefined を返す
 						}
 					},
 					error: (e) => {
-						eventIds.clear();
 						//   clearTimeoutIfExists();
 						console.log('error', e);
 						status.set('error');
