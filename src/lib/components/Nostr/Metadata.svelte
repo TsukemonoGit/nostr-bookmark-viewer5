@@ -18,11 +18,11 @@
 
 	let { relays = undefined, pubkey, error, loading, nodata, content, onChange }: Props = $props();
 
-	let queryKey = $state([`0:${pubkey}:`] as const);
-	let filters = $state([{ kinds: [0], authors: [pubkey], limit: 1 }]);
-	let max3relays = $state(relays?.slice(0, 3));
+	let queryKey = $derived([`0:${pubkey}:`] as const);
+	let filters = $derived([{ kinds: [0], authors: [pubkey], limit: 1 }]);
+	let max3relays = $derived(relays?.slice(0, 3));
 
-	let result: CreateQueryResult<EventPacket | null, Error> = $state(
+	let result: CreateQueryResult<EventPacket | null, Error> = $derived(
 		useReq(queryKey, filters, pipe(latest()), max3relays) as CreateQueryResult<
 			EventPacket | null,
 			Error
