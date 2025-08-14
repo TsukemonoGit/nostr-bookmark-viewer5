@@ -13,7 +13,7 @@
 	import ConfirmDeleteDialog from '../Layout/Dialog/ConfirmDeleteDialog.svelte';
 	import TagRenderer from './TagRenderer.svelte';
 	import type { DndTagItem } from '$lib/types/utiles';
-	import { loginUser } from '$lib/utils/stores.svelte';
+	import { commonMenu, loginUser } from '$lib/utils/stores.svelte';
 	import CreateNewTag from '../Layout/Dialog/CreateNewTag.svelte';
 	import MoveTagButton from './MoveTagButton.svelte';
 	import { get } from 'svelte/store';
@@ -545,15 +545,16 @@
 			<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-[0.3fr_0.7fr]">
 				<div>
 					<div
-						class="flex h-[240px] w-full items-center justify-center rounded bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+						class="flex h-[240px] w-full items-center justify-center rounded bg-gray-200 break-all text-gray-500 dark:bg-gray-700 dark:text-gray-400"
 					>
 						{#if selectedBookmark.image && selectedBookmark.image.trim() !== ''}
-							<img
-								loading="lazy"
-								src={selectedBookmark.image}
-								alt={selectedBookmark.title || ''}
-								class="h-[240px] w-full rounded object-cover"
-							/>
+							{#if commonMenu.get().light.checked}{selectedBookmark.image}{:else}
+								<img
+									loading="lazy"
+									src={selectedBookmark.image}
+									alt={selectedBookmark.title || ''}
+									class="h-[240px] w-full rounded object-cover"
+								/>{/if}
 						{:else}
 							<span class="text-lg">{$t('bookmark.noImage')}</span>
 						{/if}

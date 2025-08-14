@@ -1,11 +1,17 @@
 <script lang="ts">
 	import { DropdownMenu } from 'bits-ui';
 	import { Check } from '@lucide/svelte';
-	import { commonMenu } from '$lib/utils/stores.svelte';
+	import { commonMenu, type CommonMenuConfig } from '$lib/utils/stores.svelte';
 	import { t } from '@konemono/svelte5-i18n';
 
-	function toggleItem(index: number, checked: boolean) {
-		commonMenu.get()[index].checked = checked;
+	function toggleItem(id: keyof CommonMenuConfig, checked: boolean) {
+		commonMenu.update((current) => ({
+			...current,
+			[id]: {
+				...current[id],
+				checked
+			}
+		}));
 	}
 </script>
 
@@ -15,10 +21,10 @@
 	>
 	<DropdownMenu.Portal>
 		<DropdownMenu.Content class="rounded-md bg-surface-100 p-1 dark:bg-surface-900">
-			{#each commonMenu.get() as item, i}
+			{#each Object.entries(commonMenu.get()) as [id, item]}
 				<DropdownMenu.CheckboxItem
 					checked={item.checked}
-					onCheckedChange={(checked) => toggleItem(i, checked)}
+					onCheckedChange={(checked) => toggleItem(id as keyof CommonMenuConfig, checked)}
 					class="flex items-center gap-2 rounded px-2 py-1 hover:bg-surface-200 hover:dark:bg-surface-800"
 				>
 					<div class="w-4">

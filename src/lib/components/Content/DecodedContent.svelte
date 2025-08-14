@@ -3,6 +3,8 @@
 	import { nip19 } from 'nostr-tools';
 	import UrlDisplay from '../Layout/UrlDisplay.svelte';
 	import UserName from '../Layout/UserName.svelte';
+	import { commonMenu } from '$lib/utils/stores.svelte';
+	import Link from '../Layout/Link.svelte';
 
 	interface Props {
 		decoded: nip19.DecodedResult;
@@ -23,15 +25,21 @@
 			><UserName pubhex={decoded.data.pubkey} /></span
 		>
 	{:else}
-		<UrlDisplay
-			part={{
-				type: TokenType.URL,
-				content: `https://njump.me/${part.metadata?.plainNip19 || ''}`,
-				start: 0,
-				end: 0,
-				metadata: { text: part.content }
-			} as Token}
-		/>
+		{#if commonMenu.get().light.checked}<Link
+				class=" link break-all text-primary-300 underline hover:opacity-80"
+				href={`https://njump.me/${part.metadata?.plainNip19 || ''}`}
+				>{part.metadata?.text || part.content}</Link
+			>
+		{:else}
+			<UrlDisplay
+				part={{
+					type: TokenType.URL,
+					content: `https://njump.me/${part.metadata?.plainNip19 || ''}`,
+					start: 0,
+					end: 0,
+					metadata: { text: part.content }
+				} as Token}
+			/>{/if}
 		<!-- {:else if decoded.type === "nevent"}
     {@const relayHint = findRelayHint([
       ["e", decoded.data.id],

@@ -47,8 +47,14 @@
 	<div class="nostr-wrapper">
 		<div class="note-header">
 			<div class="note-avatar">
-				{#if profile?.picture}
+				{#if profile?.picture && !commonMenu.get().light.checked}
 					<UserAvatar url={profile?.picture} name={profile.name} />
+				{:else if profile?.name}
+					<div
+						class="flex h-full w-full items-center justify-center bg-neutral-300 text-center text-xs text-neutral-500 dark:bg-neutral-700 dark:text-neutral-500"
+					>
+						{profile?.name}
+					</div>
 				{:else}
 					<div class="avatar placeholder"></div>
 				{/if}
@@ -77,7 +83,7 @@
 			<div class="note-body">
 				{#if content}
 					{@render content()}
-					{#if warningText !== undefined && commonMenu.get()[0].checked}
+					{#if warningText !== undefined && commonMenu.get().enableWarning.checked}
 						<WarningHide text={warningText} />
 					{/if}
 				{:else}

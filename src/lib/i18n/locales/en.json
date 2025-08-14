@@ -1,175 +1,176 @@
 {
-  "title": "Shosai",
-  "description": "A tool to organize your Nostr bookmarks.",
-  "login": {
-    "heading": "Login with Nostr",
-    "subtitle": "Connect to Nostr to view your profile",
-    "button": "Login with Nostr",
-    "connecting": "Connecting...",
-    "needAccount": "Need a Nostr account?",
-    "tip": {
-      "installExtension": "Install a Nostr extension like Alby or Nos2x",
-      "useWebSigner": "or use a web signer service"
-    },
-    "success": "Login successful",
-    "error": {
-      "browserRequired": "Browser environment required",
-      "failed": "Login failed or cancelled"
-    }
-  },
-  "relay": {
-    "loadingRelayList": "Loading relay list...",
-    "loadingBookmarkData": "Loading bookmark data..."
-  },
-  "bookmark": {
-    "menu": "Menu",
-    "title": "Bookmarks",
-    "deleteItem": "Deleting item",
-    "removedFromMap": "Removed item from $bookmarkItemsMap",
-    "deleteError": "An error occurred during deletion",
-    "createNewList": "Creating new list",
-    "error": "Error",
-    "requiredDTag": "d tag is required",
-    "eventCreated": "Event to be created:",
-    "create": "Create",
-    "sections": {
-      "BookmarkList": "Bookmark List",
-      "Bookmarksets": "Bookmark Sets",
-      "Genericlists": "Generic Lists"
-    },
-    "noImage": "No Image",
-    "imageUrlPlaceholder": "Image URL",
-    "titlePlaceholder": "Title",
-    "descriptionPlaceholder": "Description",
-    "noTitle": "No Title",
-    "noDescription": "No Description",
-    "updatedAt": "Updated at",
-    "public": "Public",
-    "private": "Private",
-    "dragToSort": "Drag tags to sort",
-    "selectAll": "Select All",
-    "noSelection": "No bookmarks selected",
-    "selectedCountSuffix": " selected"
-  },
-  "bookmarkEdit": {
-    "title": "Edit Bookmark",
-    "description": "Edit the tags for this bookmark",
-    "noForm": "No suitable form found."
-  },
-  "moveBookmark": {
-    "trigger": "Move to another list",
-    "title": "Select destination for bookmark",
-    "sections": {
-      "BookmarkList": "Bookmarks",
-      "Bookmarksets": "Bookmark Sets",
-      "Genericlists": "Other lists"
-    },
-    "public": "Move to public list",
-    "private": "Move to private list"
-  },
-  "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "edit": "Edit",
-    "apply": "Apply",
-    "close": "Close",
-    "delete": "Delete",
-    "sending": "Sending...",
-    "sendingEvent": "Sending {action} event to relays.",
-    "eventUpdated": "Event updated on {count} relays.",
-    "error": "Error: {message}",
-    "unknownError": "Unknown error",
-    "publishSuccess": "Successfully {action}",
-    "publishFailed": "{action} Failed",
-    "publishError": "{action} Error",
-    "search_event": "Search Event",
-    "search": "Search",
-    "searching": "Searching...",
-    "overall_status": "Overall Status",
-    "waiting": "Waiting",
-    "event_not_found": "Event not found.",
-    "timeout": "Timed out. Event not found.",
-    "found_event": "Found Event",
-    "seen_on_relays": "Seen On Relays",
-    "set_relay_hint": "Set Relay Hint",
-    "bloadcast": "Bloadcast"
-  },
-  "deleteItem": {
-    "title": "Confirm Deletion",
-    "description": "Are you sure you want to delete {name}?"
-  },
-  "deleteConfirm": {
-    "trigger": "Delete",
-    "title": "Confirm Deletion",
-    "description": "Are you sure you want to delete the following {count} items from your bookmarks?"
-  },
-  "tagEditor": {
-    "mode": {
-      "selecting": "Selecting Mode",
-      "sorting": "Sorting Mode"
-    },
-    "actions": {
-      "publish": "Move (Add)",
-      "delete": "Delete",
-      "moveDelete": "Move (Delete)",
-      "move": "Move",
-      "tagAdd": "Add",
-      "update": "Update",
-      "updateRelayhint": "Update Relay Hint"
-    },
-    "errors": {
-      "noTagsSelected": "No tags selected for moving.",
-      "destinationNotFound": "Destination bookmark not found.",
-      "decryptionFailed": "Failed to decrypt existing private tags.",
-      "destinationEventCreationFailed": "Failed to create destination event.",
-      "moveFailed": "Failed to move tags.",
-      "noBookmarkSelected": "No bookmark selected.",
-      "editFailed": "Edit failed",
-      "noBookmarkSpecified": "No bookmark specified.",
-      "encryptionFailed": "Failed to encrypt tag.",
-      "privateUpdateFailed": "Failed to update tags. See console for details.",
-      "updateRelayhint": "Failed to update relay hint"
-    },
-    "success": {
-      "moveCompleted": "tags moved."
-    }
-  },
-  "hashtagForm": {
-    "label": "Hashtag",
-    "placeholder": "nostr",
-    "submit": "OK"
-  },
-  "urlForm": {
-    "urlLabel": "URL",
-    "urlPlaceholder": "https://example.com",
-    "titleLabel": "Title (optional)",
-    "titlePlaceholder": "Bookmark Title",
-    "submit": "OK"
-  },
-  "eventForm": {
-    "eventIdLabel": "Event ID / Note / Nevent",
-    "eventIdPlaceholder": "hex event ID, note1..., or nevent1...",
-    "relayLabel": "Relay URL (optional)",
-    "relayPlaceholder": "wss://relay.example.com",
-    "submit": "OK",
-    "errors": {
-      "invalidId": "Invalid ID"
-    }
-  },
-  "addressableForm": {
-    "addressableIdLabel": "Addressable ID / Naddr",
-    "addressableIdPlaceholder": "kind:pubkey:d-tag format, or naddr1...",
-    "relayLabel": "Relay URL (optional)",
-    "relayPlaceholder": "wss://relay.example.com",
-    "submit": "OK",
-    "errors": {
-      "invalidId": "Invalid ID"
-    }
-  },
-  "footer": {
-    "top": "Return to Top Page"
-  },
-  "commonMenu": {
-    "enableWarning": "Enable Warning Handling"
-  }
+	"title": "Shosai",
+	"description": "A tool to organize your Nostr bookmarks.",
+	"login": {
+		"heading": "Login with Nostr",
+		"subtitle": "Connect to Nostr to view your profile",
+		"button": "Login with Nostr",
+		"connecting": "Connecting...",
+		"needAccount": "Need a Nostr account?",
+		"tip": {
+			"installExtension": "Install a Nostr extension like Alby or Nos2x",
+			"useWebSigner": "or use a web signer service"
+		},
+		"success": "Login successful",
+		"error": {
+			"browserRequired": "Browser environment required",
+			"failed": "Login failed or cancelled"
+		}
+	},
+	"relay": {
+		"loadingRelayList": "Loading relay list...",
+		"loadingBookmarkData": "Loading bookmark data..."
+	},
+	"bookmark": {
+		"menu": "Menu",
+		"title": "Bookmarks",
+		"deleteItem": "Deleting item",
+		"removedFromMap": "Removed item from $bookmarkItemsMap",
+		"deleteError": "An error occurred during deletion",
+		"createNewList": "Creating new list",
+		"error": "Error",
+		"requiredDTag": "d tag is required",
+		"eventCreated": "Event to be created:",
+		"create": "Create",
+		"sections": {
+			"BookmarkList": "Bookmark List",
+			"Bookmarksets": "Bookmark Sets",
+			"Genericlists": "Generic Lists"
+		},
+		"noImage": "No Image",
+		"imageUrlPlaceholder": "Image URL",
+		"titlePlaceholder": "Title",
+		"descriptionPlaceholder": "Description",
+		"noTitle": "No Title",
+		"noDescription": "No Description",
+		"updatedAt": "Updated at",
+		"public": "Public",
+		"private": "Private",
+		"dragToSort": "Drag tags to sort",
+		"selectAll": "Select All",
+		"noSelection": "No bookmarks selected",
+		"selectedCountSuffix": " selected"
+	},
+	"bookmarkEdit": {
+		"title": "Edit Bookmark",
+		"description": "Edit the tags for this bookmark",
+		"noForm": "No suitable form found."
+	},
+	"moveBookmark": {
+		"trigger": "Move to another list",
+		"title": "Select destination for bookmark",
+		"sections": {
+			"BookmarkList": "Bookmarks",
+			"Bookmarksets": "Bookmark Sets",
+			"Genericlists": "Other lists"
+		},
+		"public": "Move to public list",
+		"private": "Move to private list"
+	},
+	"common": {
+		"save": "Save",
+		"cancel": "Cancel",
+		"edit": "Edit",
+		"apply": "Apply",
+		"close": "Close",
+		"delete": "Delete",
+		"sending": "Sending...",
+		"sendingEvent": "Sending {action} event to relays.",
+		"eventUpdated": "Event updated on {count} relays.",
+		"error": "Error: {message}",
+		"unknownError": "Unknown error",
+		"publishSuccess": "Successfully {action}",
+		"publishFailed": "{action} Failed",
+		"publishError": "{action} Error",
+		"search_event": "Search Event",
+		"search": "Search",
+		"searching": "Searching...",
+		"overall_status": "Overall Status",
+		"waiting": "Waiting",
+		"event_not_found": "Event not found.",
+		"timeout": "Timed out. Event not found.",
+		"found_event": "Found Event",
+		"seen_on_relays": "Seen On Relays",
+		"set_relay_hint": "Set Relay Hint",
+		"bloadcast": "Bloadcast"
+	},
+	"deleteItem": {
+		"title": "Confirm Deletion",
+		"description": "Are you sure you want to delete {name}?"
+	},
+	"deleteConfirm": {
+		"trigger": "Delete",
+		"title": "Confirm Deletion",
+		"description": "Are you sure you want to delete the following {count} items from your bookmarks?"
+	},
+	"tagEditor": {
+		"mode": {
+			"selecting": "Selecting Mode",
+			"sorting": "Sorting Mode"
+		},
+		"actions": {
+			"publish": "Move (Add)",
+			"delete": "Delete",
+			"moveDelete": "Move (Delete)",
+			"move": "Move",
+			"tagAdd": "Add",
+			"update": "Update",
+			"updateRelayhint": "Update Relay Hint"
+		},
+		"errors": {
+			"noTagsSelected": "No tags selected for moving.",
+			"destinationNotFound": "Destination bookmark not found.",
+			"decryptionFailed": "Failed to decrypt existing private tags.",
+			"destinationEventCreationFailed": "Failed to create destination event.",
+			"moveFailed": "Failed to move tags.",
+			"noBookmarkSelected": "No bookmark selected.",
+			"editFailed": "Edit failed",
+			"noBookmarkSpecified": "No bookmark specified.",
+			"encryptionFailed": "Failed to encrypt tag.",
+			"privateUpdateFailed": "Failed to update tags. See console for details.",
+			"updateRelayhint": "Failed to update relay hint"
+		},
+		"success": {
+			"moveCompleted": "tags moved."
+		}
+	},
+	"hashtagForm": {
+		"label": "Hashtag",
+		"placeholder": "nostr",
+		"submit": "OK"
+	},
+	"urlForm": {
+		"urlLabel": "URL",
+		"urlPlaceholder": "https://example.com",
+		"titleLabel": "Title (optional)",
+		"titlePlaceholder": "Bookmark Title",
+		"submit": "OK"
+	},
+	"eventForm": {
+		"eventIdLabel": "Event ID / Note / Nevent",
+		"eventIdPlaceholder": "hex event ID, note1..., or nevent1...",
+		"relayLabel": "Relay URL (optional)",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "Invalid ID"
+		}
+	},
+	"addressableForm": {
+		"addressableIdLabel": "Addressable ID / Naddr",
+		"addressableIdPlaceholder": "kind:pubkey:d-tag format, or naddr1...",
+		"relayLabel": "Relay URL (optional)",
+		"relayPlaceholder": "wss://relay.example.com",
+		"submit": "OK",
+		"errors": {
+			"invalidId": "Invalid ID"
+		}
+	},
+	"footer": {
+		"top": "Return to Top Page"
+	},
+	"commonMenu": {
+		"enableWarning": "Enable Warning Handling",
+		"light": "Lite mode"
+	}
 }
